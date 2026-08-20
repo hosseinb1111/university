@@ -1,0 +1,49 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Logs
+*.log
+storage/logs/*
+logs/*
+
+# Cache
+storage/cache/*
+bootstrap/cache/*
+
+# Runtime
+storage/framework/*
+tmp/*
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database dumps
+*.sql
+*.sqlite
+*.sqlite3
+
+# Uploaded files
+public/uploads/*
+public/storage/*
+
+# Build files
+dist/
+build/
+
+# Frontend
+.next/
+out/
+
+# PHP tools
+.phpunit.result.cache
