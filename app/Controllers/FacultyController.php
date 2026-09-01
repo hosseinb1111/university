@@ -83,6 +83,12 @@ final class FacultyController
                 ?? 0
             );
 
+        $facultyName =
+            (string) (
+                $faculty['name']
+                ?? 'دانشکده'
+            );
+
         $programs =
             $facultyId > 0
                 ? Program::byFaculty(
@@ -96,12 +102,6 @@ final class FacultyController
                     $facultyId
                 )
                 : [];
-
-        $facultyName =
-            (string) (
-                $faculty['name']
-                ?? 'دانشکده'
-            );
 
         return View::renderIntoLayout(
             'layouts/app',
@@ -212,9 +212,6 @@ final class FacultyController
             'image' =>
                 '',
 
-            'dean_person_id' =>
-                null,
-
             'email' =>
                 '',
 
@@ -253,9 +250,6 @@ final class FacultyController
 
                 'faculty' =>
                     $faculty,
-
-                'people' =>
-                    People::active(),
 
                 'errors' =>
                     is_array($formErrors)
@@ -433,9 +427,6 @@ final class FacultyController
                 'faculty' =>
                     $faculty,
 
-                'people' =>
-                    People::active(),
-
                 'errors' =>
                     is_array($formErrors)
                         ? $formErrors
@@ -573,11 +564,6 @@ final class FacultyController
             );
         }
 
-        /*
-         * The faculty model owns dean_person_id.
-         * If a dean is assigned, keep the people record
-         * independent from the faculty itself.
-         */
         Session::flash(
             'success',
             'دانشکده با موفقیت ویرایش شد.'
@@ -619,10 +605,6 @@ final class FacultyController
             );
         }
 
-        /*
-         * The database schema uses ON DELETE CASCADE
-         * for programs belonging to a faculty.
-         */
         try {
             $deleted =
                 Faculty::delete(
@@ -677,10 +659,6 @@ final class FacultyController
      */
     private function input(): array
     {
-        $deanPersonId =
-            $_POST['dean_person_id']
-            ?? null;
-
         return [
             'slug' =>
                 trim(
@@ -714,11 +692,6 @@ final class FacultyController
                 $this->nullableString(
                     $_POST['image']
                     ?? null
-                ),
-
-            'dean_person_id' =>
-                $this->nullablePositiveId(
-                    $deanPersonId
                 ),
 
             'email' =>
@@ -878,20 +851,6 @@ final class FacultyController
                 'آدرس ایمیل معتبر نیست.';
         }
 
-        $deanPersonId =
-            $data['dean_person_id']
-            ?? null;
-
-        if (
-            $deanPersonId !== null
-            && People::find(
-                (int) $deanPersonId
-            ) === null
-        ) {
-            $errors['dean_person_id'] =
-                'عضو انتخاب‌شده برای ریاست دانشکده معتبر نیست.';
-        }
-
         $image =
             $data['image']
             ?? null;
@@ -1037,35 +996,6 @@ final class FacultyController
         return $value === ''
             ? null
             : $value;
-    }
-
-    /**
-     * Convert an optional positive ID.
-     */
-    private function nullablePositiveId(
-        mixed $value
-    ): ?int {
-        if (
-            $value === null
-            || $value === ''
-        ) {
-            return null;
-        }
-
-        $id =
-            filter_var(
-                $value,
-                FILTER_VALIDATE_INT,
-                [
-                    'options' => [
-                        'min_range' => 1,
-                    ],
-                ]
-            );
-
-        return $id === false
-            ? null
-            : (int) $id;
     }
 
     /**

@@ -1,113 +1,366 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Core\View;
+
+$announcement =
+    is_array(
+        $announcement ?? null
+    )
+        ? $announcement
+        : [];
+
+
+$title =
+    trim(
+        (string) (
+            $announcement['title']
+            ?? ''
+        )
+    );
+
+
+$excerpt =
+    trim(
+        (string) (
+            $announcement['excerpt']
+            ?? ''
+        )
+    );
+
+
+$content =
+    trim(
+        (string) (
+            $announcement['content']
+            ?? ''
+        )
+    );
+
+
+$featuredImage =
+    trim(
+        (string) (
+            $announcement['featured_image']
+            ?? ''
+        )
+    );
+
+
+$publishedAt =
+    $announcement['published_at']
+    ?? null;
+
+
+$expiresAt =
+    $announcement['expires_at']
+    ?? null;
+
+
+/*
+|--------------------------------------------------------------------------
+| Format date
+|--------------------------------------------------------------------------
+*/
+
+$formatDate =
+    static function (
+        mixed $value
+    ): string {
+
+        if (
+            !is_string($value)
+            || trim($value) === ''
+        ) {
+            return '';
+        }
+
+
+        if (
+            function_exists(
+                'jalali_date'
+            )
+        ) {
+
+            $jalali =
+                jalali_date(
+                    $value,
+                    'Y/m/d H:i'
+                );
+
+
+            if (
+                is_string($jalali)
+                && trim($jalali) !== ''
+            ) {
+                return $jalali;
+            }
+        }
+
+
+        $timestamp =
+            strtotime(
+                $value
+            );
+
+
+        if (
+            $timestamp === false
+        ) {
+            return '';
+        }
+
+
+        return date(
+            'Y/m/d H:i',
+            $timestamp
+        );
+    };
+
+
+/*
+|--------------------------------------------------------------------------
+| Expiration timestamp
+|--------------------------------------------------------------------------
+*/
+
+$expiresTimestamp =
+    false;
+
+
+if (
+    is_string($expiresAt)
+    && trim($expiresAt) !== ''
+) {
+
+    $expiresTimestamp =
+        strtotime(
+            $expiresAt
+        );
+}
+
 ?>
 
-<section class="public-announcement">
+<section class="announcement-detail">
 
-    <div class="container">
-
-        <article class="public-announcement__article">
-
-            <div class="public-announcement__meta">
-
-                <?php if (
-                    !empty(
-                        $announcement['published_at']
-                    )
-                ): ?>
-
-                    <?= View::escape(
-                        $announcement['published_at']
-                    ) ?>
-
-                <?php endif; ?>
-
-            </div>
+    <div class="announcement-detail__container">
 
 
-            <h1>
-                <?= View::escape(
-                    $announcement['title']
-                ) ?>
-            </h1>
+        <!-- =========================================================
+             BACK LINK
+        ========================================================== -->
 
+        <a
+            href="<?= View::url(
+                '/announcements'
+            ) ?>"
+            class="announcement-detail__back"
+        >
+
+            <span
+                aria-hidden="true"
+            >
+                →
+            </span>
+
+            <span>
+                بازگشت به اطلاعیه‌ها
+            </span>
+
+        </a>
+
+
+        <!-- =========================================================
+             ARTICLE
+        ========================================================== -->
+
+        <article
+            class="announcement-detail__article"
+        >
+
+
+            <!-- =====================================================
+                 FEATURED IMAGE
+            ====================================================== -->
 
             <?php if (
-                !empty(
-                    $announcement['featured_image']
-                )
+                $featuredImage !== ''
             ): ?>
 
                 <img
                     src="<?= View::escape(
-                        $announcement['featured_image']
+                        $featuredImage
                     ) ?>"
                     alt="<?= View::escape(
-                        $announcement['title']
+                        $title
                     ) ?>"
-                    class="public-announcement__image"
+                    class="announcement-detail__image"
                 >
 
             <?php endif; ?>
 
 
-            <?php if (
-                !empty(
-                    $announcement['excerpt']
-                )
-            ): ?>
+            <!-- =====================================================
+                 HEADER
+            ====================================================== -->
 
-                <p
-                    class="public-announcement__excerpt"
+            <header
+                class="announcement-detail__header"
+            >
+
+                <?php if (
+                    $publishedAt !== null
+                    && trim(
+                        (string) $publishedAt
+                    ) !== ''
+                ): ?>
+
+                    <div
+                        class="announcement-detail__meta"
+                    >
+
+                        <time
+                            class="announcement-detail__date"
+                            datetime="<?= View::escape(
+                                (string) $publishedAt
+                            ) ?>"
+                        >
+                            <?= View::escape(
+                                $formatDate(
+                                    $publishedAt
+                                )
+                            ) ?>
+                        </time>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <h1
+                    class="announcement-detail__title"
                 >
                     <?= View::escape(
-                        $announcement['excerpt']
+                        $title
                     ) ?>
-                </p>
+                </h1>
+
+
+                <?php if (
+                    $excerpt !== ''
+                ): ?>
+
+                    <p
+                        class="announcement-detail__excerpt"
+                    >
+                        <?= View::escape(
+                            $excerpt
+                        ) ?>
+                    </p>
+
+                <?php endif; ?>
+
+            </header>
+
+
+            <!-- =====================================================
+                 EXPIRATION COUNTDOWN
+            ====================================================== -->
+
+            <?php if (
+                $expiresTimestamp !== false
+            ): ?>
+
+                <div
+                    class="announcement-detail__countdown"
+                    data-countdown
+                    data-countdown-target="<?= (int) (
+                        $expiresTimestamp * 1000
+                    ) ?>"
+                >
+
+                    <span
+                        class="announcement-detail__countdown-label"
+                    >
+                        زمان باقی‌مانده تا پایان نمایش
+                    </span>
+
+
+                    <strong
+                        class="announcement-detail__countdown-value"
+                        data-countdown-value
+                    >
+                        در حال محاسبه...
+                    </strong>
+
+                </div>
 
             <?php endif; ?>
 
 
-            <div class="public-announcement__content">
+            <!-- =====================================================
+                 CONTENT
+            ====================================================== -->
+
+            <div
+                class="announcement-detail__content"
+            >
 
                 <?php
+
                 /*
-                 * For now this remains escaped plain text.
+                 * Keep announcement content as plain text.
                  *
-                 * Once we add a controlled rich-text editor,
-                 * HTML sanitization will be implemented before
-                 * allowing formatted HTML.
+                 * Newlines become line breaks visually,
+                 * while HTML entered by an administrator
+                 * remains escaped.
                  */
+
+                $safeContent =
+                    View::escape(
+                        $content
+                    );
+
                 ?>
 
                 <?= nl2br(
-                    View::escape(
-                        $announcement['content']
-                    )
+                    $safeContent
                 ) ?>
 
             </div>
 
-
-            <div
-                style="
-                    margin-top:40px;
-                "
-            >
-
-                <a
-                    href="<?= View::route(
-                        'announcements.index'
-                    ) ?>"
-                    class="button button--secondary"
-                >
-                    بازگشت به اطلاعیه‌ها
-                </a>
-
-            </div>
-
         </article>
+
+
+        <!-- =========================================================
+             BOTTOM NAVIGATION
+        ========================================================== -->
+
+        <div
+            class="announcement-detail__bottom"
+        >
+
+            <a
+                href="<?= View::url(
+                    '/announcements'
+                ) ?>"
+                class="button button--secondary"
+            >
+                ← همه اطلاعیه‌ها
+            </a>
+
+
+            <a
+                href="<?= View::url(
+                    '/'
+                ) ?>"
+                class="button button--primary"
+            >
+                صفحه اصلی
+            </a>
+
+        </div>
 
     </div>
 

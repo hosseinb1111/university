@@ -1,0 +1,478 @@
+/*
+|--------------------------------------------------------------------------
+| English — Buttons
+|--------------------------------------------------------------------------
+| Base .english-button + primary/secondary variants, and the shared
+| flex/gap/stacking behavior used by every button group across pages.
+|
+| Full light/dark theme support.
+|
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   BASE BUTTON
+========================================================================== */
+
+.english-button {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        44px;
+
+    padding:
+        10px
+        17px;
+
+    margin:
+        0;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:
+        11px;
+
+    flex:
+        0
+        0
+        auto;
+
+    text-decoration:
+        none;
+
+    text-align:
+        center;
+
+    white-space:
+        nowrap;
+
+    vertical-align:
+        middle;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.2;
+
+    cursor:
+        pointer;
+
+    transition:
+        background-color var(--english-transition),
+        border-color var(--english-transition),
+        color var(--english-transition),
+        box-shadow var(--english-transition),
+        transform var(--english-transition);
+}
+
+
+.english-button:hover {
+    transform:
+        translateY(-1px);
+}
+
+
+.english-button:active {
+    transform:
+        translateY(0)
+        scale(0.985);
+}
+
+
+/* ==========================================================================
+   PRIMARY BUTTON
+========================================================================== */
+
+.english-button--primary {
+    background:
+        var(--english-primary);
+
+    color:
+        var(--english-background);
+
+    border-color:
+        var(--english-primary);
+
+    box-shadow:
+        var(--english-shadow-sm);
+}
+
+
+.english-button--primary:hover {
+    background:
+        var(--english-primary-hover);
+
+    border-color:
+        var(--english-primary-hover);
+
+    color:
+        var(--english-background);
+
+    box-shadow:
+        var(--english-shadow-md);
+}
+
+
+/* ==========================================================================
+   SECONDARY BUTTON
+========================================================================== */
+
+.english-button--secondary {
+    background:
+        var(--english-surface);
+
+    border-color:
+        var(--english-border);
+
+    color:
+        var(--english-text);
+
+    box-shadow:
+        var(--english-shadow-xs);
+}
+
+
+.english-button--secondary:hover {
+    background:
+        var(--english-surface-soft);
+
+    border-color:
+        var(--english-border-strong);
+
+    color:
+        var(--english-text);
+
+    box-shadow:
+        var(--english-shadow-sm);
+}
+
+
+/* ==========================================================================
+   BUTTON FOCUS
+========================================================================== */
+
+.english-button:focus-visible {
+    outline:
+        3px
+        solid
+        var(--english-focus);
+
+    outline-offset:
+        3px;
+}
+
+
+/* ==========================================================================
+   BUTTON DISABLED
+========================================================================== */
+
+.english-button:disabled,
+.english-button[aria-disabled="true"] {
+    opacity:
+        0.55;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+
+    box-shadow:
+        none;
+}
+
+
+/* ==========================================================================
+   SHARED BUTTON WIDTH
+========================================================================== */
+
+.english-button--primary,
+.english-button--secondary {
+    min-width:
+        130px;
+}
+
+
+/* ==========================================================================
+   SHARED BUTTON GROUPS
+========================================================================== */
+
+.english-home-slide__actions,
+.english-home-fallback-hero__actions,
+.english-home-about__links,
+.english-home-contact__actions,
+.english-contact-cta__actions,
+.english-faculty-cta__actions,
+.english-program-detail-cta__actions {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-start;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        10px;
+
+    margin-top:
+        24px;
+}
+
+
+/* ==========================================================================
+   SHARED CTA INNER LAYOUT
+========================================================================== */
+
+.english-home-contact__inner,
+.english-contact-cta__inner,
+.english-faculty-cta__inner,
+.english-program-detail-cta__inner {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        40px;
+}
+
+
+.english-home-contact__actions,
+.english-contact-cta__actions,
+.english-faculty-cta__actions,
+.english-program-detail-cta__actions {
+    margin-top:
+        0;
+
+    flex:
+        0
+        0
+        auto;
+}
+
+
+.english-home-contact__inner > div:first-child,
+.english-contact-cta__inner > div:first-child,
+.english-faculty-cta__inner > div:first-child,
+.english-program-detail-cta__inner > div:first-child {
+    min-width:
+        0;
+
+    flex:
+        1
+        1
+        auto;
+}
+
+
+/* ==========================================================================
+   DARK THEME REFINEMENT
+|--------------------------------------------------------------------------
+| Keep buttons integrated with the dark English design rather than simply
+| inverting their colors.
+|--------------------------------------------------------------------------
+*/
+
+html[data-theme="dark"]
+.english-button--primary {
+    background:
+        var(--english-primary);
+
+    border-color:
+        var(--english-primary);
+
+    color:
+        #101317;
+
+    box-shadow:
+        0
+        8px
+        22px
+        rgba(
+            0,
+            0,
+            0,
+            0.26
+        );
+}
+
+
+html[data-theme="dark"]
+.english-button--primary:hover {
+    background:
+        var(--english-primary-hover);
+
+    border-color:
+        var(--english-primary-hover);
+
+    color:
+        #101317;
+
+    box-shadow:
+        0
+        11px
+        28px
+        rgba(
+            0,
+            0,
+            0,
+            0.34
+        );
+}
+
+
+html[data-theme="dark"]
+.english-button--secondary {
+    background:
+        var(--english-surface);
+
+    border-color:
+        var(--english-border);
+
+    color:
+        var(--english-text);
+
+    box-shadow:
+        0
+        4px
+        16px
+        rgba(
+            0,
+            0,
+            0,
+            0.16
+        );
+}
+
+
+html[data-theme="dark"]
+.english-button--secondary:hover {
+    background:
+        var(--english-surface-soft);
+
+    border-color:
+        var(--english-border-strong);
+
+    color:
+        var(--english-text);
+
+    box-shadow:
+        0
+        8px
+        22px
+        rgba(
+            0,
+            0,
+            0,
+            0.24
+        );
+}
+
+
+/* ==========================================================================
+   MOBILE
+========================================================================== */
+
+@media (max-width: 700px) {
+
+    .english-home-slide__actions,
+    .english-home-fallback-hero__actions,
+    .english-home-about__links,
+    .english-home-contact__actions,
+    .english-contact-cta__actions,
+    .english-faculty-cta__actions,
+    .english-program-detail-cta__actions {
+
+        width:
+            100%;
+
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+
+        margin-top:
+            20px;
+    }
+
+
+    .english-home-slide__actions .english-button,
+    .english-home-fallback-hero__actions .english-button,
+    .english-home-about__links .english-button,
+    .english-home-contact__actions .english-button,
+    .english-contact-cta__actions .english-button,
+    .english-faculty-cta__actions .english-button,
+    .english-program-detail-cta__actions .english-button {
+
+        width:
+            100%;
+
+        min-width:
+            0;
+    }
+
+
+    .english-home-contact__inner,
+    .english-contact-cta__inner,
+    .english-faculty-cta__inner,
+    .english-program-detail-cta__inner {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap:
+            25px;
+    }
+
+
+    .english-home-contact__actions,
+    .english-contact-cta__actions,
+    .english-faculty-cta__actions,
+    .english-program-detail-cta__actions {
+
+        width:
+            100%;
+    }
+
+}
+
+
+/* ==========================================================================
+   REDUCED MOTION
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .english-button {
+        transition:
+            none;
+    }
+
+}

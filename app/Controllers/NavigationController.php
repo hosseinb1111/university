@@ -14,7 +14,7 @@ use App\Models\Page;
 final class NavigationController
 {
     /**
-     * List navigation items.
+     * Navigation administration page.
      */
     public function index(): string
     {
@@ -30,15 +30,70 @@ final class NavigationController
 
                 'success' =>
                     $this->successMessage(),
+
+                'error' =>
+                    $this->errorMessage(),
             ]
         );
     }
 
     /**
-     * Create form.
+     * Create navigation item form.
      */
     public function create(): string
     {
+        $form =
+            Session::getFlash(
+                'navigation_form'
+            );
+
+        $errors =
+            Session::getFlash(
+                'navigation_errors'
+            );
+
+        $item = [
+            'parent_id' =>
+                null,
+
+            'display_location' =>
+                'main',
+
+            'page_id' =>
+                null,
+
+            'title' =>
+                '',
+
+            'description' =>
+                '',
+
+            'url' =>
+                '',
+
+            'destination_type' =>
+                'page',
+
+            'target' =>
+                '_self',
+
+            'sort_order' =>
+                0,
+
+            'is_active' =>
+                1,
+        ];
+
+        if (
+            is_array($form)
+        ) {
+            $item =
+                array_merge(
+                    $item,
+                    $form
+                );
+        }
+
         return View::renderIntoLayout(
             'layouts/admin',
             'admin/navigation/create',
@@ -46,26 +101,22 @@ final class NavigationController
                 'title' =>
                     'افزودن آیتم منو | صدرا',
 
-                'item' => [
-                    'parent_id' => '',
-                    'page_id' => '',
-                    'title' => '',
-                    'url' => '',
-                    'target' => '_self',
-                    'sort_order' => 0,
-                    'is_active' => 1,
-                ],
+                'item' =>
+                    $item,
 
                 'parents' =>
                     Navigation::parentOptions(),
 
                 'pages' =>
-                    Page::paginate(
-                        1,
-                        100
-                    )['items'],
+                    $this->pages(),
 
-                'errors' => [],
+                'errors' =>
+                    is_array($errors)
+                        ? $errors
+                        : [],
+
+                'errorMessage' =>
+                    $this->errorMessage(),
             ]
         );
     }
@@ -77,11 +128,13 @@ final class NavigationController
     {
         Csrf::requireValid();
 
-        $data = $this->collectInput();
+        $data =
+            $this->collectInput();
 
-        $errors = $this->validate(
-            $data
-        );
+        $errors =
+            $this->validate(
+                $data
+            );
 
         if (
             $errors !== []
@@ -116,9 +169,15 @@ final class NavigationController
     public function edit(
         string $id
     ): string {
-        $item = Navigation::find(
-            (int) $id
-        );
+        $itemId =
+            $this->positiveId(
+                $id
+            );
+
+        $item =
+            Navigation::find(
+                $itemId
+            );
 
         if (
             $item === null
@@ -127,6 +186,33 @@ final class NavigationController
                 'آیتم منوی مورد نظر پیدا نشد.'
             );
         }
+
+        $form =
+            Session::getFlash(
+                'navigation_form'
+            );
+
+        $errors =
+            Session::getFlash(
+                'navigation_errors'
+            );
+
+        if (
+            is_array($form)
+        ) {
+            $item =
+                array_merge(
+                    $item,
+                    $form
+                );
+        }
+
+        $item['destination_type'] =
+            !empty(
+                $item['page_id']
+            )
+                ? 'page'
+                : 'url';
 
         return View::renderIntoLayout(
             'layouts/admin',
@@ -140,16 +226,19 @@ final class NavigationController
 
                 'parents' =>
                     Navigation::parentOptions(
-                        (int) $id
+                        $itemId
                     ),
 
                 'pages' =>
-                    Page::paginate(
-                        1,
-                        100
-                    )['items'],
+                    $this->pages(),
 
-                'errors' => [],
+                'errors' =>
+                    is_array($errors)
+                        ? $errors
+                        : [],
+
+                'errorMessage' =>
+                    $this->errorMessage(),
             ]
         );
     }
@@ -162,7 +251,10 @@ final class NavigationController
     ): never {
         Csrf::requireValid();
 
-        $itemId = (int) $id;
+        $itemId =
+            $this->positiveId(
+                $id
+            );
 
         if (
             Navigation::find(
@@ -174,12 +266,14 @@ final class NavigationController
             );
         }
 
-        $data = $this->collectInput();
+        $data =
+            $this->collectInput();
 
-        $errors = $this->validate(
-            $data,
-            $itemId
-        );
+        $errors =
+            $this->validate(
+                $data,
+                $itemId
+            );
 
         if (
             $errors !== []
@@ -201,10 +295,26 @@ final class NavigationController
             );
         }
 
-        Navigation::update(
-            $itemId,
-            $data
-        );
+        $updated =
+            Navigation::update(
+                $itemId,
+                $data
+            );
+
+        if (
+            !$updated
+        ) {
+            Session::flash(
+                'error',
+                'ویرایش آیتم منو انجام نشد.'
+            );
+
+            Response::redirect(
+                '/admin/navigation/'
+                . $itemId
+                . '/edit'
+            );
+        }
 
         Response::redirect(
             '/admin/navigation?success=updated'
@@ -219,15 +329,23 @@ final class NavigationController
     ): never {
         Csrf::requireValid();
 
-        $itemId = (int) $id;
+        $itemId =
+            $this->positiveId(
+                $id
+            );
 
         if (
             Navigation::find(
                 $itemId
             ) === null
         ) {
-            Response::notFound(
-                'آیتم منوی مورد نظر پیدا نشد.'
+            Session::flash(
+                'error',
+                'آیتم مورد نظر پیدا نشد.'
+            );
+
+            Response::redirect(
+                '/admin/navigation'
             );
         }
 
@@ -242,13 +360,32 @@ final class NavigationController
 
     /**
      * Collect form input.
+     *
+     * @return array<string, mixed>
      */
     private function collectInput(): array
     {
-        $parentId = null;
+        $displayLocation =
+            Navigation::normalizeDisplayLocation(
+                $_POST['display_location']
+                ?? 'main'
+            );
+
+        $destinationType =
+            $_POST['destination_type']
+            ?? 'page';
+
+        $destinationType =
+            $destinationType === 'url'
+                ? 'url'
+                : 'page';
+
+        $parentId =
+            null;
 
         if (
-            isset(
+            $displayLocation === 'main'
+            && isset(
                 $_POST['parent_id']
             )
             && $_POST['parent_id'] !== ''
@@ -259,14 +396,17 @@ final class NavigationController
             if (
                 $parentId <= 0
             ) {
-                $parentId = null;
+                $parentId =
+                    null;
             }
         }
 
-        $pageId = null;
+        $pageId =
+            null;
 
         if (
-            isset(
+            $destinationType === 'page'
+            && isset(
                 $_POST['page_id']
             )
             && $_POST['page_id'] !== ''
@@ -277,26 +417,40 @@ final class NavigationController
             if (
                 $pageId <= 0
             ) {
-                $pageId = null;
+                $pageId =
+                    null;
             }
         }
 
-        $target =
-            Navigation::normalizeTarget(
-                $_POST['target']
-                ?? '_self'
+        $url =
+            trim(
+                (string) (
+                    $_POST['url']
+                    ?? ''
+                )
             );
 
-        $url = trim(
-            (string) (
-                $_POST['url']
-                ?? ''
-            )
-        );
+        if (
+            $destinationType !== 'url'
+        ) {
+            $url =
+                '';
+        }
+
+        $description =
+            trim(
+                (string) (
+                    $_POST['description']
+                    ?? ''
+                )
+            );
 
         return [
             'parent_id' =>
                 $parentId,
+
+            'display_location' =>
+                $displayLocation,
 
             'page_id' =>
                 $pageId,
@@ -309,13 +463,24 @@ final class NavigationController
                     )
                 ),
 
+            'description' =>
+                $description === ''
+                    ? null
+                    : $description,
+
             'url' =>
                 $url === ''
                     ? null
                     : $url,
 
+            'destination_type' =>
+                $destinationType,
+
             'target' =>
-                $target,
+                Navigation::normalizeTarget(
+                    $_POST['target']
+                    ?? '_self'
+                ),
 
             'sort_order' =>
                 (int) (
@@ -327,13 +492,15 @@ final class NavigationController
                 isset(
                     $_POST['is_active']
                 )
-                ? 1
-                : 0,
+                    ? 1
+                    : 0,
         ];
     }
 
     /**
-     * Validate input.
+     * Validate navigation item.
+     *
+     * @return array<string, string>
      */
     private function validate(
         array $data,
@@ -353,18 +520,43 @@ final class NavigationController
             $title === ''
         ) {
             $errors['title'] =
-                'عنوان منو الزامی است.';
-        }
-
-        if (
+                'عنوان الزامی است.';
+        } elseif (
             mb_strlen(
                 $title,
                 'UTF-8'
             ) > 255
         ) {
             $errors['title'] =
-                'عنوان منو نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.';
+                'عنوان نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.';
         }
+
+        $description =
+            $data['description']
+            ?? null;
+
+        if (
+            is_string($description)
+            && mb_strlen(
+                $description,
+                'UTF-8'
+            ) > 500
+        ) {
+            $errors['description'] =
+                'توضیحات نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد.';
+        }
+
+        $displayLocation =
+            Navigation::normalizeDisplayLocation(
+                $data['display_location']
+                ?? 'main'
+            );
+
+        $destinationType =
+            ($data['destination_type']
+            ?? 'page') === 'url'
+                ? 'url'
+                : 'page';
 
         $pageId =
             $data['page_id']
@@ -379,21 +571,36 @@ final class NavigationController
             );
 
         if (
-            $pageId === null
-            && $url === ''
+            $destinationType === 'page'
         ) {
-            $errors['destination'] =
-                'یک صفحه یا یک آدرس برای منو انتخاب کنید.';
-        }
-
-        if (
-            $pageId !== null
-            && Page::find(
-                (int) $pageId
-            ) === null
-        ) {
-            $errors['page_id'] =
-                'صفحه انتخاب شده وجود ندارد.';
+            if (
+                $pageId === null
+            ) {
+                $errors['destination'] =
+                    'یک صفحه مقصد انتخاب کنید.';
+            } elseif (
+                Page::find(
+                    (int) $pageId
+                ) === null
+            ) {
+                $errors['page_id'] =
+                    'صفحه انتخاب‌شده وجود ندارد.';
+            }
+        } else {
+            if (
+                $url === ''
+            ) {
+                $errors['destination'] =
+                    'یک آدرس مستقیم وارد کنید.';
+            } elseif (
+                mb_strlen(
+                    $url,
+                    'UTF-8'
+                ) > 500
+            ) {
+                $errors['url'] =
+                    'آدرس نمی‌تواند بیشتر از ۵۰۰ کاراکتر باشد.';
+            }
         }
 
         $parentId =
@@ -401,15 +608,35 @@ final class NavigationController
             ?? null;
 
         if (
-            $parentId !== null
+            $displayLocation === 'quick'
         ) {
             if (
+                $parentId !== null
+            ) {
+                $errors['parent_id'] =
+                    'آیتم‌های دسترسی سریع باید در سطح اصلی باشند.';
+            }
+        } elseif (
+            $parentId !== null
+        ) {
+            $parent =
                 Navigation::find(
                     (int) $parentId
-                ) === null
+                );
+
+            if (
+                $parent === null
             ) {
                 $errors['parent_id'] =
                     'آیتم والد وجود ندارد.';
+            } elseif (
+                (
+                    $parent['display_location']
+                    ?? 'main'
+                ) !== 'main'
+            ) {
+                $errors['parent_id'] =
+                    'آیتم انتخاب‌شده نمی‌تواند والد باشد.';
             } elseif (
                 $ignoreId !== null
                 && Navigation::wouldCreateCycle(
@@ -426,7 +653,28 @@ final class NavigationController
     }
 
     /**
-     * Operation message.
+     * Load pages for navigation destination.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function pages(): array
+    {
+        $result =
+            Page::paginate(
+                1,
+                100
+            );
+
+        return is_array(
+            $result['items']
+            ?? null
+        )
+            ? $result['items']
+            : [];
+    }
+
+    /**
+     * Success message.
      */
     private function successMessage(): ?string
     {
@@ -441,12 +689,57 @@ final class NavigationController
                 'آیتم منو با موفقیت حذف شد.',
         ];
 
-        $key = (string) (
-            $_GET['success']
-            ?? ''
-        );
+        $key =
+            (string) (
+                $_GET['success']
+                ?? ''
+            );
 
         return $messages[$key]
             ?? null;
+    }
+
+    /**
+     * Error flash message.
+     */
+    private function errorMessage(): ?string
+    {
+        $error =
+            Session::getFlash(
+                'error'
+            );
+
+        return is_string($error)
+            && $error !== ''
+                ? $error
+                : null;
+    }
+
+    /**
+     * Validate positive route ID.
+     */
+    private function positiveId(
+        string $id
+    ): int {
+        $value =
+            filter_var(
+                $id,
+                FILTER_VALIDATE_INT,
+                [
+                    'options' => [
+                        'min_range' => 1,
+                    ],
+                ]
+            );
+
+        if (
+            $value === false
+        ) {
+            Response::notFound(
+                'شناسه آیتم منو معتبر نیست.'
+            );
+        }
+
+        return (int) $value;
     }
 }

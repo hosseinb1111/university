@@ -4,7 +4,15 @@ declare(strict_types=1);
 
 use App\Controllers\AnnouncementController;
 use App\Controllers\DocumentController;
+use App\Controllers\EnglishAdminController;
+use App\Controllers\EnglishAnnouncementController;
 use App\Controllers\EnglishController;
+use App\Controllers\EnglishFacultyController;
+use App\Controllers\EnglishHomepageServiceController;
+use App\Controllers\EnglishHomepageSlideController;
+use App\Controllers\EnglishPeopleController;
+use App\Controllers\EnglishProgramController;
+use App\Controllers\EnglishResearchCenterController;
 use App\Controllers\FacultyController;
 use App\Controllers\HomeController;
 use App\Controllers\MediaController;
@@ -19,6 +27,9 @@ use App\Controllers\SeoController;
 use App\Controllers\TeacherController;
 use App\Controllers\UserController;
 use App\Controllers\HomepageSlideController;
+use App\Controllers\HomepageServiceController;
+use App\Controllers\SliderSettingsController;
+use App\Controllers\SiteSettingController;
 
 use App\Core\Csrf;
 use App\Core\Response;
@@ -29,6 +40,15 @@ use App\Core\View;
 use App\Middleware\RequireAuth;
 use App\Middleware\RequireRole;
 
+use App\Models\Announcement;
+use App\Models\Document;
+use App\Models\Faculty;
+use App\Models\HomepageService;
+use App\Models\HomepageSlide;
+use App\Models\Page;
+use App\Models\People;
+use App\Models\Program;
+use App\Models\ResearchCenter;
 use App\Models\User;
 
 
@@ -86,8 +106,41 @@ $seoController =
 $englishController =
     new EnglishController();
 
+$englishAdminController =
+    new EnglishAdminController();
+
+$englishAnnouncementController =
+    new EnglishAnnouncementController();
+
+$englishFacultyController =
+    new EnglishFacultyController();
+
+$englishProgramController =
+    new EnglishProgramController();
+
+$englishPeopleController =
+    new EnglishPeopleController();
+
+$englishResearchCenterController =
+    new EnglishResearchCenterController();
+
+$englishHomepageSlideController =
+    new EnglishHomepageSlideController();
+
+$englishHomepageServiceController =
+    new EnglishHomepageServiceController();
+
 $homepageSlideController =
     new HomepageSlideController();
+
+$homepageServiceController =
+    new HomepageServiceController();
+
+$sliderSettingsController =
+    new SliderSettingsController();
+
+$siteSettingController =
+    new SiteSettingController();
 
 
 /*
@@ -431,7 +484,13 @@ Router::get(
 
 /*
 |--------------------------------------------------------------------------
-| ENGLISH SITE
+| ENGLISH PUBLIC SITE
+|--------------------------------------------------------------------------
+*/
+
+/*
+|--------------------------------------------------------------------------
+| English Home
 |--------------------------------------------------------------------------
 */
 
@@ -444,6 +503,13 @@ Router::get(
     'english.home'
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| English About
+|--------------------------------------------------------------------------
+*/
+
 Router::get(
     '/english/about',
     [
@@ -452,6 +518,13 @@ Router::get(
     ],
     'english.about'
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| English Presidency
+|--------------------------------------------------------------------------
+*/
 
 Router::get(
     '/english/presidency',
@@ -462,6 +535,19 @@ Router::get(
     'english.presidency'
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| English Faculties
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+|
+| Public English faculty pages intentionally use EnglishController.
+| EnglishFacultyController is the ADMIN controller.
+|
+*/
+
 Router::get(
     '/english/faculties',
     [
@@ -470,6 +556,61 @@ Router::get(
     ],
     'english.faculties'
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| English Faculty Details
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/english/faculties/{slug}',
+    [
+        $englishController,
+        'faculty',
+    ],
+    'english.faculty.show'
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| English Programs
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/english/programs',
+    [
+        $englishController,
+        'programs',
+    ],
+    'english.programs'
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| English Program Details
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/english/programs/{slug}',
+    [
+        $englishController,
+        'program',
+    ],
+    'english.program.show'
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| English Research
+|--------------------------------------------------------------------------
+*/
 
 Router::get(
     '/english/research',
@@ -480,6 +621,13 @@ Router::get(
     'english.research'
 );
 
+
+/*
+|--------------------------------------------------------------------------
+| English Announcements
+|--------------------------------------------------------------------------
+*/
+
 Router::get(
     '/english/announcements',
     [
@@ -488,6 +636,29 @@ Router::get(
     ],
     'english.announcements'
 );
+
+
+/*
+|--------------------------------------------------------------------------
+| English Announcement Details
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/english/announcements/{slug}',
+    [
+        $englishController,
+        'announcement',
+    ],
+    'english.announcement.show'
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| English Contact
+|--------------------------------------------------------------------------
+*/
 
 Router::get(
     '/english/contact',
@@ -508,6 +679,7 @@ Router::get(
 Router::get(
     '/teacher/login',
     static function (): string {
+
         if (
             Session::authenticated()
         ) {
@@ -531,6 +703,7 @@ Router::get(
 Router::post(
     '/teacher/login',
     static function (): never {
+
         Csrf::requireValid();
 
         $username =
@@ -638,6 +811,7 @@ Router::post(
 Router::get(
     '/teacher/forgot-password',
     static function (): string {
+
         return View::renderIntoLayout(
             'layouts/app',
             'teacher/forgot-password',
@@ -653,6 +827,7 @@ Router::get(
 Router::post(
     '/teacher/forgot-password',
     static function (): never {
+
         Csrf::requireValid();
 
         $email =
@@ -679,13 +854,6 @@ Router::post(
             );
         }
 
-        /*
-         * Password-reset email delivery will be implemented
-         * by the password recovery service.
-         *
-         * We deliberately return the same response whether
-         * the email belongs to an account or not.
-         */
         Session::flash(
             'success',
             'اگر حسابی با این ایمیل وجود داشته باشد، لینک بازیابی ارسال خواهد شد.'
@@ -775,6 +943,7 @@ Router::post(
 Router::get(
     '/admin',
     static function (): string {
+
         $user =
             Session::user();
 
@@ -785,6 +954,497 @@ Router::get(
                 'teacher.login'
             );
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard statistics
+        |--------------------------------------------------------------------------
+        */
+
+        $stats = [
+            'announcements' =>
+                0,
+
+            'pages' =>
+                0,
+
+            'documents' =>
+                0,
+
+            'faculties' =>
+                0,
+
+            'programs' =>
+                0,
+
+            'people' =>
+                0,
+
+            'researchCenters' =>
+                0,
+
+            'slides' =>
+                0,
+
+            'services' =>
+                0,
+        ];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Announcements
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    Announcement::class,
+                    'count'
+                )
+            ) {
+
+                $stats['announcements'] =
+                    (int) Announcement::count();
+
+            } elseif (
+                method_exists(
+                    Announcement::class,
+                    'paginate'
+                )
+            ) {
+
+                $result =
+                    Announcement::paginate(
+                        1,
+                        1
+                    );
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['announcements'] =
+                        (int) (
+                            $result['total']
+                            ?? 0
+                        );
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard announcements count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pages
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    Page::class,
+                    'count'
+                )
+            ) {
+
+                $stats['pages'] =
+                    (int) Page::count();
+
+            } elseif (
+                method_exists(
+                    Page::class,
+                    'paginate'
+                )
+            ) {
+
+                $result =
+                    Page::paginate(
+                        1,
+                        1
+                    );
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['pages'] =
+                        (int) (
+                            $result['total']
+                            ?? 0
+                        );
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard pages count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Documents
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    Document::class,
+                    'count'
+                )
+            ) {
+
+                $stats['documents'] =
+                    (int) Document::count();
+
+            } elseif (
+                method_exists(
+                    Document::class,
+                    'paginate'
+                )
+            ) {
+
+                $result =
+                    Document::paginate(
+                        1,
+                        1
+                    );
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['documents'] =
+                        (int) (
+                            $result['total']
+                            ?? 0
+                        );
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard documents count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Faculties
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    Faculty::class,
+                    'countActive'
+                )
+            ) {
+
+                $stats['faculties'] =
+                    (int) Faculty::countActive();
+
+            } elseif (
+                method_exists(
+                    Faculty::class,
+                    'active'
+                )
+            ) {
+
+                $result =
+                    Faculty::active();
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['faculties'] =
+                        count($result);
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard faculties count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Programs
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    Program::class,
+                    'countActive'
+                )
+            ) {
+
+                $stats['programs'] =
+                    (int) Program::countActive();
+
+            } elseif (
+                method_exists(
+                    Program::class,
+                    'active'
+                )
+            ) {
+
+                $result =
+                    Program::active();
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['programs'] =
+                        count($result);
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard programs count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | People
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    People::class,
+                    'countActive'
+                )
+            ) {
+
+                $stats['people'] =
+                    (int) People::countActive();
+
+            } elseif (
+                method_exists(
+                    People::class,
+                    'active'
+                )
+            ) {
+
+                $result =
+                    People::active();
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['people'] =
+                        count($result);
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard people count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Research Centers
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    ResearchCenter::class,
+                    'countActive'
+                )
+            ) {
+
+                $stats['researchCenters'] =
+                    (int) ResearchCenter::countActive();
+
+            } elseif (
+                method_exists(
+                    ResearchCenter::class,
+                    'active'
+                )
+            ) {
+
+                $result =
+                    ResearchCenter::active();
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['researchCenters'] =
+                        count($result);
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard research centers count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Homepage Slides
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    HomepageSlide::class,
+                    'count'
+                )
+            ) {
+
+                $stats['slides'] =
+                    (int) HomepageSlide::count();
+
+            } elseif (
+                method_exists(
+                    HomepageSlide::class,
+                    'latest'
+                )
+            ) {
+
+                $result =
+                    HomepageSlide::latest(
+                        1000
+                    );
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['slides'] =
+                        count($result);
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard slides count failed: '
+                . $e->getMessage()
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Homepage Services
+        |--------------------------------------------------------------------------
+        */
+
+        try {
+
+            if (
+                method_exists(
+                    HomepageService::class,
+                    'count'
+                )
+            ) {
+
+                $stats['services'] =
+                    (int) HomepageService::count();
+
+            } elseif (
+                method_exists(
+                    HomepageService::class,
+                    'latest'
+                )
+            ) {
+
+                $result =
+                    HomepageService::latest(
+                        1000
+                    );
+
+                if (
+                    is_array($result)
+                ) {
+
+                    $stats['services'] =
+                        count($result);
+                }
+            }
+
+        } catch (
+            \Throwable $e
+        ) {
+
+            error_log(
+                'Dashboard services count failed: '
+                . $e->getMessage()
+            );
+        }
+
 
         return View::renderIntoLayout(
             'layouts/admin',
@@ -797,10 +1457,627 @@ Router::get(
                     User::publicData(
                         $user
                     ),
+
+                'stats' =>
+                    $stats,
             ]
         );
     },
     'admin.dashboard',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english',
+    [
+        $englishAdminController,
+        'index',
+    ],
+    'admin.english',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN HOMEPAGE
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/home',
+    [
+        $englishAdminController,
+        'home',
+    ],
+    'admin.english.home',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/home',
+    [
+        $englishAdminController,
+        'updateHome',
+    ],
+    'admin.english.home.update',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN SLIDER
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/slider',
+    [
+        $englishAdminController,
+        'slider',
+    ],
+    'admin.english.slider',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/slider',
+    [
+        $englishAdminController,
+        'updateSlider',
+    ],
+    'admin.english.slider.update',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN HOMEPAGE SLIDES
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/slides',
+    [
+        $englishHomepageSlideController,
+        'index',
+    ],
+    'admin.english.slides.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/slides/create',
+    [
+        $englishHomepageSlideController,
+        'create',
+    ],
+    'admin.english.slides.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/slides',
+    [
+        $englishHomepageSlideController,
+        'store',
+    ],
+    'admin.english.slides.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/slides/{id}/edit',
+    [
+        $englishHomepageSlideController,
+        'edit',
+    ],
+    'admin.english.slides.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/slides/{id}',
+    [
+        $englishHomepageSlideController,
+        'update',
+    ],
+    'admin.english.slides.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/slides/{id}/delete',
+    [
+        $englishHomepageSlideController,
+        'delete',
+    ],
+    'admin.english.slides.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN HOMEPAGE SERVICES
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/services',
+    [
+        $englishHomepageServiceController,
+        'index',
+    ],
+    'admin.english.services.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/services/create',
+    [
+        $englishHomepageServiceController,
+        'create',
+    ],
+    'admin.english.services.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/services',
+    [
+        $englishHomepageServiceController,
+        'store',
+    ],
+    'admin.english.services.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/services/{id}/edit',
+    [
+        $englishHomepageServiceController,
+        'edit',
+    ],
+    'admin.english.services.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/services/{id}',
+    [
+        $englishHomepageServiceController,
+        'update',
+    ],
+    'admin.english.services.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/services/{id}/delete',
+    [
+        $englishHomepageServiceController,
+        'delete',
+    ],
+    'admin.english.services.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN STATIC PAGES
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/pages/{page}',
+    [
+        $englishAdminController,
+        'page',
+    ],
+    'admin.english.page',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/pages/{page}',
+    [
+        $englishAdminController,
+        'updatePage',
+    ],
+    'admin.english.page.update',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN ANNOUNCEMENTS
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/announcements',
+    [
+        $englishAnnouncementController,
+        'index',
+    ],
+    'admin.english.announcements.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/announcements/create',
+    [
+        $englishAnnouncementController,
+        'create',
+    ],
+    'admin.english.announcements.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/announcements',
+    [
+        $englishAnnouncementController,
+        'store',
+    ],
+    'admin.english.announcements.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/announcements/{id}/edit',
+    [
+        $englishAnnouncementController,
+        'edit',
+    ],
+    'admin.english.announcements.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/announcements/{id}',
+    [
+        $englishAnnouncementController,
+        'update',
+    ],
+    'admin.english.announcements.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/announcements/{id}/delete',
+    [
+        $englishAnnouncementController,
+        'delete',
+    ],
+    'admin.english.announcements.delete',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/announcements/{id}/publish',
+    [
+        $englishAnnouncementController,
+        'publish',
+    ],
+    'admin.english.announcements.publish',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/announcements/{id}/archive',
+    [
+        $englishAnnouncementController,
+        'archive',
+    ],
+    'admin.english.announcements.archive',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN FACULTIES
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/faculties',
+    [
+        $englishFacultyController,
+        'index',
+    ],
+    'admin.english.faculties.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/faculties/create',
+    [
+        $englishFacultyController,
+        'create',
+    ],
+    'admin.english.faculties.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/faculties',
+    [
+        $englishFacultyController,
+        'store',
+    ],
+    'admin.english.faculties.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/faculties/{id}/edit',
+    [
+        $englishFacultyController,
+        'edit',
+    ],
+    'admin.english.faculties.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/faculties/{id}',
+    [
+        $englishFacultyController,
+        'update',
+    ],
+    'admin.english.faculties.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/faculties/{id}/delete',
+    [
+        $englishFacultyController,
+        'delete',
+    ],
+    'admin.english.faculties.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN PROGRAMS
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/programs',
+    [
+        $englishProgramController,
+        'index',
+    ],
+    'admin.english.programs.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/programs/create',
+    [
+        $englishProgramController,
+        'create',
+    ],
+    'admin.english.programs.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/programs',
+    [
+        $englishProgramController,
+        'store',
+    ],
+    'admin.english.programs.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/programs/{id}/edit',
+    [
+        $englishProgramController,
+        'edit',
+    ],
+    'admin.english.programs.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/programs/{id}',
+    [
+        $englishProgramController,
+        'update',
+    ],
+    'admin.english.programs.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/programs/{id}/delete',
+    [
+        $englishProgramController,
+        'delete',
+    ],
+    'admin.english.programs.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN PEOPLE
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/people',
+    [
+        $englishPeopleController,
+        'index',
+    ],
+    'admin.english.people.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/people/create',
+    [
+        $englishPeopleController,
+        'create',
+    ],
+    'admin.english.people.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/people',
+    [
+        $englishPeopleController,
+        'store',
+    ],
+    'admin.english.people.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/people/{id}/edit',
+    [
+        $englishPeopleController,
+        'edit',
+    ],
+    'admin.english.people.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/people/{id}',
+    [
+        $englishPeopleController,
+        'update',
+    ],
+    'admin.english.people.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/people/{id}/delete',
+    [
+        $englishPeopleController,
+        'delete',
+    ],
+    'admin.english.people.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ENGLISH ADMIN RESEARCH CENTERS
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/english/research-centers',
+    [
+        $englishResearchCenterController,
+        'index',
+    ],
+    'admin.english.research-centers.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/research-centers/create',
+    [
+        $englishResearchCenterController,
+        'create',
+    ],
+    'admin.english.research-centers.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/research-centers',
+    [
+        $englishResearchCenterController,
+        'store',
+    ],
+    'admin.english.research-centers.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/english/research-centers/{id}/edit',
+    [
+        $englishResearchCenterController,
+        'edit',
+    ],
+    'admin.english.research-centers.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/research-centers/{id}',
+    [
+        $englishResearchCenterController,
+        'update',
+    ],
+    'admin.english.research-centers.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/english/research-centers/{id}/delete',
+    [
+        $englishResearchCenterController,
+        'delete',
+    ],
+    'admin.english.research-centers.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN SETTINGS
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/settings',
+    [
+        $siteSettingController,
+        'index',
+    ],
+    'admin.settings',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/settings',
+    [
+        $siteSettingController,
+        'update',
+    ],
+    'admin.settings.update',
     $contentAdminMiddleware
 );
 
@@ -1203,6 +2480,100 @@ Router::post(
         'delete',
     ],
     'admin.slides.delete',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN HOMEPAGE SLIDER SETTINGS
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/slider-settings',
+    [
+        $sliderSettingsController,
+        'index',
+    ],
+    'admin.slider-settings',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/slider-settings',
+    [
+        $sliderSettingsController,
+        'update',
+    ],
+    'admin.slider-settings.update',
+    $contentAdminMiddleware
+);
+
+
+/*
+|--------------------------------------------------------------------------
+| ADMIN HOMEPAGE SERVICES
+|--------------------------------------------------------------------------
+*/
+
+Router::get(
+    '/admin/services',
+    [
+        $homepageServiceController,
+        'index',
+    ],
+    'admin.services.index',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/services/create',
+    [
+        $homepageServiceController,
+        'create',
+    ],
+    'admin.services.create',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/services',
+    [
+        $homepageServiceController,
+        'store',
+    ],
+    'admin.services.store',
+    $contentAdminMiddleware
+);
+
+Router::get(
+    '/admin/services/{id}/edit',
+    [
+        $homepageServiceController,
+        'edit',
+    ],
+    'admin.services.edit',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/services/{id}',
+    [
+        $homepageServiceController,
+        'update',
+    ],
+    'admin.services.update',
+    $contentAdminMiddleware
+);
+
+Router::post(
+    '/admin/services/{id}/delete',
+    [
+        $homepageServiceController,
+        'delete',
+    ],
+    'admin.services.delete',
     $contentAdminMiddleware
 );
 

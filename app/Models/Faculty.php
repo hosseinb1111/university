@@ -17,27 +17,21 @@ final class Faculty
      */
     public static function active(): array
     {
-        $statement = Database::query(
-            '
-            SELECT
-                faculties.*,
+        $statement =
+            Database::query(
+                '
+                SELECT
+                    faculties.*
 
-                dean.first_name AS dean_first_name,
+                FROM faculties
 
-                dean.last_name AS dean_last_name
+                WHERE faculties.is_active = 1
 
-            FROM faculties
-
-            LEFT JOIN people AS dean
-                ON dean.id = faculties.dean_person_id
-
-            WHERE faculties.is_active = 1
-
-            ORDER BY
-                faculties.sort_order ASC,
-                faculties.name ASC
-            '
-        );
+                ORDER BY
+                    faculties.sort_order ASC,
+                    faculties.name ASC
+                '
+            );
 
         return $statement->fetchAll(
             PDO::FETCH_ASSOC
@@ -52,35 +46,30 @@ final class Faculty
     public static function findActiveBySlug(
         string $slug
     ): ?array {
-        $statement = Database::query(
-            '
-            SELECT
-                faculties.*,
+        $statement =
+            Database::query(
+                '
+                SELECT
+                    faculties.*
 
-                dean.first_name AS dean_first_name,
+                FROM faculties
 
-                dean.last_name AS dean_last_name
+                WHERE faculties.slug = :slug
 
-            FROM faculties
+                AND faculties.is_active = 1
 
-            LEFT JOIN people AS dean
-                ON dean.id = faculties.dean_person_id
+                LIMIT 1
+                ',
+                [
+                    ':slug' =>
+                        $slug,
+                ]
+            );
 
-            WHERE faculties.slug = :slug
-
-            AND faculties.is_active = 1
-
-            LIMIT 1
-            ',
-            [
-                ':slug' =>
-                    $slug,
-            ]
-        );
-
-        $faculty = $statement->fetch(
-            PDO::FETCH_ASSOC
-        );
+        $faculty =
+            $statement->fetch(
+                PDO::FETCH_ASSOC
+            );
 
         return $faculty === false
             ? null
@@ -102,18 +91,20 @@ final class Faculty
         int $page = 1,
         int $perPage = 20
     ): array {
-        $page = max(
-            1,
-            $page
-        );
+        $page =
+            max(
+                1,
+                $page
+            );
 
-        $perPage = max(
-            1,
-            min(
-                $perPage,
-                100
-            )
-        );
+        $perPage =
+            max(
+                1,
+                min(
+                    $perPage,
+                    100
+                )
+            );
 
         $offset =
             ($page - 1)
@@ -137,19 +128,9 @@ final class Faculty
             $pdo->prepare(
                 '
                 SELECT
-                    faculties.*,
-
-                    dean.first_name
-                        AS dean_first_name,
-
-                    dean.last_name
-                        AS dean_last_name
+                    faculties.*
 
                 FROM faculties
-
-                LEFT JOIN people AS dean
-                    ON dean.id =
-                       faculties.dean_person_id
 
                 ORDER BY
                     faculties.sort_order ASC,
@@ -212,19 +193,9 @@ final class Faculty
             Database::query(
                 '
                 SELECT
-                    faculties.*,
-
-                    dean.first_name
-                        AS dean_first_name,
-
-                    dean.last_name
-                        AS dean_last_name
+                    faculties.*
 
                 FROM faculties
-
-                LEFT JOIN people AS dean
-                    ON dean.id =
-                       faculties.dean_person_id
 
                 WHERE faculties.id = :id
 
@@ -256,7 +227,7 @@ final class Faculty
         int $userId
     ): int {
         /*
-         * The current faculties table does not have
+         * The faculties table does not have
          * created_by / updated_by fields.
          */
         Database::query(
@@ -267,7 +238,6 @@ final class Faculty
                 short_name,
                 description,
                 image,
-                dean_person_id,
                 email,
                 phone,
                 fax,
@@ -275,13 +245,13 @@ final class Faculty
                 sort_order,
                 is_active
             )
+
             VALUES (
                 :slug,
                 :name,
                 :short_name,
                 :description,
                 :image,
-                :dean_person_id,
                 :email,
                 :phone,
                 :fax,
@@ -307,10 +277,6 @@ final class Faculty
 
                 ':image' =>
                     $data['image']
-                    ?? null,
-
-                ':dean_person_id' =>
-                    $data['dean_person_id']
                     ?? null,
 
                 ':email' =>
@@ -371,8 +337,6 @@ final class Faculty
 
                 image = :image,
 
-                dean_person_id = :dean_person_id,
-
                 email = :email,
 
                 phone = :phone,
@@ -409,10 +373,6 @@ final class Faculty
                     $data['image']
                     ?? null,
 
-                ':dean_person_id' =>
-                    $data['dean_person_id']
-                    ?? null,
-
                 ':email' =>
                     $data['email']
                     ?? null,
@@ -447,9 +407,9 @@ final class Faculty
     /**
      * Delete a faculty.
      *
-     * Programs belonging to this faculty are deleted
-     * by the database because programs.faculty_id uses
-     * ON DELETE CASCADE.
+     * Programs belonging to a faculty are deleted
+     * by the database because programs.faculty_id
+     * uses ON DELETE CASCADE.
      */
     public static function delete(
         int $id
@@ -457,6 +417,7 @@ final class Faculty
         return Database::execute(
             '
             DELETE FROM faculties
+
             WHERE id = :id
             ',
             [
@@ -583,6 +544,7 @@ final class Faculty
             Database::query(
                 '
                 SELECT COUNT(*)
+
                 FROM faculties
 
                 WHERE is_active = 1
@@ -593,7 +555,7 @@ final class Faculty
     }
 
     /**
-     * Get one faculty by its exact slug regardless
+     * Get one faculty by exact slug regardless
      * of active state.
      *
      * Useful for admin operations.
@@ -607,19 +569,9 @@ final class Faculty
             Database::query(
                 '
                 SELECT
-                    faculties.*,
-
-                    dean.first_name
-                        AS dean_first_name,
-
-                    dean.last_name
-                        AS dean_last_name
+                    faculties.*
 
                 FROM faculties
-
-                LEFT JOIN people AS dean
-                    ON dean.id =
-                       faculties.dean_person_id
 
                 WHERE faculties.slug = :slug
 

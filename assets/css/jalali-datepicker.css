@@ -1,0 +1,170 @@
+/*
+ * Jalali datepicker popup styles.
+ * Everything is namespaced under .jdp- so it can't collide with
+ * existing admin/announcements/media CSS. Deliberately neutral
+ * (system font stack, CSS-var-first colors with plain fallbacks)
+ * so it blends into whatever admin theme is already in place rather
+ * than imposing a new visual style.
+ */
+
+.jdp-popup {
+    position: absolute;
+    z-index: 1000;
+    width: 280px;
+    box-sizing: border-box;
+    background: var(--admin-surface, #fff);
+    border: 1px solid var(--admin-border, #d9dce1);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    padding: 12px;
+    font-family: inherit;
+    direction: rtl;
+}
+
+.jdp-popup[hidden] {
+    display: none;
+}
+
+.jdp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.jdp-label {
+    flex: 1;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.jdp-nav {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: var(--admin-text, #1f2430);
+}
+
+.jdp-nav:hover {
+    background: var(--admin-hover, #f0f1f4);
+}
+
+.jdp-nav--year {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.jdp-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--admin-muted, #6b7280);
+    margin-bottom: 4px;
+}
+
+.jdp-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.jdp-day {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px 0;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--admin-text, #1f2430);
+}
+
+.jdp-day:hover {
+    background: var(--admin-hover, #f0f1f4);
+}
+
+.jdp-day--blank {
+    cursor: default;
+    pointer-events: none;
+}
+
+.jdp-day--today {
+    border: 1px solid var(--admin-accent, #2f6feb);
+}
+
+.jdp-day--selected {
+    background: var(--admin-accent, #2f6feb);
+    color: #fff;
+}
+
+.jdp-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--admin-border, #e5e7eb);
+}
+
+.jdp-time-input {
+    width: 48px;
+    text-align: center;
+    padding: 4px;
+    border: 1px solid var(--admin-border, #d9dce1);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    direction: ltr;
+}
+
+.jdp-time-sep {
+    font-weight: 600;
+}
+
+.jdp-footer {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.jdp-action {
+    flex: 1;
+    border: 1px solid var(--admin-border, #d9dce1);
+    background: var(--admin-surface, #fff);
+    border-radius: 6px;
+    padding: 6px 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: var(--admin-text, #1f2430);
+}
+
+.jdp-action:hover {
+    background: var(--admin-hover, #f0f1f4);
+}
+
+.jdp-action--muted {
+    color: var(--admin-muted, #6b7280);
+}
+
+.jdp-action--primary {
+    background: var(--admin-accent, #2f6feb);
+    border-color: var(--admin-accent, #2f6feb);
+    color: #fff;
+    font-weight: 600;
+}
+
+.jdp-action--primary:hover {
+    filter: brightness(0.95);
+}
+
+/* Optional: a visual cue that a text field opens a picker. */
+input[data-jalali-picker] {
+    cursor: pointer;
+    background-image: none;
+}

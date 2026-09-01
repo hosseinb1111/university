@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use RuntimeException;
+
 final class Response
 {
     /**
-     * Send a standard HTML response.
+     * Send an HTTP response.
      */
     public static function send(
         string $content,
@@ -18,9 +20,14 @@ final class Response
             $status
         );
 
-        self::sendHeaders(
+        foreach (
             $headers
-        );
+            as $name => $value
+        ) {
+            header(
+                $name . ': ' . $value
+            );
+        }
 
         echo $content;
 
@@ -28,120 +35,18 @@ final class Response
     }
 
     /**
-     * Send a plain-text response.
-     */
-    public static function text(
-        string $content,
-        int $status = 200,
-        array $headers = []
-    ): never {
-        $headers = array_merge(
-            [
-                'Content-Type' =>
-                    'text/plain; charset=UTF-8',
-
-                'Cache-Control' =>
-                    'public, max-age=3600',
-            ],
-            $headers
-        );
-
-        self::send(
-            $content,
-            $status,
-            $headers
-        );
-    }
-
-    /**
-     * Send an XML response.
-     */
-    public static function xml(
-        string $content,
-        int $status = 200,
-        array $headers = []
-    ): never {
-        $headers = array_merge(
-            [
-                'Content-Type' =>
-                    'application/xml; charset=UTF-8',
-
-                'Cache-Control' =>
-                    'public, max-age=3600',
-            ],
-            $headers
-        );
-
-        self::send(
-            $content,
-            $status,
-            $headers
-        );
-    }
-
-    /**
-     * Send a JSON response.
-     *
-     * @param mixed $data
-     */
-    public static function json(
-        mixed $data,
-        int $status = 200,
-        array $headers = []
-    ): never {
-        $json = json_encode(
-            $data,
-            JSON_UNESCAPED_UNICODE
-            | JSON_UNESCAPED_SLASHES
-            | JSON_THROW_ON_ERROR
-        );
-
-        $headers = array_merge(
-            [
-                'Content-Type' =>
-                    'application/json; charset=UTF-8',
-
-                'Cache-Control' =>
-                    'no-store',
-            ],
-            $headers
-        );
-
-        self::send(
-            $json,
-            $status,
-            $headers
-        );
-    }
-
-    /**
-     * Redirect to an absolute or relative URL.
+     * Redirect to a URL.
      */
     public static function redirect(
         string $url,
         int $status = 302
     ): never {
-        $allowedStatuses = [
-            301,
-            302,
-            303,
-            307,
-            308,
-        ];
-
         if (
-            !in_array(
-                $status,
-                $allowedStatuses,
-                true
-            )
+            $status < 300
+            || $status > 399
         ) {
             $status = 302;
         }
-
-        http_response_code(
-            $status
-        );
 
         header(
             'Location: '
@@ -154,101 +59,191 @@ final class Response
     }
 
     /**
-     * Redirect using a named route.
+     * Redirect using a named application route.
      *
-     * @param array<string, scalar|null> $parameters
+     * @param array<string, mixed> $parameters
      */
     public static function redirectRoute(
         string $routeName,
         array $parameters = [],
         int $status = 302
     ): never {
-        self::redirect(
+        $url =
             Router::route(
                 $routeName,
                 $parameters
-            ),
+            );
+
+        self::redirect(
+            $url,
             $status
         );
     }
 
     /**
-     * Return a 404 response.
+     * Redirect back to the previous request.
+     */
+    public static function back(
+        string $fallback = '/'
+    ): never {
+        $referer =
+            $_SERVER['HTTP_REFERER']
+            ?? '';
+
+        if (
+            !is_string($referer)
+            || trim($referer) === ''
+        ) {
+            self::redirect(
+                $fallback
+            );
+        }
+
+        self::redirect(
+            $referer
+        );
+    }
+
+    /**
+     * Render the public 404 page.
      */
     public static function notFound(
         string $message = 'صفحه مورد نظر پیدا نشد.'
     ): never {
-        self::send(
-            $message,
-            404
+        http_response_code(404);
+
+        $content =
+            View::render(
+                'errors/404',
+                [
+                    'message' =>
+                        $message,
+                ]
+            );
+
+        echo View::renderIntoLayout(
+            'layouts/app',
+            'errors/404',
+            [
+                'title' =>
+                    'صفحه پیدا نشد | صدرا',
+
+                'description' =>
+                    'صفحه مورد نظر در وب‌سایت موسسه آموزش عالی صدرالمتالهین پیدا نشد.',
+
+                'message' =>
+                    $message,
+            ]
         );
+
+        exit;
     }
 
     /**
-     * Return a 403 response.
+     * Render the public 403 page.
      */
     public static function forbidden(
-        string $message = 'دسترسی به این بخش مجاز نیست.'
+        string $message = 'دسترسی به این صفحه مجاز نیست.'
     ): never {
-        self::send(
-            $message,
-            403
+        http_response_code(403);
+
+        echo View::renderIntoLayout(
+            'layouts/app',
+            'errors/403',
+            [
+                'title' =>
+                    'دسترسی غیرمجاز | صدرا',
+
+                'description' =>
+                    'شما اجازه دسترسی به این صفحه را ندارید.',
+
+                'message' =>
+                    $message,
+            ]
         );
+
+        exit;
     }
 
     /**
-     * Return a 401 response.
-     */
-    public static function unauthorized(
-        string $message = 'برای دسترسی به این بخش باید وارد حساب کاربری شوید.'
-    ): never {
-        self::send(
-            $message,
-            401
-        );
-    }
-
-    /**
-     * Return a 422 validation response.
-     */
-    public static function unprocessable(
-        string $message = 'اطلاعات ارسال‌شده معتبر نیست.'
-    ): never {
-        self::send(
-            $message,
-            422
-        );
-    }
-
-    /**
-     * Return a 500 server-error response.
-     */
-    public static function serverError(
-        string $message = 'خطای داخلی سرور رخ داده است.'
-    ): never {
-        self::send(
-            $message,
-            500
-        );
-    }
-
-    /**
-     * Send HTTP headers.
+     * Return a JSON response.
      *
-     * @param array<string, string> $headers
+     * @param mixed $data
      */
-    private static function sendHeaders(
-        array $headers
-    ): void {
+    public static function json(
+        mixed $data,
+        int $status = 200,
+        array $headers = []
+    ): never {
+        http_response_code(
+            $status
+        );
+
+        header(
+            'Content-Type: application/json; charset=UTF-8'
+        );
+
         foreach (
             $headers
             as $name => $value
         ) {
             header(
-                $name
-                . ': '
-                . $value
+                $name . ': ' . $value
             );
         }
+
+        try {
+            $json =
+                json_encode(
+                    $data,
+                    JSON_UNESCAPED_UNICODE
+                    | JSON_UNESCAPED_SLASHES
+                    | JSON_THROW_ON_ERROR
+                );
+        } catch (
+            \JsonException $exception
+        ) {
+            throw new RuntimeException(
+                'Unable to encode JSON response.',
+                0,
+                $exception
+            );
+        }
+
+        echo $json;
+
+        exit;
+    }
+
+    /**
+     * Return an empty response.
+     */
+    public static function noContent(): never
+    {
+        http_response_code(204);
+
+        exit;
+    }
+
+    /**
+     * Return a plain-text error response.
+     */
+    public static function error(
+        string $message,
+        int $status = 500
+    ): never {
+        http_response_code(
+            $status
+        );
+
+        echo View::render(
+            'errors/404',
+            [
+                'message' =>
+                    $message,
+            ]
+        );
+
+        exit;
     }
 }

@@ -6,12 +6,11 @@ namespace App\Models;
 
 use App\Core\Database;
 use PDO;
-use RuntimeException;
 
 final class Navigation
 {
     /**
-     * Get all active root-level navigation items.
+     * Get active root-level main navigation items.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -29,21 +28,28 @@ final class Navigation
             FROM navigation_items
 
             LEFT JOIN pages
-                ON pages.id = navigation_items.page_id
+                ON pages.id =
+                   navigation_items.page_id
 
             WHERE navigation_items.parent_id IS NULL
+
+            AND navigation_items.display_location = :display_location
 
             AND navigation_items.is_active = 1
 
             ORDER BY
                 navigation_items.sort_order ASC,
                 navigation_items.id ASC
-            '
+            ',
+            [
+                ':display_location' =>
+                    'main',
+            ]
         );
     }
 
     /**
-     * Get active children of a navigation item.
+     * Get active children of a main item.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -62,9 +68,12 @@ final class Navigation
             FROM navigation_items
 
             LEFT JOIN pages
-                ON pages.id = navigation_items.page_id
+                ON pages.id =
+                   navigation_items.page_id
 
             WHERE navigation_items.parent_id = :parent_id
+
+            AND navigation_items.display_location = :display_location
 
             AND navigation_items.is_active = 1
 
@@ -73,39 +82,51 @@ final class Navigation
                 navigation_items.id ASC
             ',
             [
-                ':parent_id' => $parentId,
+                ':parent_id' =>
+                    $parentId,
+
+                ':display_location' =>
+                    'main',
             ]
         );
     }
 
     /**
-     * Build the complete public navigation tree.
+     * Build public navigation tree.
      *
      * @return array<int, array<string, mixed>>
      */
     public static function tree(): array
     {
-        $items = Database::all(
-            '
-            SELECT
-                navigation_items.*,
+        $items =
+            Database::all(
+                '
+                SELECT
+                    navigation_items.*,
 
-                pages.title AS page_title,
+                    pages.title AS page_title,
 
-                pages.slug AS page_slug
+                    pages.slug AS page_slug
 
-            FROM navigation_items
+                FROM navigation_items
 
-            LEFT JOIN pages
-                ON pages.id = navigation_items.page_id
+                LEFT JOIN pages
+                    ON pages.id =
+                       navigation_items.page_id
 
-            WHERE navigation_items.is_active = 1
+                WHERE navigation_items.display_location = :display_location
 
-            ORDER BY
-                navigation_items.sort_order ASC,
-                navigation_items.id ASC
-            '
-        );
+                AND navigation_items.is_active = 1
+
+                ORDER BY
+                    navigation_items.sort_order ASC,
+                    navigation_items.id ASC
+                ',
+                [
+                    ':display_location' =>
+                        'main',
+                ]
+            );
 
         return self::buildTree(
             $items
@@ -113,7 +134,74 @@ final class Navigation
     }
 
     /**
-     * Get all navigation records for admin.
+     * Get homepage quick-service links.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function quickLinks(
+        int $limit = 10
+    ): array {
+        $limit =
+            max(
+                1,
+                min(
+                    $limit,
+                    50
+                )
+            );
+
+        $statement =
+            Database::connection()
+                ->prepare(
+                    '
+                    SELECT
+                        navigation_items.*,
+
+                        pages.title AS page_title,
+
+                        pages.slug AS page_slug
+
+                    FROM navigation_items
+
+                    LEFT JOIN pages
+                        ON pages.id =
+                           navigation_items.page_id
+
+                    WHERE navigation_items.parent_id IS NULL
+
+                    AND navigation_items.display_location = :display_location
+
+                    AND navigation_items.is_active = 1
+
+                    ORDER BY
+                        navigation_items.sort_order ASC,
+                        navigation_items.id ASC
+
+                    LIMIT :limit
+                    '
+                );
+
+        $statement->bindValue(
+            ':display_location',
+            'quick',
+            PDO::PARAM_STR
+        );
+
+        $statement->bindValue(
+            ':limit',
+            $limit,
+            PDO::PARAM_INT
+        );
+
+        $statement->execute();
+
+        return $statement->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+    }
+
+    /**
+     * Get all navigation items for admin.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -133,12 +221,15 @@ final class Navigation
             FROM navigation_items
 
             LEFT JOIN navigation_items AS parent
-                ON parent.id = navigation_items.parent_id
+                ON parent.id =
+                   navigation_items.parent_id
 
             LEFT JOIN pages
-                ON pages.id = navigation_items.page_id
+                ON pages.id =
+                   navigation_items.page_id
 
             ORDER BY
+                navigation_items.display_location ASC,
                 navigation_items.sort_order ASC,
                 navigation_items.id ASC
             '
@@ -146,7 +237,9 @@ final class Navigation
     }
 
     /**
-     * Find by ID.
+     * Find navigation item by ID.
+     *
+     * @return array<string, mixed>|null
      */
     public static function find(
         int $id
@@ -156,55 +249,78 @@ final class Navigation
             SELECT
                 navigation_items.*,
 
+                parent.title AS parent_title,
+
                 pages.title AS page_title,
 
                 pages.slug AS page_slug
 
             FROM navigation_items
 
+            LEFT JOIN navigation_items AS parent
+                ON parent.id =
+                   navigation_items.parent_id
+
             LEFT JOIN pages
-                ON pages.id = navigation_items.page_id
+                ON pages.id =
+                   navigation_items.page_id
 
             WHERE navigation_items.id = :id
 
             LIMIT 1
             ',
             [
-                ':id' => $id,
+                ':id' =>
+                    $id,
             ]
         );
     }
 
     /**
-     * Get possible parent items.
+     * Get possible main-navigation parents.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public static function parentOptions(
         ?int $ignoreId = null
     ): array {
-        $sql = '
+        $sql =
+            '
             SELECT
                 id,
                 parent_id,
                 title
+
             FROM navigation_items
-        ';
 
-        $parameters = [];
+            WHERE display_location = :display_location
 
-        if ($ignoreId !== null) {
-            $sql .= '
-                WHERE id != :ignore_id
+            AND parent_id IS NULL
             ';
+
+        $parameters = [
+            ':display_location' =>
+                'main',
+        ];
+
+        if (
+            $ignoreId !== null
+        ) {
+            $sql .=
+                '
+                AND id != :ignore_id
+                ';
 
             $parameters[':ignore_id'] =
                 $ignoreId;
         }
 
-        $sql .= '
+        $sql .=
+            '
             ORDER BY
                 sort_order ASC,
                 title ASC
-        ';
+            ';
 
         return Database::all(
             $sql,
@@ -214,36 +330,49 @@ final class Navigation
 
     /**
      * Create navigation item.
+     *
+     * @param array<string, mixed> $data
      */
     public static function create(
         array $data
     ): int {
-        $parentId = $data['parent_id']
+        $displayLocation =
+            self::normalizeDisplayLocation(
+                $data['display_location']
+                ?? 'main'
+            );
+
+        $parentId =
+            $data['parent_id']
             ?? null;
 
-        $pageId = $data['page_id']
-            ?? null;
+        if (
+            $displayLocation === 'quick'
+        ) {
+            $parentId =
+                null;
+        }
 
-        /*
-         * A navigation item should not point to both
-         * a page and a completely unrelated URL unless
-         * explicitly desired.
-         */
         Database::execute(
             '
             INSERT INTO navigation_items (
                 parent_id,
+                display_location,
                 page_id,
                 title,
+                description,
                 url,
                 target,
                 sort_order,
                 is_active
             )
+
             VALUES (
                 :parent_id,
+                :display_location,
                 :page_id,
                 :title,
+                :description,
                 :url,
                 :target,
                 :sort_order,
@@ -254,18 +383,29 @@ final class Navigation
                 ':parent_id' =>
                     $parentId,
 
+                ':display_location' =>
+                    $displayLocation,
+
                 ':page_id' =>
-                    $pageId,
+                    $data['page_id']
+                    ?? null,
 
                 ':title' =>
                     $data['title'],
 
+                ':description' =>
+                    $data['description']
+                    ?? null,
+
                 ':url' =>
-                    $data['url'] ?? null,
+                    $data['url']
+                    ?? null,
 
                 ':target' =>
-                    $data['target']
-                    ?? '_self',
+                    self::normalizeTarget(
+                        $data['target']
+                        ?? '_self'
+                    ),
 
                 ':sort_order' =>
                     (int) (
@@ -286,11 +426,30 @@ final class Navigation
 
     /**
      * Update navigation item.
+     *
+     * @param array<string, mixed> $data
      */
     public static function update(
         int $id,
         array $data
     ): bool {
+        $displayLocation =
+            self::normalizeDisplayLocation(
+                $data['display_location']
+                ?? 'main'
+            );
+
+        $parentId =
+            $data['parent_id']
+            ?? null;
+
+        if (
+            $displayLocation === 'quick'
+        ) {
+            $parentId =
+                null;
+        }
+
         return Database::execute(
             '
             UPDATE navigation_items
@@ -298,9 +457,14 @@ final class Navigation
             SET
                 parent_id = :parent_id,
 
+                display_location =
+                    :display_location,
+
                 page_id = :page_id,
 
                 title = :title,
+
+                description = :description,
 
                 url = :url,
 
@@ -317,8 +481,10 @@ final class Navigation
                     $id,
 
                 ':parent_id' =>
-                    $data['parent_id']
-                    ?? null,
+                    $parentId,
+
+                ':display_location' =>
+                    $displayLocation,
 
                 ':page_id' =>
                     $data['page_id']
@@ -327,13 +493,19 @@ final class Navigation
                 ':title' =>
                     $data['title'],
 
+                ':description' =>
+                    $data['description']
+                    ?? null,
+
                 ':url' =>
                     $data['url']
                     ?? null,
 
                 ':target' =>
-                    $data['target']
-                    ?? '_self',
+                    self::normalizeTarget(
+                        $data['target']
+                        ?? '_self'
+                    ),
 
                 ':sort_order' =>
                     (int) (
@@ -359,19 +531,21 @@ final class Navigation
         return Database::execute(
             '
             DELETE FROM navigation_items
+
             WHERE id = :id
             ',
             [
-                ':id' => $id,
+                ':id' =>
+                    $id,
             ]
         ) > 0;
     }
 
     /**
-     * Build a nested tree.
+     * Build nested navigation tree.
      *
      * @param array<int, array<string, mixed>> $items
-     * @param int|null $parentId
+     *
      * @return array<int, array<string, mixed>>
      */
     private static function buildTree(
@@ -401,26 +575,33 @@ final class Navigation
                     (int) $item['id']
                 );
 
-            $tree[] = $item;
+            $tree[] =
+                $item;
         }
 
         return $tree;
     }
 
     /**
-     * Build the final public URL for a navigation item.
+     * Resolve final public URL.
+     *
+     * @param array<string, mixed> $item
      */
     public static function url(
         array $item
     ): string {
         if (
-            !empty($item['url'])
+            !empty(
+                $item['url']
+            )
         ) {
             return (string) $item['url'];
         }
 
         if (
-            !empty($item['page_slug'])
+            !empty(
+                $item['page_slug']
+            )
         ) {
             return '/pages/'
                 . rawurlencode(
@@ -432,7 +613,18 @@ final class Navigation
     }
 
     /**
-     * Validate a navigation target.
+     * Normalize display location.
+     */
+    public static function normalizeDisplayLocation(
+        mixed $value
+    ): string {
+        return $value === 'quick'
+            ? 'quick'
+            : 'main';
+    }
+
+    /**
+     * Normalize link target.
      */
     public static function normalizeTarget(
         mixed $target
@@ -443,7 +635,7 @@ final class Navigation
     }
 
     /**
-     * Validate whether a parent relationship is safe.
+     * Validate parent cycle.
      */
     public static function wouldCreateCycle(
         int $itemId,
@@ -463,7 +655,8 @@ final class Navigation
 
         $visited = [];
 
-        $current = $parentId;
+        $current =
+            $parentId;
 
         while (
             $current !== null
@@ -473,13 +666,11 @@ final class Navigation
                     $visited[$current]
                 )
             ) {
-                /*
-                 * Existing corrupted cycle.
-                 */
                 return true;
             }
 
-            $visited[$current] = true;
+            $visited[$current] =
+                true;
 
             if (
                 $current === $itemId
@@ -487,17 +678,23 @@ final class Navigation
                 return true;
             }
 
-            $parent = Database::first(
-                '
-                SELECT parent_id
-                FROM navigation_items
-                WHERE id = :id
-                LIMIT 1
-                ',
-                [
-                    ':id' => $current,
-                ]
-            );
+            $parent =
+                Database::first(
+                    '
+                    SELECT
+                        parent_id
+
+                    FROM navigation_items
+
+                    WHERE id = :id
+
+                    LIMIT 1
+                    ',
+                    [
+                        ':id' =>
+                            $current,
+                    ]
+                );
 
             if (
                 $parent === null

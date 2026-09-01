@@ -5,16 +5,34 @@ declare(strict_types=1);
 use App\Core\Csrf;
 use App\Core\View;
 
+
+/*
+|--------------------------------------------------------------------------
+| Current path
+|--------------------------------------------------------------------------
+*/
+
 $currentPath =
-    is_string($currentPath ?? null)
+    is_string(
+        $currentPath
+        ?? null
+    )
         ? $currentPath
         : '/admin';
+
+
+/*
+|--------------------------------------------------------------------------
+| User
+|--------------------------------------------------------------------------
+*/
 
 $role =
     (string) (
         $user['role']
         ?? ''
     );
+
 
 $name =
     trim(
@@ -29,10 +47,12 @@ $name =
         )
     );
 
+
 if (
     $name === ''
 ) {
-    $name = 'کاربر';
+    $name =
+        'کاربر';
 }
 
 
@@ -40,6 +60,23 @@ if (
 |--------------------------------------------------------------------------
 | Active navigation helper
 |--------------------------------------------------------------------------
+|
+| Important:
+|
+| The dashboard routes are exact-match routes.
+| Section routes may use prefix matching.
+|
+| This prevents:
+|
+| /admin/english
+|
+| from incorrectly remaining active on:
+|
+| /admin/english/home
+| /admin/english/slides
+| /admin/english/services
+| etc.
+|
 */
 
 $adminNavActive =
@@ -47,14 +84,24 @@ $adminNavActive =
         string $currentPath,
         string $path
     ): string {
+
+        /*
+         * Dashboard pages must be exact.
+         */
         if (
             $path === '/admin'
+            || $path === '/admin/english'
         ) {
-            return $currentPath === '/admin'
+            return $currentPath === $path
                 ? 'admin-nav__link--active'
                 : '';
         }
 
+
+        /*
+         * Other navigation entries may represent
+         * a route family.
+         */
         return str_starts_with(
             $currentPath,
             $path
@@ -66,12 +113,28 @@ $adminNavActive =
 
 /*
 |--------------------------------------------------------------------------
+| English section state
+|--------------------------------------------------------------------------
+*/
+
+$englishSectionActive =
+    $currentPath === '/admin/english'
+    || str_starts_with(
+        $currentPath,
+        '/admin/english/'
+    );
+
+
+/*
+|--------------------------------------------------------------------------
 | Role label
 |--------------------------------------------------------------------------
 */
 
 $roleLabel =
-    match ($role) {
+    match (
+        $role
+    ) {
         'super_admin' =>
             'مدیر ارشد',
 
@@ -90,16 +153,20 @@ $roleLabel =
 
 ?>
 
+
 <div class="admin-sidebar__top">
 
     <a
-        href="<?= View::url('/admin') ?>"
+        href="<?= View::url(
+            '/admin'
+        ) ?>"
         class="admin-brand"
     >
 
         <div class="admin-brand__logo">
             ص
         </div>
+
 
         <div class="admin-brand__text">
 
@@ -128,6 +195,10 @@ $roleLabel =
 </div>
 
 
+<!-- ============================================================
+     USER
+============================================================= -->
+
 <div class="admin-sidebar__user">
 
     <div class="admin-sidebar__avatar">
@@ -139,7 +210,8 @@ $roleLabel =
                 1,
                 'UTF-8'
             ),
-            ENT_QUOTES | ENT_SUBSTITUTE,
+            ENT_QUOTES
+            | ENT_SUBSTITUTE,
             'UTF-8'
         ) ?>
 
@@ -149,19 +221,26 @@ $roleLabel =
     <div class="admin-sidebar__user-info">
 
         <strong>
+
             <?= htmlspecialchars(
                 $name,
-                ENT_QUOTES | ENT_SUBSTITUTE,
+                ENT_QUOTES
+                | ENT_SUBSTITUTE,
                 'UTF-8'
             ) ?>
+
         </strong>
 
+
         <span>
+
             <?= htmlspecialchars(
                 $roleLabel,
-                ENT_QUOTES | ENT_SUBSTITUTE,
+                ENT_QUOTES
+                | ENT_SUBSTITUTE,
                 'UTF-8'
             ) ?>
+
         </span>
 
     </div>
@@ -175,17 +254,23 @@ $roleLabel =
 >
 
 
-    <!-- =====================================================
+    <!-- ========================================================
          CONTENT MANAGEMENT
-    ====================================================== -->
+    ========================================================= -->
 
     <div class="admin-nav__label">
         مدیریت محتوا
     </div>
 
 
+    <!-- =====================================================
+         Dashboard
+    ====================================================== -->
+
     <a
-        href="<?= View::url('/admin') ?>"
+        href="<?= View::url(
+            '/admin'
+        ) ?>"
         class="admin-nav__link <?= $adminNavActive(
             $currentPath,
             '/admin'
@@ -203,7 +288,9 @@ $roleLabel =
     </a>
 
 
-    <!-- Homepage slider -->
+    <!-- =====================================================
+         Persian Homepage Slider
+    ====================================================== -->
 
     <a
         href="<?= View::url(
@@ -226,7 +313,59 @@ $roleLabel =
     </a>
 
 
-    <!-- Announcements -->
+    <!-- =====================================================
+         Persian Slider Settings
+    ====================================================== -->
+
+    <a
+        href="<?= View::url(
+            '/admin/slider-settings'
+        ) ?>"
+        class="admin-nav__link <?= $adminNavActive(
+            $currentPath,
+            '/admin/slider-settings'
+        ) ?>"
+    >
+
+        <span class="admin-nav__icon">
+            🎞
+        </span>
+
+        <span>
+            تنظیمات اسلایدر
+        </span>
+
+    </a>
+
+
+    <!-- =====================================================
+         Persian Homepage Services
+    ====================================================== -->
+
+    <a
+        href="<?= View::url(
+            '/admin/services'
+        ) ?>"
+        class="admin-nav__link <?= $adminNavActive(
+            $currentPath,
+            '/admin/services'
+        ) ?>"
+    >
+
+        <span class="admin-nav__icon">
+            🔗
+        </span>
+
+        <span>
+            خدمات صفحه اصلی
+        </span>
+
+    </a>
+
+
+    <!-- =====================================================
+         Persian Announcements
+    ====================================================== -->
 
     <a
         href="<?= View::url(
@@ -249,7 +388,9 @@ $roleLabel =
     </a>
 
 
-    <!-- Pages -->
+    <!-- =====================================================
+         Persian Pages
+    ====================================================== -->
 
     <a
         href="<?= View::url(
@@ -272,7 +413,9 @@ $roleLabel =
     </a>
 
 
-    <!-- Navigation -->
+    <!-- =====================================================
+         Navigation
+    ====================================================== -->
 
     <a
         href="<?= View::url(
@@ -295,7 +438,9 @@ $roleLabel =
     </a>
 
 
-    <!-- Documents -->
+    <!-- =====================================================
+         Documents
+    ====================================================== -->
 
     <a
         href="<?= View::url(
@@ -318,7 +463,9 @@ $roleLabel =
     </a>
 
 
-    <!-- Media -->
+    <!-- =====================================================
+         Media
+    ====================================================== -->
 
     <a
         href="<?= View::url(
@@ -341,9 +488,544 @@ $roleLabel =
     </a>
 
 
-    <!-- =====================================================
+    <!-- ========================================================
+         ENGLISH WEBSITE
+    ========================================================= -->
+
+    <div
+        class="
+            admin-nav__label
+            admin-nav__label--english
+            <?= $englishSectionActive
+                ? 'admin-nav__label--active'
+                : ''
+            ?>
+        "
+    >
+        سایت انگلیسی
+    </div>
+
+
+    <div
+        class="
+            admin-nav__english-group
+            <?= $englishSectionActive
+                ? 'admin-nav__english-group--active'
+                : ''
+            ?>
+        "
+    >
+
+
+        <!-- =====================================================
+             English Dashboard
+        ====================================================== -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🌐
+            </span>
+
+            <span>
+                داشبورد انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- =====================================================
+             English Homepage
+        ====================================================== -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/home'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/home'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🏠
+            </span>
+
+            <span>
+                صفحه اصلی انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- =====================================================
+             English Homepage Slider
+        ====================================================== -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/slides'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/slides'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🖼
+            </span>
+
+            <span>
+                اسلایدهای صفحه اصلی انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- =====================================================
+             English Slider Settings
+        ====================================================== -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/slider'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/slider'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🎞
+            </span>
+
+            <span>
+                تنظیمات اسلایدر انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- =====================================================
+             English Homepage Services
+        ====================================================== -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/services'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/services'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🔗
+            </span>
+
+            <span>
+                خدمات صفحه اصلی انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- =====================================================
+             English Static Pages
+        ====================================================== -->
+
+        <div
+            class="
+                admin-nav__sub-label
+                admin-nav__sub-label--english
+            "
+        >
+            صفحات انگلیسی
+        </div>
+
+
+        <!-- About -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/about'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/about'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                ℹ
+            </span>
+
+            <span>
+                درباره انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- Presidency -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/presidency'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/presidency'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                👤
+            </span>
+
+            <span>
+                ریاست انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- Faculties page -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/faculties'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/faculties'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🎓
+            </span>
+
+            <span>
+                صفحه دانشکده‌های انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- Programs page -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/programs'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/programs'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                📚
+            </span>
+
+            <span>
+                صفحه رشته‌های انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- Research page -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/research'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/research'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🔬
+            </span>
+
+            <span>
+                صفحه پژوهش انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- Announcements page -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/announcements'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/announcements'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                📢
+            </span>
+
+            <span>
+                صفحه اطلاعیه‌های انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- Contact page -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/pages/contact'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                admin-nav__link--english-sub
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/pages/contact'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                ✉
+            </span>
+
+            <span>
+                صفحه تماس انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- =====================================================
+             English Content
+        ====================================================== -->
+
+        <div
+            class="
+                admin-nav__sub-label
+                admin-nav__sub-label--english
+            "
+        >
+            محتوای انگلیسی
+        </div>
+
+
+        <!-- English Announcements -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/announcements'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/announcements'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                📣
+            </span>
+
+            <span>
+                اطلاعیه‌های انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- English Faculties -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/faculties'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/faculties'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🎓
+            </span>
+
+            <span>
+                دانشکده‌های انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- English Programs -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/programs'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/programs'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                📚
+            </span>
+
+            <span>
+                رشته‌های انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- English People -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/people'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/people'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                👨‍🏫
+            </span>
+
+            <span>
+                افراد و اعضای انگلیسی
+            </span>
+
+        </a>
+
+
+        <!-- English Research Centers -->
+
+        <a
+            href="<?= View::url(
+                '/admin/english/research-centers'
+            ) ?>"
+            class="
+                admin-nav__link
+                admin-nav__link--english
+                <?= $adminNavActive(
+                    $currentPath,
+                    '/admin/english/research-centers'
+                ) ?>
+            "
+        >
+
+            <span class="admin-nav__icon">
+                🔬
+            </span>
+
+            <span>
+                مراکز پژوهشی انگلیسی
+            </span>
+
+        </a>
+
+    </div>
+
+
+    <!-- ========================================================
          EDUCATION & RESEARCH
-    ====================================================== -->
+    ========================================================= -->
 
     <div class="admin-nav__label">
         آموزش و پژوهش
@@ -396,7 +1078,7 @@ $roleLabel =
     </a>
 
 
-    <!-- Research centers -->
+    <!-- Research Centers -->
 
     <a
         href="<?= View::url(
@@ -442,9 +1124,9 @@ $roleLabel =
     </a>
 
 
-    <!-- =====================================================
+    <!-- ========================================================
          SYSTEM MANAGEMENT
-    ====================================================== -->
+    ========================================================= -->
 
     <?php if (
         in_array(
@@ -518,16 +1200,42 @@ $roleLabel =
 </nav>
 
 
+<!-- ============================================================
+     SIDEBAR BOTTOM
+============================================================= -->
+
 <div class="admin-sidebar__bottom">
 
+    <!-- Persian website -->
 
     <a
-        href="<?= View::url('/') ?>"
+        href="<?= View::url(
+            '/'
+        ) ?>"
         class="admin-sidebar__website"
     >
         ↗ مشاهده سایت
     </a>
 
+
+    <!-- English website -->
+
+    <a
+        href="<?= View::url(
+            '/english'
+        ) ?>"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="
+            admin-sidebar__website
+            admin-sidebar__website--english
+        "
+    >
+        🌐 مشاهده سایت انگلیسی
+    </a>
+
+
+    <!-- Logout -->
 
     <form
         method="POST"
@@ -549,3 +1257,4 @@ $roleLabel =
     </form>
 
 </div>
+

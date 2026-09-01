@@ -9,21 +9,7 @@ use App\Core\View;
  * Sadra University
  * Public Document Category
  * =========================================================
- *
- * Expected variables:
- *
- * @var array<string, mixed> $category
- * @var array<int, array<string, mixed>> $documents
- *
- * =========================================================
  */
-
-
-/*
-|--------------------------------------------------------------------------
-| Normalize input
-|--------------------------------------------------------------------------
-*/
 
 $category =
     is_array($category ?? null)
@@ -36,12 +22,6 @@ $documents =
         : [];
 
 
-/*
-|--------------------------------------------------------------------------
-| Category information
-|--------------------------------------------------------------------------
-*/
-
 $categorySlug =
     trim(
         (string) (
@@ -50,6 +30,7 @@ $categorySlug =
         )
     );
 
+
 $categoryName =
     trim(
         (string) (
@@ -57,6 +38,7 @@ $categoryName =
             ?? 'اسناد'
         )
     );
+
 
 $categoryDescription =
     trim(
@@ -69,109 +51,241 @@ $categoryDescription =
 
 /*
 |--------------------------------------------------------------------------
-| File size formatter
+| File size
 |--------------------------------------------------------------------------
 */
 
-$formatFileSize = static function (
-    int $bytes
-): string {
-    if ($bytes <= 0) {
-        return 'نامشخص';
-    }
+$formatFileSize =
+    static function (
+        int $bytes
+    ): string {
 
-    $units = [
-        'B',
-        'KB',
-        'MB',
-        'GB',
-    ];
+        if ($bytes <= 0) {
+            return 'نامشخص';
+        }
 
-    $size =
-        (float) $bytes;
+        $units = [
+            'B',
+            'KB',
+            'MB',
+            'GB',
+        ];
 
-    $unitIndex = 0;
+        $size =
+            (float) $bytes;
 
-    while (
-        $size >= 1024
-        && $unitIndex < count($units) - 1
-    ) {
-        $size /= 1024;
+        $unitIndex =
+            0;
 
-        $unitIndex++;
-    }
+        while (
+            $size >= 1024
+            && $unitIndex < count($units) - 1
+        ) {
+            $size /= 1024;
 
-    return number_format(
-        $size,
-        $unitIndex === 0
-            ? 0
-            : 2
-    )
-    . ' '
-    . $units[
-        $unitIndex
-    ];
-};
+            $unitIndex++;
+        }
+
+        $decimals =
+            $unitIndex === 0
+                ? 0
+                : (
+                    $size >= 10
+                        ? 1
+                        : 2
+                );
+
+        return number_format(
+            $size,
+            $decimals,
+            '.',
+            ','
+        )
+        . ' '
+        . $units[$unitIndex];
+    };
 
 
 /*
 |--------------------------------------------------------------------------
-| Document type label
+| File metadata
 |--------------------------------------------------------------------------
 */
 
-$getFileTypeLabel = static function (
-    string $mime
-): string {
-    $mime =
-        strtolower(
-            trim($mime)
-        );
+$getFileMeta =
+    static function (
+        string $mime,
+        string $filename
+    ): array {
 
-    return match (true) {
+        $mime =
+            strtolower(
+                trim($mime)
+            );
 
-        $mime === 'application/pdf' =>
-            'PDF',
+        $extension =
+            strtolower(
+                (string) pathinfo(
+                    $filename,
+                    PATHINFO_EXTENSION
+                )
+            );
 
-        $mime === 'application/msword',
-        $mime ===
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' =>
-            'WORD',
 
-        $mime === 'application/vnd.ms-excel',
-        $mime ===
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' =>
-            'EXCEL',
+        if (
+            $mime === 'application/pdf'
+            || $extension === 'pdf'
+        ) {
+            return [
+                'label' => 'PDF',
+                'class' => 'pdf',
+                'description' => 'سند PDF',
+            ];
+        }
 
-        $mime === 'application/vnd.ms-powerpoint',
-        $mime ===
-            'application/vnd.openxmlformats-officedocument.presentationml.presentation' =>
-            'POWERPOINT',
 
-        default =>
-            'FILE',
+        if (
+            str_contains(
+                $mime,
+                'word'
+            )
+            || str_contains(
+                $mime,
+                'document'
+            )
+            || in_array(
+                $extension,
+                [
+                    'doc',
+                    'docx',
+                ],
+                true
+            )
+        ) {
+            return [
+                'label' => '',
+                'class' => 'word',
+                'description' => 'سند متنی',
+            ];
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'excel'
+            )
+            || str_contains(
+                $mime,
+                'spreadsheet'
+            )
+            || in_array(
+                $extension,
+                [
+                    'xls',
+                    'xlsx',
+                    'csv',
+                ],
+                true
+            )
+        ) {
+            return [
+                'label' => 'XLS',
+                'class' => 'excel',
+                'description' => 'فایل جدولی',
+            ];
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'powerpoint'
+            )
+            || str_contains(
+                $mime,
+                'presentation'
+            )
+            || in_array(
+                $extension,
+                [
+                    'ppt',
+                    'pptx',
+                ],
+                true
+            )
+        ) {
+            return [
+                'label' => 'PPT',
+                'class' => 'powerpoint',
+                'description' => 'ارائه',
+            ];
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'image'
+            )
+            || in_array(
+                $extension,
+                [
+                    'jpg',
+                    'jpeg',
+                    'png',
+                    'webp',
+                    'gif',
+                ],
+                true
+            )
+        ) {
+            return [
+                'label' => 'IMG',
+                'class' => 'image',
+                'description' => 'تصویر',
+            ];
+        }
+
+
+        return [
+            'label' =>
+                $extension !== ''
+                    ? strtoupper(
+                        substr(
+                            $extension,
+                            0,
+                            4
+                        )
+                    )
+                    : 'FILE',
+
+            'class' => 'file',
+
+            'description' => 'فایل',
+        ];
     };
-};
 
 ?>
 
-<section class="institution-page">
+<section class="institution-page documents-category">
 
     <div class="container">
 
-
-        <!-- =================================================
-             Breadcrumb
-        ================================================== -->
+        <!-- =====================================================
+             BREADCRUMB
+        ====================================================== -->
 
         <nav
-            class="program-detail__breadcrumb"
+            class="documents-category__breadcrumb"
             aria-label="مسیر صفحه"
         >
 
             <a
-                href="<?= View::url(
-                    '/documents'
+                href="<?= View::escape(
+                    View::url(
+                        '/documents'
+                    )
                 ) ?>"
             >
                 اسناد و فرم‌ها
@@ -192,11 +306,13 @@ $getFileTypeLabel = static function (
         </nav>
 
 
-        <!-- =================================================
-             Hero
-        ================================================== -->
+        <!-- =====================================================
+             HERO
+        ====================================================== -->
 
-        <header class="institution-hero">
+        <header
+            class="institution-hero documents-category__hero"
+        >
 
             <span>
                 دسته اسناد
@@ -207,7 +323,6 @@ $getFileTypeLabel = static function (
                     $categoryName
                 ) ?>
             </h1>
-
 
             <?php if (
                 $categoryDescription !== ''
@@ -222,7 +337,7 @@ $getFileTypeLabel = static function (
             <?php else: ?>
 
                 <p>
-                    اسناد و فایل‌های منتشرشده در این دسته‌بندی.
+                    اسناد و فایل‌های رسمی منتشرشده در این دسته‌بندی.
                 </p>
 
             <?php endif; ?>
@@ -230,17 +345,27 @@ $getFileTypeLabel = static function (
         </header>
 
 
-        <!-- =================================================
-             Documents
-        ================================================== -->
+        <!-- =====================================================
+             DOCUMENTS
+        ====================================================== -->
 
         <?php if (
             $documents === []
         ): ?>
 
             <div
-                class="institution-empty"
+                class="
+                    institution-empty
+                    documents-category__empty
+                "
             >
+
+                <div
+                    class="documents-empty-icon"
+                    aria-hidden="true"
+                >
+                    📄
+                </div>
 
                 <strong>
                     سندی در این دسته وجود ندارد.
@@ -250,13 +375,59 @@ $getFileTypeLabel = static function (
                     در حال حاضر فایل منتشرشده‌ای برای نمایش وجود ندارد.
                 </p>
 
+                <a
+                    href="<?= View::escape(
+                        View::url(
+                            '/documents'
+                        )
+                    ) ?>"
+                    class="button button--secondary"
+                >
+                    بازگشت به همه اسناد
+                </a>
+
             </div>
 
         <?php else: ?>
 
             <div
-                class="document-list"
+                class="documents-category__toolbar"
             >
+
+                <div>
+
+                    <span>
+                        کتابخانه اسناد
+                    </span>
+
+                    <strong>
+                        <?= number_format(
+                            count(
+                                $documents
+                            )
+                        ) ?>
+
+                        سند
+                    </strong>
+
+                </div>
+
+
+                <a
+                    href="<?= View::escape(
+                        View::url(
+                            '/documents'
+                        )
+                    ) ?>"
+                    class="documents-category__back"
+                >
+                    ← همه دسته‌ها
+                </a>
+
+            </div>
+
+
+            <div class="document-list">
 
                 <?php foreach (
                     $documents
@@ -264,11 +435,20 @@ $getFileTypeLabel = static function (
                 ): ?>
 
                     <?php
+
                     $documentId =
                         (int) (
                             $document['id']
                             ?? 0
                         );
+
+
+                    if (
+                        $documentId <= 0
+                    ) {
+                        continue;
+                    }
+
 
                     $title =
                         trim(
@@ -278,19 +458,19 @@ $getFileTypeLabel = static function (
                             )
                         );
 
+
                     if (
                         $title === ''
                     ) {
                         $title =
                             trim(
                                 (string) (
-                                    $document[
-                                        'file_name'
-                                    ]
-                                    ?? 'سند'
+                                    $document['file_name']
+                                    ?? ''
                                 )
                             );
                     }
+
 
                     if (
                         $title === ''
@@ -299,48 +479,56 @@ $getFileTypeLabel = static function (
                             'سند';
                     }
 
+
                     $description =
                         trim(
                             (string) (
-                                $document[
-                                    'description'
-                                ]
+                                $document['description']
                                 ?? ''
                             )
                         );
+
+
+                    $fileName =
+                        trim(
+                            (string) (
+                                $document['file_name']
+                                ?? ''
+                            )
+                        );
+
 
                     $mimeType =
                         strtolower(
                             trim(
                                 (string) (
-                                    $document[
-                                        'mime_type'
-                                    ]
+                                    $document['mime_type']
                                     ?? ''
                                 )
                             )
                         );
 
-                    $fileType =
-                        $getFileTypeLabel(
-                            $mimeType
-                        );
 
                     $fileSize =
                         (int) (
-                            $document[
-                                'file_size'
-                            ]
+                            $document['file_size']
                             ?? 0
                         );
 
+
                     $downloadCount =
                         (int) (
-                            $document[
-                                'download_count'
-                            ]
+                            $document['download_count']
                             ?? 0
                         );
+
+
+                    $fileMeta =
+                        $getFileMeta(
+                            $mimeType,
+                            $fileName
+                        );
+
 
                     $downloadUrl =
                         View::url(
@@ -351,6 +539,7 @@ $getFileTypeLabel = static function (
                             . '/'
                             . $documentId
                         );
+
                     ?>
 
 
@@ -358,28 +547,57 @@ $getFileTypeLabel = static function (
                         class="document-card"
                     >
 
-
-                        <!-- =================================
-                             File type
-                        ================================== -->
+                        <!-- =====================================
+                             FILE
+                        ====================================== -->
 
                         <div
-                            class="document-card__icon"
+                            class="
+                                document-card__file
+                                document-card__file--<?= View::escape(
+                                    $fileMeta['class']
+                                ) ?>
+                            "
                             aria-hidden="true"
                         >
-                            <?= View::escape(
-                                $fileType
-                            ) ?>
+
+                            <div
+                                class="document-card__file-icon"
+                            >
+
+                                <?php if (
+                                    $fileMeta['label'] !== ''
+                                ): ?>
+
+                                    <span>
+                                        <?= View::escape(
+                                            $fileMeta['label']
+                                        ) ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </div>
+
                         </div>
 
 
-                        <!-- =================================
-                             Information
-                        ================================== -->
+                        <!-- =====================================
+                             CONTENT
+                        ====================================== -->
 
                         <div
                             class="document-card__body"
                         >
+
+                            <div
+                                class="document-card__type"
+                            >
+                                <?= View::escape(
+                                    $fileMeta['description']
+                                ) ?>
+                            </div>
+
 
                             <h2>
 
@@ -413,61 +631,87 @@ $getFileTypeLabel = static function (
                                 class="document-card__meta"
                             >
 
-
                                 <?php if (
                                     $fileSize > 0
                                 ): ?>
 
                                     <span>
-                                        حجم:
-                                        <?= View::escape(
-                                            $formatFileSize(
-                                                $fileSize
-                                            )
-                                        ) ?>
-                                    </span>
 
-                                <?php endif; ?>
+                                        حجم
 
+                                        <strong>
+                                            <?= View::escape(
+                                                $formatFileSize(
+                                                    $fileSize
+                                                )
+                                            ) ?>
+                                        </strong>
 
-                                <?php if (
-                                    $mimeType !== ''
-                                ): ?>
-
-                                    <span>
-                                        <?= View::escape(
-                                            $mimeType
-                                        ) ?>
                                     </span>
 
                                 <?php endif; ?>
 
 
                                 <span>
-                                    <?= number_format(
-                                        $downloadCount
-                                    ) ?>
 
                                     دانلود
+
+                                    <strong>
+                                        <?= number_format(
+                                            $downloadCount
+                                        ) ?>
+                                    </strong>
+
                                 </span>
+
+                                <?php if (
+                                    $fileName !== ''
+                                ): ?>
+
+                                    <span
+                                        class="document-card__filename"
+                                    >
+                                        <?= View::escape(
+                                            $fileName
+                                        ) ?>
+                                    </span>
+
+                                <?php endif; ?>
 
                             </div>
 
                         </div>
 
 
-                        <!-- =================================
-                             Download
-                        ================================== -->
+                        <!-- =====================================
+                             ACTION
+                        ====================================== -->
 
-                        <a
-                            href="<?= View::escape(
-                                $downloadUrl
-                            ) ?>"
-                            class="button button--secondary"
+                        <div
+                            class="document-card__action"
                         >
-                            مشاهده / دانلود
-                        </a>
+
+                            <a
+                                href="<?= View::escape(
+                                    $downloadUrl
+                                ) ?>"
+                                class="document-card__download"
+                            >
+
+                                <span>
+                                    مشاهده و دانلود
+                                </span>
+
+                                <span
+                                    class="document-card__arrow"
+                                    aria-hidden="true"
+                                >
+                                    →
+                                </span>
+
+                            </a>
+
+                        </div>
 
                     </article>
 
@@ -478,21 +722,19 @@ $getFileTypeLabel = static function (
         <?php endif; ?>
 
 
-        <!-- =================================================
-             Bottom actions
-        ================================================== -->
+        <!-- =====================================================
+             BOTTOM ACTIONS
+        ====================================================== -->
 
-        <div
-            class="institution-section"
-        >
+        <section class="institution-section documents-category__actions">
 
-            <div
-                class="institution-action-grid"
-            >
+            <div class="institution-action-grid">
 
                 <a
-                    href="<?= View::url(
-                        '/documents'
+                    href="<?= View::escape(
+                        View::url(
+                            '/documents'
+                        )
                     ) ?>"
                     class="institution-action-card"
                 >
@@ -502,15 +744,17 @@ $getFileTypeLabel = static function (
                     </strong>
 
                     <span>
-                        بازگشت به فهرست تمام دسته‌های اسناد
+                        بازگشت به فهرست تمام دسته‌های اسناد.
                     </span>
 
                 </a>
 
 
                 <a
-                    href="<?= View::url(
-                        '/contact'
+                    href="<?= View::escape(
+                        View::url(
+                            '/contact'
+                        )
                     ) ?>"
                     class="institution-action-card"
                 >
@@ -527,8 +771,10 @@ $getFileTypeLabel = static function (
 
 
                 <a
-                    href="<?= View::url(
-                        '/announcements'
+                    href="<?= View::escape(
+                        View::url(
+                            '/announcements'
+                        )
                     ) ?>"
                     class="institution-action-card"
                 >
@@ -545,7 +791,7 @@ $getFileTypeLabel = static function (
 
             </div>
 
-        </div>
+        </section>
 
     </div>
 

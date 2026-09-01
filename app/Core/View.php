@@ -23,11 +23,7 @@ final class View
     /**
      * Render a view and return its HTML.
      *
-     * Example:
-     *
-     * return View::render('home/index', [
-     *     'title' => 'صفحه اصلی',
-     * ]);
+     * @param array<string, mixed> $data
      */
     public static function render(
         string $view,
@@ -35,60 +31,35 @@ final class View
     ): string {
         $viewFile = self::resolve($view);
 
-        /*
-         * Merge shared data with local view data.
-         *
-         * Local data takes precedence.
-         */
         $viewData = array_merge(
             self::$shared,
             $data
         );
 
-        /*
-         * Make array keys available as variables:
-         *
-         * [
-         *     'title' => 'Home'
-         * ]
-         *
-         * becomes:
-         *
-         * $title
-         *
-         * EXTR_SKIP prevents accidental overwriting of
-         * existing local variables.
-         */
         extract(
             $viewData,
             EXTR_SKIP
         );
 
-        /*
-         * Isolate the template execution inside a method scope
-         * and capture its output.
-         */
         ob_start();
 
         try {
             require $viewFile;
+
+            return (string) ob_get_clean();
         } catch (\Throwable $exception) {
-            /*
-             * Always clean the output buffer when a template fails.
-             */
-            ob_end_clean();
+            if (ob_get_level() > 0) {
+                ob_end_clean();
+            }
 
             throw $exception;
         }
-
-        return (string) ob_get_clean();
     }
 
     /**
-     * Render a view and send it directly to the browser.
+     * Render a view directly.
      *
-     * Useful for controllers that don't need to manipulate
-     * the generated HTML.
+     * @param array<string, mixed> $data
      */
     public static function display(
         string $view,
@@ -101,7 +72,7 @@ final class View
     }
 
     /**
-     * Share data with all views.
+     * Share a value with all views.
      */
     public static function share(
         string $key,
@@ -112,6 +83,8 @@ final class View
 
     /**
      * Share multiple values with all views.
+     *
+     * @param array<string, mixed> $data
      */
     public static function shareMany(
         array $data
@@ -128,20 +101,11 @@ final class View
         string $key,
         mixed $default = null
     ): mixed {
-        return self::$shared[$key]
-            ?? $default;
+        return self::$shared[$key] ?? $default;
     }
 
     /**
-     * Resolve a view name to a PHP template.
-     *
-     * Example:
-     *
-     * View::render('home/index')
-     *
-     * resolves to:
-     *
-     * app/Views/home/index.php
+     * Resolve a view name to a PHP file.
      */
     private static function resolve(
         string $view
@@ -154,28 +118,12 @@ final class View
             );
         }
 
-        /*
-         * Convert Windows separators to Unix-style separators.
-         */
         $view = str_replace(
             '\\',
             '/',
             $view
         );
 
-        /*
-         * Prevent path traversal.
-         *
-         * We only allow a simple view identifier made of:
-         * - letters
-         * - numbers
-         * - underscore
-         * - hyphen
-         * - slash
-         * - dot
-         *
-         * The ".php" extension is added automatically.
-         */
         if (
             preg_match(
                 '#^[A-Za-z0-9_./-]+$#',
@@ -187,23 +135,12 @@ final class View
             );
         }
 
-        /*
-         * Explicitly reject traversal segments.
-         */
-        if (
-            str_contains(
-                $view,
-                '..'
-            )
-        ) {
+        if (str_contains($view, '..')) {
             throw new RuntimeException(
                 'Invalid view path.'
             );
         }
 
-        /*
-         * Prevent callers from providing the extension themselves.
-         */
         if (
             str_ends_with(
                 strtolower($view),
@@ -218,8 +155,12 @@ final class View
         }
 
         $viewFile = self::$viewsPath
-            . '/'
-            . $view
+            . DIRECTORY_SEPARATOR
+            . str_replace(
+                '/',
+                DIRECTORY_SEPARATOR,
+                $view
+            )
             . '.php';
 
         if (!is_file($viewFile)) {
@@ -232,9 +173,7 @@ final class View
     }
 
     /**
-     * Generate a named route URL from a view.
-     *
-     * This is a convenience wrapper around Router::route().
+     * Generate a named route URL.
      */
     public static function route(
         string $name,
@@ -247,18 +186,18 @@ final class View
     }
 
     /**
-     * Escape HTML safely.
-     *
-     * Use this when displaying user/database content:
-     *
-     * <?= View::escape($title) ?>
+     * Escape HTML safely using UTF-8.
      */
     public static function escape(
         mixed $value
     ): string {
+        if ($value === null) {
+            return '';
+        }
+
         return htmlspecialchars(
             (string) $value,
-            ENT_QUOTES | ENT_SUBSTITUTE,
+            ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5,
             'UTF-8'
         );
     }
@@ -266,52 +205,132 @@ final class View
     /**
      * Generate an asset URL.
      *
-     * Example:
+     * Automatically adds a cache-busting version
+     * for CSS and JavaScript files based on their
+     * last modified time.
+     *
+     * Examples:
      *
      * View::asset('css/app.css')
-     *
-     * => /assets/css/app.css
+     * View::asset('js/app.js')
+     * View::asset('images/logo.png')
      */
     public static function asset(
         string $path
     ): string {
+        $path = trim($path);
+
+        if ($path === '') {
+            return self::baseUrl() . '/assets/';
+        }
+
+        $path = str_replace(
+            '\\',
+            '/',
+            $path
+        );
+
         $path = ltrim(
-            trim($path),
+            $path,
             '/'
         );
 
-        $baseUrl = rtrim(
-            (string) config(
-                'app.url',
-                ''
-            ),
-            '/'
-        );
+        if (
+            str_starts_with(
+                $path,
+                'assets/'
+            )
+        ) {
+            $path = substr(
+                $path,
+                7
+            );
+        }
 
-        return $baseUrl
+        $url = self::baseUrl()
             . '/assets/'
             . $path;
+
+        $version = self::assetVersion(
+            $path
+        );
+
+        if ($version !== null) {
+            $url .= '?v=' . $version;
+        }
+
+        return $url;
     }
 
     /**
-     * Get the configured application URL.
+     * Return a cache-busting version string for CSS/JS assets,
+     * based on the file's last-modified time on disk.
+     *
+     * Returns null for non-versioned extensions or missing files,
+     * so callers fall back to an unversioned URL instead of breaking.
+     */
+    private static function assetVersion(
+        string $relativePath
+    ): ?string {
+        $extension = strtolower(
+            pathinfo(
+                $relativePath,
+                PATHINFO_EXTENSION
+            )
+        );
+
+        if (
+            !in_array(
+                $extension,
+                ['css', 'js'],
+                true
+            )
+        ) {
+            return null;
+        }
+
+        /*
+         * Assets are stored in:
+         *
+         * BASE_PATH/assets/
+         */
+        $absolutePath = BASE_PATH
+            . '/assets/'
+            . $relativePath;
+
+        if (!is_file($absolutePath)) {
+            return null;
+        }
+
+        $mtime = filemtime(
+            $absolutePath
+        );
+
+        return $mtime !== false
+            ? (string) $mtime
+            : null;
+    }
+
+    /**
+     * Generate an application URL.
      */
     public static function url(
         string $path = ''
     ): string {
-        $baseUrl = rtrim(
-            (string) config(
-                'app.url',
-                ''
-            ),
-            '/'
-        );
+        $baseUrl = self::baseUrl();
 
         $path = trim(
-            $path
+            str_replace(
+                '\\',
+                '/',
+                $path
+            )
         );
 
-        if ($path === '' || $path === '/') {
+        if (
+            $path === ''
+            || $path === '/'
+        ) {
             return $baseUrl . '/';
         }
 
@@ -324,19 +343,73 @@ final class View
     }
 
     /**
-     * Render one view inside another.
+     * Get the application's public base URL.
      *
-     * Example:
+     * Production hosting can be configured using app.url,
+     * while the current request is used as a safe fallback.
+     */
+    private static function baseUrl(): string
+    {
+        $configuredUrl = trim(
+            (string) config(
+                'app.url',
+                ''
+            )
+        );
+
+        /*
+         * Prefer explicitly configured application URL.
+         */
+        if ($configuredUrl !== '') {
+            return rtrim(
+                $configuredUrl,
+                '/'
+            );
+        }
+
+        /*
+         * Fallback for InfinityFree/shared hosting.
+         *
+         * This allows assets and links to work even if
+         * app.url has not been configured correctly.
+         */
+        $https = (
+            (!empty($_SERVER['HTTPS'])
+                && strtolower(
+                    (string) $_SERVER['HTTPS']
+                ) !== 'off')
+            || (
+                isset($_SERVER['HTTP_X_FORWARDED_PROTO'])
+                && strtolower(
+                    (string) $_SERVER['HTTP_X_FORWARDED_PROTO']
+                ) === 'https'
+            )
+        );
+
+        $scheme = $https
+            ? 'https'
+            : 'http';
+
+        $host = trim(
+            (string) (
+                $_SERVER['HTTP_HOST']
+                ?? ''
+            )
+        );
+
+        if ($host === '') {
+            return '';
+        }
+
+        return $scheme
+            . '://'
+            . $host;
+    }
+
+    /**
+     * Render a view inside a layout.
      *
-     * $content = View::render(
-     *     'pages/about',
-     *     ['title' => 'درباره ما']
-     * );
-     *
-     * return View::render(
-     *     'layouts/app',
-     *     ['content' => $content]
-     * );
+     * @param array<string, mixed> $data
      */
     public static function renderIntoLayout(
         string $layout,

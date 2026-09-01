@@ -2,16 +2,70 @@
 
 declare(strict_types=1);
 
-$errors = $errors ?? [];
+use App\Core\Csrf;
+use App\Core\View;
 
-$page = $page ?? [];
+$errors =
+    is_array(
+        $errors ?? null
+    )
+        ? $errors
+        : [];
 
-$parents = $parents ?? [];
+$page =
+    is_array(
+        $page ?? null
+    )
+        ? $page
+        : [];
 
-$action = $action ?? '';
+$parents =
+    is_array(
+        $parents ?? null
+    )
+        ? $parents
+        : [];
+
+$action =
+    (string) (
+        $action
+        ?? ''
+    );
 
 $submitLabel =
-    $submitLabel ?? 'ذخیره';
+    (string) (
+        $submitLabel
+        ?? 'ذخیره'
+    );
+
+$status =
+    (string) (
+        $page['status']
+        ?? 'draft'
+    );
+
+/*
+ * Database stores Gregorian DATETIME.
+ *
+ * Admin interface displays Jalali.
+ *
+ * The value passed to jalali_date_fa() must remain
+ * the original Gregorian database string.
+ */
+$publishedAt = '';
+
+if (
+    !empty(
+        $page['published_at']
+        ?? null
+    )
+) {
+    $publishedAt =
+        jalali_date_fa(
+            (string) $page['published_at'],
+            'Y/m/d H:i'
+        );
+}
 ?>
 
 <form
@@ -19,10 +73,10 @@ $submitLabel =
     action="<?= View::escape(
         $action
     ) ?>"
-    class="admin-form"
+    class="admin-pages__form"
 >
 
-    <?= \App\Core\Csrf::field() ?>
+    <?= Csrf::field() ?>
 
 
     <?php if (
@@ -30,43 +84,78 @@ $submitLabel =
     ): ?>
 
         <div
-            class="form-errors"
+            class="
+                admin-pages__alert
+                admin-pages__alert--error
+            "
             role="alert"
         >
 
-            <strong>
-                لطفاً موارد زیر را اصلاح کنید:
-            </strong>
+            <div>
 
-            <ul>
+                <strong>
+                    لطفاً موارد زیر را اصلاح کنید:
+                </strong>
 
-                <?php foreach (
-                    $errors
-                    as $error
-                ): ?>
+                <ul>
 
-                    <li>
-                        <?= View::escape(
-                            $error
-                        ) ?>
-                    </li>
+                    <?php foreach (
+                        $errors
+                        as $key => $error
+                    ): ?>
 
-                <?php endforeach; ?>
+                        <?php if (
+                            is_array($error)
+                        ): ?>
 
-            </ul>
+                            <?php foreach (
+                                $error
+                                as $nestedError
+                            ): ?>
+
+                                <li>
+                                    <?= View::escape(
+                                        (string) $nestedError
+                                    ) ?>
+                                </li>
+
+                            <?php endforeach; ?>
+
+                        <?php else: ?>
+
+                            <li>
+                                <?= View::escape(
+                                    (string) $error
+                                ) ?>
+                            </li>
+
+                        <?php endif; ?>
+
+                    <?php endforeach; ?>
+
+                </ul>
+
+            </div>
 
         </div>
 
     <?php endif; ?>
 
 
-    <div class="form-grid">
+    <div class="admin-pages__form-grid">
 
-        <div class="form-field form-field--full">
+
+        <!-- Title -->
+
+        <div
+            class="
+                admin-pages__field
+                admin-pages__field--full
+            "
+        >
 
             <label
                 for="title"
-                class="form-field__label"
             >
                 عنوان صفحه
             </label>
@@ -75,46 +164,25 @@ $submitLabel =
                 id="title"
                 name="title"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $page['title'] ?? ''
+                    $page['title']
+                    ?? ''
                 ) ?>"
                 maxlength="255"
-                required
-            >
-
-        </div>
-
-
-        <div class="form-field">
-
-            <label
-                for="slug"
-                class="form-field__label"
-            >
-                آدرس صفحه
-            </label>
-
-            <input
-                id="slug"
-                name="slug"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $page['slug'] ?? ''
-                ) ?>"
-                maxlength="255"
-                placeholder="مثلاً about"
                 required
             >
 
             <?php if (
-                isset($errors['slug'])
+                isset(
+                    $errors['title']
+                )
             ): ?>
 
-                <small class="form-field__error">
+                <small
+                    class="admin-pages__field-error"
+                >
                     <?= View::escape(
-                        $errors['slug']
+                        (string) $errors['title']
                     ) ?>
                 </small>
 
@@ -123,11 +191,55 @@ $submitLabel =
         </div>
 
 
-        <div class="form-field">
+        <!-- Slug -->
+
+        <div class="admin-pages__field">
+
+            <label
+                for="slug"
+            >
+                آدرس صفحه
+            </label>
+
+            <input
+                id="slug"
+                name="slug"
+                type="text"
+                value="<?= View::escape(
+                    $page['slug']
+                    ?? ''
+                ) ?>"
+                maxlength="255"
+                placeholder="about"
+                required
+                dir="ltr"
+            >
+
+            <?php if (
+                isset(
+                    $errors['slug']
+                )
+            ): ?>
+
+                <small
+                    class="admin-pages__field-error"
+                >
+                    <?= View::escape(
+                        (string) $errors['slug']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
+
+        </div>
+
+
+        <!-- Parent -->
+
+        <div class="admin-pages__field">
 
             <label
                 for="parent_id"
-                class="form-field__label"
             >
                 صفحه والد
             </label>
@@ -135,7 +247,6 @@ $submitLabel =
             <select
                 id="parent_id"
                 name="parent_id"
-                class="form-field__input"
             >
 
                 <option value="">
@@ -154,14 +265,21 @@ $submitLabel =
                                 $page['parent_id']
                                 ?? ''
                             )
-                            === (string) $parent['id']
+                            ===
+                            (string) (
+                                $parent['id']
+                                ?? ''
+                            )
                         )
                             ? 'selected'
                             : ''
                         ?>
                     >
                         <?= View::escape(
-                            $parent['title']
+                            (string) (
+                                $parent['title']
+                                ?? ''
+                            )
                         ) ?>
                     </option>
 
@@ -172,11 +290,12 @@ $submitLabel =
         </div>
 
 
-        <div class="form-field">
+        <!-- Status -->
+
+        <div class="admin-pages__field">
 
             <label
                 for="status"
-                class="form-field__label"
             >
                 وضعیت
             </label>
@@ -184,16 +303,11 @@ $submitLabel =
             <select
                 id="status"
                 name="status"
-                class="form-field__input"
             >
 
                 <option
                     value="draft"
-                    <?= (
-                        ($page['status']
-                        ?? 'draft')
-                        === 'draft'
-                    )
+                    <?= $status === 'draft'
                         ? 'selected'
                         : ''
                     ?>
@@ -203,11 +317,7 @@ $submitLabel =
 
                 <option
                     value="published"
-                    <?= (
-                        ($page['status']
-                        ?? '')
-                        === 'published'
-                    )
+                    <?= $status === 'published'
                         ? 'selected'
                         : ''
                     ?>
@@ -217,11 +327,7 @@ $submitLabel =
 
                 <option
                     value="private"
-                    <?= (
-                        ($page['status']
-                        ?? '')
-                        === 'private'
-                    )
+                    <?= $status === 'private'
                         ? 'selected'
                         : ''
                     ?>
@@ -234,42 +340,73 @@ $submitLabel =
         </div>
 
 
-        <div class="form-field">
+        <!-- Published At -->
+
+        <div class="admin-pages__field">
 
             <label
                 for="published_at"
-                class="form-field__label"
             >
                 تاریخ انتشار
             </label>
 
-            <input
-                id="published_at"
-                name="published_at"
-                type="datetime-local"
-                class="form-field__input"
-                value="<?= View::escape(
-                    !empty(
-                        $page['published_at']
-                    )
-                        ? date(
-                            'Y-m-d\TH:i',
-                            strtotime(
-                                $page['published_at']
-                            )
-                        )
-                        : ''
-                ) ?>"
+            <div
+                class="admin-pages__date-field"
             >
+
+                <input
+                    id="published_at"
+                    name="published_at"
+                    type="text"
+                    value="<?= View::escape(
+                        $publishedAt
+                    ) ?>"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    dir="ltr"
+                    placeholder="۱۴۰۵/۰۶/۰۵ ۱۱:۱۴"
+                    maxlength="16"
+                    data-jalali-picker
+                    data-jalali-time="1"
+                >
+
+            </div>
+
+            <small>
+                تاریخ انتشار را با تقویم شمسی انتخاب کنید.
+                در صورت نیاز می‌توانید تاریخ را به صورت دستی نیز وارد کنید.
+            </small>
+
+            <?php if (
+                isset(
+                    $errors['published_at']
+                )
+            ): ?>
+
+                <small
+                    class="admin-pages__field-error"
+                >
+                    <?= View::escape(
+                        (string) $errors['published_at']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field form-field--full">
+        <!-- Featured Image -->
+
+        <div
+            class="
+                admin-pages__field
+                admin-pages__field--full
+            "
+        >
 
             <label
                 for="featured_image"
-                class="form-field__label"
             >
                 تصویر شاخص
             </label>
@@ -278,43 +415,64 @@ $submitLabel =
                 id="featured_image"
                 name="featured_image"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
                     $page['featured_image']
                     ?? ''
                 ) ?>"
                 maxlength="500"
+                placeholder="/media/example.webp"
+                dir="ltr"
             >
+
+            <small>
+                مسیر یا آدرس تصویر شاخص صفحه را وارد کنید.
+            </small>
 
         </div>
 
 
-        <div class="form-field form-field--full">
+        <!-- Excerpt -->
+
+        <div
+            class="
+                admin-pages__field
+                admin-pages__field--full
+            "
+        >
 
             <label
                 for="excerpt"
-                class="form-field__label"
             >
-                خلاصه
+                خلاصه صفحه
             </label>
 
             <textarea
                 id="excerpt"
                 name="excerpt"
-                class="form-field__textarea"
-                rows="4"
+                rows="5"
             ><?= View::escape(
-                $page['excerpt'] ?? ''
+                $page['excerpt']
+                ?? ''
             ) ?></textarea>
+
+            <small>
+                خلاصه کوتاهی برای معرفی صفحه و استفاده‌های احتمالی در لیست‌ها.
+            </small>
 
         </div>
 
 
-        <div class="form-field form-field--full">
+        <!-- Content -->
+
+        <div
+            class="
+                admin-pages__field
+                admin-pages__field--full
+            "
+        >
 
             <label
                 for="content"
-                class="form-field__label"
             >
                 محتوای صفحه
             </label>
@@ -322,42 +480,61 @@ $submitLabel =
             <textarea
                 id="content"
                 name="content"
-                class="form-field__textarea"
                 rows="18"
             ><?= View::escape(
-                $page['content'] ?? ''
+                $page['content']
+                ?? ''
             ) ?></textarea>
+
+            <small>
+                محتوای اصلی صفحه را در این بخش وارد کنید.
+            </small>
 
         </div>
 
     </div>
 
 
-    <div
-        style="
-            margin-top:32px;
-            padding-top:28px;
-            border-top:1px solid #e2e8f0;
-        "
-    >
+    <!-- SEO -->
 
-        <h2
-            style="
-                margin:0 0 20px;
-                font-size:18px;
-            "
-        >
-            تنظیمات SEO
-        </h2>
+    <section class="admin-pages__section">
+
+        <header class="admin-pages__section-header">
+
+            <div
+                class="admin-pages__section-icon"
+                aria-hidden="true"
+            >
+                ⚙
+            </div>
+
+            <div>
+
+                <h2>
+                    تنظیمات SEO
+                </h2>
+
+                <p>
+                    اطلاعاتی که برای موتورهای جستجو استفاده می‌شود.
+                </p>
+
+            </div>
+
+        </header>
 
 
-        <div class="form-grid">
+        <div class="admin-pages__form-grid">
 
-            <div class="form-field form-field--full">
+
+            <div
+                class="
+                    admin-pages__field
+                    admin-pages__field--full
+                "
+            >
 
                 <label
                     for="seo_title"
-                    class="form-field__label"
                 >
                     عنوان SEO
                 </label>
@@ -366,9 +543,9 @@ $submitLabel =
                     id="seo_title"
                     name="seo_title"
                     type="text"
-                    class="form-field__input"
                     value="<?= View::escape(
-                        $page['seo_title'] ?? ''
+                        $page['seo_title']
+                        ?? ''
                     ) ?>"
                     maxlength="255"
                 >
@@ -376,11 +553,15 @@ $submitLabel =
             </div>
 
 
-            <div class="form-field form-field--full">
+            <div
+                class="
+                    admin-pages__field
+                    admin-pages__field--full
+                "
+            >
 
                 <label
                     for="seo_description"
-                    class="form-field__label"
                 >
                     توضیحات SEO
                 </label>
@@ -388,8 +569,7 @@ $submitLabel =
                 <textarea
                     id="seo_description"
                     name="seo_description"
-                    class="form-field__textarea"
-                    rows="4"
+                    rows="5"
                 ><?= View::escape(
                     $page['seo_description']
                     ?? ''
@@ -398,11 +578,15 @@ $submitLabel =
             </div>
 
 
-            <div class="form-field form-field--full">
+            <div
+                class="
+                    admin-pages__field
+                    admin-pages__field--full
+                "
+            >
 
                 <label
                     for="seo_keywords"
-                    class="form-field__label"
                 >
                     کلمات کلیدی
                 </label>
@@ -411,22 +595,24 @@ $submitLabel =
                     id="seo_keywords"
                     name="seo_keywords"
                     type="text"
-                    class="form-field__input"
                     value="<?= View::escape(
                         $page['seo_keywords']
                         ?? ''
                     ) ?>"
                     maxlength="1000"
+                    placeholder="صدرا، دانشگاه، آموزش عالی"
                 >
 
             </div>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <div class="admin-form__actions">
+    <!-- Actions -->
+
+    <div class="admin-pages__form-actions">
 
         <button
             type="submit"
@@ -436,6 +622,7 @@ $submitLabel =
                 $submitLabel
             ) ?>
         </button>
+
 
         <a
             href="<?= View::route(

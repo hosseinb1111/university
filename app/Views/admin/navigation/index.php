@@ -1,87 +1,320 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Core\Csrf;
+use App\Core\View;
+
+
+$items =
+    is_array(
+        $items ?? null
+    )
+        ? $items
+        : [];
+
+
+$success =
+    is_string(
+        $success ?? null
+    )
+        ? $success
+        : null;
+
+
+$error =
+    is_string(
+        $error ?? null
+    )
+        ? $error
+        : null;
+
+
+$mainItems =
+    0;
+
+$quickItems =
+    0;
+
+$activeItems =
+    0;
+
+
+foreach (
+    $items
+    as $navigationItem
+) {
+    $location =
+        (
+            $navigationItem[
+                'display_location'
+            ]
+            ?? 'main'
+        ) === 'quick'
+            ? 'quick'
+            : 'main';
+
+    if (
+        $location === 'quick'
+    ) {
+        $quickItems++;
+    } else {
+        $mainItems++;
+    }
+
+    if (
+        (int) (
+            $navigationItem[
+                'is_active'
+            ]
+            ?? 0
+        ) === 1
+    ) {
+        $activeItems++;
+    }
+}
+
 ?>
 
-<div class="admin-page">
+<div class="admin-navigation">
 
-    <div class="admin-page__header">
+    <header class="admin-navigation__header">
 
-        <div>
+        <div class="admin-navigation__header-main">
+
+            <span class="admin-navigation__eyebrow">
+                ساختار سایت
+            </span>
+
             <h1>
                 منوی سایت
             </h1>
 
             <p>
-                مدیریت ساختار منوی اصلی و زیرمنوهای سایت
+                تمام آیتم‌های منوی اصلی و بخش «سامانه‌ها و خدمات» را از اینجا مدیریت کنید.
             </p>
+
         </div>
 
-        <a
-            href="<?= View::route(
-                'admin.navigation.create'
-            ) ?>"
-            class="button button--primary"
-        >
-            + افزودن آیتم
-        </a>
 
-    </div>
+        <div class="admin-navigation__header-action">
+
+            <a
+                href="<?= View::route(
+                    'admin.navigation.create'
+                ) ?>"
+                class="admin-navigation__create-button"
+            >
+
+                <span
+                    class="admin-navigation__create-button-icon"
+                    aria-hidden="true"
+                >
+                    +
+                </span>
+
+                افزودن آیتم
+
+            </a>
+
+        </div>
+
+    </header>
 
 
     <?php if (
         $success !== null
+        && $success !== ''
     ): ?>
 
         <div
-            style="
-                margin-bottom:20px;
-                padding:14px 16px;
-                background:#f0fdf4;
-                border:1px solid #bbf7d0;
-                border-radius:12px;
-                color:#166534;
+            class="
+                admin-navigation__alert
+                admin-navigation__alert--success
             "
+            role="status"
         >
-            <?= View::escape(
-                $success
-            ) ?>
+
+            <span
+                class="admin-navigation__alert-icon"
+                aria-hidden="true"
+            >
+                ✓
+            </span>
+
+            <div>
+                <?= View::escape(
+                    $success
+                ) ?>
+            </div>
+
         </div>
 
     <?php endif; ?>
 
 
-    <div class="admin-panel">
+    <?php if (
+        $error !== null
+        && $error !== ''
+    ): ?>
+
+        <div
+            class="
+                admin-navigation__alert
+                admin-navigation__alert--error
+            "
+            role="alert"
+        >
+
+            <span
+                class="admin-navigation__alert-icon"
+                aria-hidden="true"
+            >
+                !
+            </span>
+
+            <div>
+                <?= View::escape(
+                    $error
+                ) ?>
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <section class="admin-navigation__panel">
+
+        <header class="admin-navigation__panel-header">
+
+            <div class="admin-navigation__panel-title">
+
+                <div
+                    class="admin-navigation__panel-icon"
+                    aria-hidden="true"
+                >
+                    ☰
+                </div>
+
+                <div>
+
+                    <strong>
+                        آیتم‌های منو
+                    </strong>
+
+                    <span>
+                        <?= number_format(
+                            count($items)
+                        ) ?>
+                        آیتم
+                        ·
+                        <?= number_format(
+                            $activeItems
+                        ) ?>
+                        فعال
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-navigation__stats">
+
+                <span>
+                    منوی اصلی:
+                    <strong>
+                        <?= number_format(
+                            $mainItems
+                        ) ?>
+                    </strong>
+                </span>
+
+                <span>
+                    دسترسی سریع:
+                    <strong>
+                        <?= number_format(
+                            $quickItems
+                        ) ?>
+                    </strong>
+                </span>
+
+            </div>
+
+        </header>
+
 
         <?php if (
             $items === []
         ): ?>
 
-            <div
-                style="
-                    padding:50px 20px;
-                    text-align:center;
-                    color:#64748b;
-                "
-            >
-                هنوز آیتمی برای منوی سایت ایجاد نشده است.
+            <div class="admin-navigation__empty">
+
+                <div
+                    class="admin-navigation__empty-icon"
+                    aria-hidden="true"
+                >
+                    ☰
+                </div>
+
+                <h2>
+                    هنوز آیتمی ایجاد نشده است.
+                </h2>
+
+                <p>
+                    اولین آیتم منوی سایت یا یکی از سامانه‌ها و خدمات را اضافه کنید.
+                </p>
+
+                <a
+                    href="<?= View::route(
+                        'admin.navigation.create'
+                    ) ?>"
+                    class="admin-navigation__create-button"
+                >
+                    افزودن اولین آیتم
+                </a>
+
             </div>
 
         <?php else: ?>
 
-            <div class="announcement-table-wrapper">
+            <div class="admin-navigation__table-wrapper">
 
-                <table class="announcement-table">
+                <table class="admin-navigation__table">
 
                     <thead>
 
                     <tr>
-                        <th>عنوان</th>
-                        <th>والد</th>
-                        <th>مقصد</th>
-                        <th>وضعیت</th>
-                        <th>ترتیب</th>
-                        <th>عملیات</th>
+
+                        <th>
+                            عنوان
+                        </th>
+
+                        <th>
+                            محل نمایش
+                        </th>
+
+                        <th>
+                            والد
+                        </th>
+
+                        <th>
+                            مقصد
+                        </th>
+
+                        <th>
+                            وضعیت
+                        </th>
+
+                        <th>
+                            ترتیب
+                        </th>
+
+                        <th>
+                            عملیات
+                        </th>
+
                     </tr>
 
                     </thead>
@@ -90,105 +323,301 @@ declare(strict_types=1);
 
                     <?php foreach (
                         $items
-                        as $item
+                        as $navigationItem
                     ): ?>
+
+                        <?php
+
+                        $id =
+                            (int) (
+                                $navigationItem[
+                                    'id'
+                                ]
+                                ?? 0
+                            );
+
+                        $location =
+                            (
+                                $navigationItem[
+                                    'display_location'
+                                ]
+                                ?? 'main'
+                            ) === 'quick'
+                                ? 'quick'
+                                : 'main';
+
+                        $title =
+                            trim(
+                                (string) (
+                                    $navigationItem[
+                                        'title'
+                                    ]
+                                    ?? ''
+                                )
+                            );
+
+                        $description =
+                            trim(
+                                (string) (
+                                    $navigationItem[
+                                        'description'
+                                    ]
+                                    ?? ''
+                                )
+                            );
+
+                        $parentTitle =
+                            trim(
+                                (string) (
+                                    $navigationItem[
+                                        'parent_title'
+                                    ]
+                                    ?? ''
+                                )
+                            );
+
+                        $pageSlug =
+                            trim(
+                                (string) (
+                                    $navigationItem[
+                                        'page_slug'
+                                    ]
+                                    ?? ''
+                                )
+                            );
+
+                        $url =
+                            trim(
+                                (string) (
+                                    $navigationItem[
+                                        'url'
+                                    ]
+                                    ?? ''
+                                )
+                            );
+
+                        $isActive =
+                            (int) (
+                                $navigationItem[
+                                    'is_active'
+                                ]
+                                ?? 0
+                            ) === 1;
+
+                        $sortOrder =
+                            (int) (
+                                $navigationItem[
+                                    'sort_order'
+                                ]
+                                ?? 0
+                            );
+
+                        $destination =
+                            $url !== ''
+                                ? $url
+                                : (
+                                    $pageSlug !== ''
+                                        ? '/pages/'
+                                            . $pageSlug
+                                        : '#'
+                                );
+
+                        ?>
 
                         <tr>
 
                             <td>
-                                <strong>
-                                    <?= View::escape(
-                                        $item['title']
-                                    ) ?>
-                                </strong>
+
+                                <div class="admin-navigation__item">
+
+                                    <div
+                                        class="admin-navigation__item-icon"
+                                        aria-hidden="true"
+                                    >
+                                        <?= $location === 'quick'
+                                            ? '⚡'
+                                            : '☰'
+                                        ?>
+                                    </div>
+
+                                    <div class="admin-navigation__item-text">
+
+                                        <strong
+                                            class="admin-navigation__item-title"
+                                        >
+                                            <?= View::escape(
+                                                $title
+                                            ) ?>
+                                        </strong>
+
+                                        <?php if (
+                                            $description !== ''
+                                        ): ?>
+
+                                            <span
+                                                class="
+                                                    admin-navigation__item-description
+                                                "
+                                            >
+                                                <?= View::escape(
+                                                    $description
+                                                ) ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                </div>
+
                             </td>
 
-                            <td>
-                                <?= View::escape(
-                                    $item['parent_title']
-                                    ?? 'منوی اصلی'
-                                ) ?>
-                            </td>
 
                             <td>
+
+                                <span
+                                    class="
+                                        admin-navigation__badge
+                                        admin-navigation__badge--<?= $location ?>
+                                    "
+                                >
+
+                                    <?= $location === 'quick'
+                                        ? 'دسترسی سریع'
+                                        : 'منوی اصلی'
+                                    ?>
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
                                 <?php if (
-                                    !empty(
-                                        $item['page_slug']
-                                    )
+                                    $location === 'quick'
                                 ): ?>
 
-                                    /pages/<?= View::escape(
-                                        $item['page_slug']
-                                    ) ?>
+                                    <span
+                                        class="admin-navigation__parent admin-navigation__parent--root"
+                                    >
+                                        سطح اصلی
+                                    </span>
 
-                                <?php else: ?>
-
-                                    <?= View::escape(
-                                        $item['url']
-                                        ?? '#'
-                                    ) ?>
-
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-
-                                <?php if (
-                                    (int) (
-                                        $item['is_active']
-                                        ?? 0
-                                    ) === 1
+                                <?php elseif (
+                                    $parentTitle !== ''
                                 ): ?>
 
-                                    <span class="announcement-status announcement-status--published">
-                                        فعال
+                                    <span
+                                        class="admin-navigation__parent"
+                                    >
+                                        <?= View::escape(
+                                            $parentTitle
+                                        ) ?>
                                     </span>
 
                                 <?php else: ?>
 
-                                    <span class="announcement-status announcement-status--draft">
-                                        غیرفعال
+                                    <span
+                                        class="
+                                            admin-navigation__parent
+                                            admin-navigation__parent--root
+                                        "
+                                    >
+                                        بدون والد
                                     </span>
 
                                 <?php endif; ?>
 
                             </td>
 
-                            <td>
-                                <?= (int) (
-                                    $item['sort_order']
-                                    ?? 0
-                                ) ?>
-                            </td>
 
                             <td>
 
                                 <div
-                                    style="
-                                        display:flex;
-                                        flex-wrap:wrap;
-                                        gap:6px;
+                                    class="admin-navigation__destination"
+                                    title="<?= View::escape(
+                                        $destination
+                                    ) ?>"
+                                >
+                                    <?= View::escape(
+                                        $destination
+                                    ) ?>
+                                </div>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="
+                                        admin-navigation__status
+                                        admin-navigation__status--<?= $isActive
+                                            ? 'active'
+                                            : 'inactive'
+                                        ?>
                                     "
+                                >
+                                    <?= $isActive
+                                        ? 'فعال'
+                                        : 'غیرفعال'
+                                    ?>
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <span
+                                    class="admin-navigation__order"
+                                >
+                                    <?= $sortOrder ?>
+                                </span>
+
+                            </td>
+
+
+                            <td>
+
+                                <div
+                                    class="admin-navigation__actions"
                                 >
 
                                     <a
-                                        href="/admin/navigation/<?= (int) $item['id'] ?>/edit"
-                                        class="table-action"
+                                        href="<?= View::url(
+                                            '/admin/navigation/'
+                                            . $id
+                                            . '/edit'
+                                        ) ?>"
+                                        class="
+                                            admin-navigation__action
+                                            admin-navigation__action--edit
+                                        "
                                     >
                                         ویرایش
                                     </a>
 
+
                                     <form
                                         method="POST"
-                                        action="/admin/navigation/<?= (int) $item['id'] ?>/delete"
+                                        action="<?= View::url(
+                                            '/admin/navigation/'
+                                            . $id
+                                            . '/delete'
+                                        ) ?>"
                                         onsubmit="return confirm('آیا از حذف این آیتم مطمئن هستید؟');"
                                     >
 
-                                        <?= \App\Core\Csrf::field() ?>
+                                        <?= Csrf::field() ?>
 
                                         <button
                                             type="submit"
-                                            class="table-action table-action--danger"
+                                            class="
+                                                admin-navigation__action
+                                                admin-navigation__action--delete
+                                            "
                                         >
                                             حذف
                                         </button>
@@ -211,6 +640,6 @@ declare(strict_types=1);
 
         <?php endif; ?>
 
-    </div>
+    </section>
 
 </div>

@@ -1,0 +1,2163 @@
+/*
+|--------------------------------------------------------------------------
+| Sadra Admin
+| Users
+|--------------------------------------------------------------------------
+|
+| Dedicated styling for:
+|
+| - admin/users
+| - admin/users/create
+| - admin/users/edit
+|
+| This file intentionally does not change the UserController logic.
+|
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   USERS PAGE
+   ========================================================================== */
+
+.admin-users {
+    width: 100%;
+    max-width: 1380px;
+
+    margin-inline: auto;
+
+    padding-bottom: 45px;
+}
+
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.admin-users__header {
+    display: flex;
+
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-bottom: 26px;
+}
+
+
+.admin-users__header-main {
+    min-width: 0;
+}
+
+
+.admin-users__eyebrow {
+    display: inline-flex;
+
+    align-items: center;
+
+    min-height: 26px;
+
+    margin-bottom: 8px;
+
+    padding:
+        4px
+        10px;
+
+    background:
+        #eff6ff;
+
+    border:
+        1px solid
+        #dbeafe;
+
+    border-radius:
+        999px;
+
+    color:
+        #2563eb;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1;
+
+    white-space:
+        nowrap;
+}
+
+
+.admin-users__header h1 {
+    margin:
+        0;
+
+    color:
+        #172033;
+
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            38px
+        );
+
+    font-weight:
+        850;
+
+    line-height:
+        1.25;
+
+    letter-spacing:
+        -0.035em;
+}
+
+
+.admin-users__header p {
+    max-width:
+        650px;
+
+    margin:
+        8px
+        0
+        0;
+
+    color:
+        #64748b;
+
+    font-size:
+        13px;
+
+    line-height:
+        1.85;
+}
+
+
+/* ==========================================================================
+   Header action
+   ========================================================================== */
+
+.admin-users__header-action {
+    flex:
+        0
+        0
+        auto;
+}
+
+
+.admin-users__create-button {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    min-height:
+        44px;
+
+    padding:
+        0
+        17px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border:
+        1px solid
+        #1d4ed8;
+
+    border-radius:
+        11px;
+
+    color:
+        #ffffff;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    box-shadow:
+        0
+        8px
+        20px
+        rgba(
+            37,
+            99,
+            235,
+            0.16
+        );
+
+    transition:
+        transform 160ms ease,
+        box-shadow 160ms ease,
+        background 160ms ease;
+}
+
+
+.admin-users__create-button:hover {
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #1e40af
+        );
+
+    box-shadow:
+        0
+        11px
+        25px
+        rgba(
+            37,
+            99,
+            235,
+            0.2
+        );
+
+    transform:
+        translateY(
+            -1px
+        );
+}
+
+
+.admin-users__create-button-icon {
+    width:
+        23px;
+
+    height:
+        23px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.14
+        );
+
+    border-radius:
+        7px;
+
+    font-size:
+        15px;
+
+    line-height:
+        1;
+}
+
+
+/* ==========================================================================
+   Alerts
+   ========================================================================== */
+
+.admin-users__alert {
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    gap:
+        11px;
+
+    margin-bottom:
+        18px;
+
+    padding:
+        14px
+        16px;
+
+    border-radius:
+        12px;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.75;
+}
+
+
+.admin-users__alert-icon {
+    width:
+        29px;
+
+    height:
+        29px;
+
+    flex:
+        0
+        0
+        29px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        9px;
+
+    font-size:
+        12px;
+
+    font-weight:
+        900;
+}
+
+
+.admin-users__alert--success {
+    background:
+        linear-gradient(
+            135deg,
+            #f0fdf4,
+            #f8fff9
+        );
+
+    border:
+        1px solid
+        #bbf7d0;
+
+    color:
+        #166534;
+}
+
+
+.admin-users__alert--success
+.admin-users__alert-icon {
+    background:
+        #dcfce7;
+}
+
+
+.admin-users__alert--error {
+    background:
+        linear-gradient(
+            135deg,
+            #fef2f2,
+            #fff8f8
+        );
+
+    border:
+        1px solid
+        #fecaca;
+
+    color:
+        #991b1b;
+}
+
+
+.admin-users__alert--error
+.admin-users__alert-icon {
+    background:
+        #fee2e2;
+}
+
+
+/* ==========================================================================
+   Main panel
+   ========================================================================== */
+
+.admin-users__panel {
+    overflow:
+        hidden;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        17px;
+
+    box-shadow:
+        0
+        5px
+        22px
+        rgba(
+            15,
+            23,
+            42,
+            0.045
+        );
+}
+
+
+.admin-users__panel-header {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    padding:
+        20px
+        24px;
+
+    border-bottom:
+        1px solid
+        #edf1f5;
+}
+
+
+.admin-users__panel-title {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+}
+
+
+.admin-users__panel-icon {
+    width:
+        38px;
+
+    height:
+        38px;
+
+    flex:
+        0
+        0
+        38px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        #eff6ff;
+
+    border-radius:
+        10px;
+
+    color:
+        #2563eb;
+
+    font-size:
+        17px;
+}
+
+
+.admin-users__panel-title strong {
+    display:
+        block;
+
+    color:
+        #172033;
+
+    font-size:
+        13px;
+
+    font-weight:
+        800;
+}
+
+
+.admin-users__panel-title span {
+    display:
+        block;
+
+    margin-top:
+        2px;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        10px;
+}
+
+
+/* ==========================================================================
+   User count
+   ========================================================================== */
+
+.admin-users__count {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    min-height:
+        30px;
+
+    padding:
+        5px
+        10px;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        999px;
+
+    color:
+        #64748b;
+
+    font-size:
+        10px;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+}
+
+
+.admin-users__count strong {
+    color:
+        #172033;
+
+    font-weight:
+        850;
+}
+
+
+/* ==========================================================================
+   Table wrapper
+   ========================================================================== */
+
+.admin-users__table-wrapper {
+    width:
+        100%;
+
+    overflow-x:
+        auto;
+}
+
+
+.admin-users__table {
+    width:
+        100%;
+
+    min-width:
+        900px;
+
+    border-collapse:
+        collapse;
+}
+
+
+.admin-users__table th,
+.admin-users__table td {
+    padding:
+        14px
+        18px;
+
+    border-bottom:
+        1px solid
+        #edf1f5;
+
+    text-align:
+        right;
+
+    vertical-align:
+        middle;
+}
+
+
+.admin-users__table th {
+    background:
+        #fafbfd;
+
+    color:
+        #64748b;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+
+.admin-users__table td {
+    color:
+        #334155;
+
+    font-size:
+        12px;
+}
+
+
+.admin-users__table tbody tr {
+    transition:
+        background 160ms ease;
+}
+
+
+.admin-users__table tbody tr:hover {
+    background:
+        #f8fbff;
+}
+
+
+.admin-users__table tbody tr:last-child td {
+    border-bottom:
+        0;
+}
+
+
+/* ==========================================================================
+   User identity
+   ========================================================================== */
+
+.admin-users__identity {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        11px;
+
+    min-width:
+        210px;
+}
+
+
+.admin-users__avatar {
+    width:
+        40px;
+
+    height:
+        40px;
+
+    flex:
+        0
+        0
+        40px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    overflow:
+        hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #dbeafe,
+            #bfdbfe
+        );
+
+    border:
+        1px solid
+        #bfdbfe;
+
+    border-radius:
+        12px;
+
+    color:
+        #1d4ed8;
+
+    font-size:
+        13px;
+
+    font-weight:
+        850;
+}
+
+
+.admin-users__identity-text {
+    min-width:
+        0;
+}
+
+
+.admin-users__identity-name {
+    display:
+        block;
+
+    overflow:
+        hidden;
+
+    color:
+        #172033;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.5;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+.admin-users__identity-username {
+    display:
+        block;
+
+    margin-top:
+        2px;
+
+    overflow:
+        hidden;
+
+    color:
+        #94a3b8;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace;
+
+    font-size:
+        9px;
+
+    line-height:
+        1.5;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+    direction:
+        ltr;
+
+    text-align:
+        right;
+}
+
+
+/* ==========================================================================
+   Email
+   ========================================================================== */
+
+.admin-users__email {
+    color:
+        #475467;
+
+    font-size:
+        11px;
+
+    direction:
+        ltr;
+
+    text-align:
+        right;
+}
+
+
+.admin-users__email--empty {
+    color:
+        #cbd5e1;
+}
+
+
+/* ==========================================================================
+   Role badges
+   ========================================================================== */
+
+.admin-users__role {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    min-height:
+        27px;
+
+    padding:
+        5px
+        10px;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:
+        999px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+
+.admin-users__role--super-admin {
+    background:
+        #fef3c7;
+
+    border-color:
+        #fde68a;
+
+    color:
+        #92400e;
+}
+
+
+.admin-users__role--admin {
+    background:
+        #ede9fe;
+
+    border-color:
+        #ddd6fe;
+
+    color:
+        #6d28d9;
+}
+
+
+.admin-users__role--editor {
+    background:
+        #e0f2fe;
+
+    border-color:
+        #bae6fd;
+
+    color:
+        #0369a1;
+}
+
+
+.admin-users__role--teacher {
+    background:
+        #eff6ff;
+
+    border-color:
+        #dbeafe;
+
+    color:
+        #1d4ed8;
+}
+
+
+/* ==========================================================================
+   Status
+   ========================================================================== */
+
+.admin-users__status {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    min-height:
+        27px;
+
+    padding:
+        5px
+        10px;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:
+        999px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+
+.admin-users__status::before {
+    content:
+        "";
+
+    width:
+        6px;
+
+    height:
+        6px;
+
+    border-radius:
+        50%;
+}
+
+
+.admin-users__status--active {
+    background:
+        #ecfdf3;
+
+    border-color:
+        #bbf7d0;
+
+    color:
+        #15803d;
+}
+
+
+.admin-users__status--active::before {
+    background:
+        #16a34a;
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(
+            22,
+            163,
+            74,
+            0.08
+        );
+}
+
+
+.admin-users__status--inactive {
+    background:
+        #f8fafc;
+
+    border-color:
+        #e2e8f0;
+
+    color:
+        #64748b;
+}
+
+
+.admin-users__status--inactive::before {
+    background:
+        #94a3b8;
+}
+
+
+/* ==========================================================================
+   Last login
+   ========================================================================== */
+
+.admin-users__last-login {
+    color:
+        #64748b;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.7;
+}
+
+
+.admin-users__last-login--empty {
+    color:
+        #cbd5e1;
+}
+
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+
+.admin-users__actions {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        6px;
+}
+
+
+.admin-users__action {
+    min-height:
+        32px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        5px
+        10px;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    color:
+        #475467;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1;
+
+    text-decoration:
+        none;
+
+    cursor:
+        pointer;
+
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease,
+        transform 160ms ease;
+}
+
+
+.admin-users__action:hover {
+    background:
+        #f8fafc;
+
+    border-color:
+        #cbd5e1;
+
+    color:
+        #172033;
+
+    transform:
+        translateY(
+            -1px
+        );
+}
+
+
+.admin-users__action--edit:hover {
+    background:
+        #eff6ff;
+
+    border-color:
+        #bfdbfe;
+
+    color:
+        #1d4ed8;
+}
+
+
+.admin-users__action--delete {
+    color:
+        #b42318;
+}
+
+
+.admin-users__action--delete:hover {
+    background:
+        #fef2f2;
+
+    border-color:
+        #fecaca;
+
+    color:
+        #b91c1c;
+}
+
+
+/* ==========================================================================
+   Empty state
+   ========================================================================== */
+
+.admin-users__empty {
+    padding:
+        75px
+        24px;
+
+    text-align:
+        center;
+}
+
+
+.admin-users__empty-icon {
+    width:
+        62px;
+
+    height:
+        62px;
+
+    margin:
+        0
+        auto
+        15px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        #eff6ff;
+
+    border:
+        1px solid
+        #dbeafe;
+
+    border-radius:
+        16px;
+
+    color:
+        #2563eb;
+
+    font-size:
+        25px;
+}
+
+
+.admin-users__empty h2 {
+    margin:
+        0;
+
+    color:
+        #172033;
+
+    font-size:
+        18px;
+
+    font-weight:
+        800;
+}
+
+
+.admin-users__empty p {
+    max-width:
+        420px;
+
+    margin:
+        7px
+        auto
+        20px;
+
+    color:
+        #64748b;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.8;
+}
+
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.admin-users__pagination {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        6px;
+
+    padding:
+        20px
+        24px
+        24px;
+
+    border-top:
+        1px solid
+        #edf1f5;
+}
+
+
+.admin-users__page-link,
+.admin-users__page-current {
+    min-width:
+        35px;
+
+    min-height:
+        35px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        5px
+        9px;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        9px;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+}
+
+
+.admin-users__page-link {
+    background:
+        #ffffff;
+
+    color:
+        #64748b;
+}
+
+
+.admin-users__page-link:hover {
+    background:
+        #eff6ff;
+
+    border-color:
+        #bfdbfe;
+
+    color:
+        #1d4ed8;
+}
+
+
+.admin-users__page-current {
+    background:
+        #172033;
+
+    border-color:
+        #172033;
+
+    color:
+        #ffffff;
+}
+
+
+/* ==========================================================================
+   User form
+   ========================================================================== */
+
+.admin-user-form {
+    width:
+        100%;
+
+    max-width:
+        1080px;
+
+    margin-inline:
+        auto;
+}
+
+
+.admin-user-form__panel {
+    overflow:
+        hidden;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        17px;
+
+    box-shadow:
+        0
+        5px
+        22px
+        rgba(
+            15,
+            23,
+            42,
+            0.045
+        );
+}
+
+
+.admin-user-form__header {
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    gap:
+        13px;
+
+    padding:
+        22px
+        25px;
+
+    border-bottom:
+        1px solid
+        #edf1f5;
+}
+
+
+.admin-user-form__header-icon {
+    width:
+        42px;
+
+    height:
+        42px;
+
+    flex:
+        0
+        0
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        #eff6ff;
+
+    border-radius:
+        11px;
+
+    color:
+        #2563eb;
+
+    font-size:
+        18px;
+}
+
+
+.admin-user-form__header h2 {
+    margin:
+        0;
+
+    color:
+        #172033;
+
+    font-size:
+        16px;
+
+    font-weight:
+        800;
+}
+
+
+.admin-user-form__header p {
+    margin:
+        4px
+        0
+        0;
+
+    color:
+        #64748b;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.7;
+}
+
+
+.admin-user-form__body {
+    padding:
+        28px;
+}
+
+
+.admin-user-form__grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        19px;
+}
+
+
+.admin-user-form__field {
+    min-width:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        7px;
+}
+
+
+.admin-user-form__field--full {
+    grid-column:
+        1 / -1;
+}
+
+
+.admin-user-form__field label {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    color:
+        #344054;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+}
+
+
+.admin-user-form__required {
+    color:
+        #dc2626;
+
+    font-size:
+        11px;
+}
+
+
+.admin-user-form__help {
+    margin-top:
+        0;
+
+    color:
+        #94a3b8;
+
+    font-size:
+        10px;
+
+    line-height:
+        1.7;
+}
+
+
+.admin-user-form__input,
+.admin-user-form__select {
+    width:
+        100%;
+
+    min-height:
+        47px;
+
+    padding:
+        9px
+        13px;
+
+    background:
+        #fbfcfd;
+
+    border:
+        1px solid
+        #d0d5dd;
+
+    border-radius:
+        10px;
+
+    outline:
+        none;
+
+    color:
+        #172033;
+
+    font-family:
+        inherit;
+
+    font-size:
+        12px;
+
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+
+.admin-user-form__input:hover,
+.admin-user-form__select:hover {
+    background:
+        #ffffff;
+
+    border-color:
+        #b8c0cc;
+}
+
+
+.admin-user-form__input:focus,
+.admin-user-form__select:focus {
+    background:
+        #ffffff;
+
+    border-color:
+        #2563eb;
+
+    box-shadow:
+        0
+        0
+        0
+        4px
+        rgba(
+            37,
+            99,
+            235,
+            0.08
+        );
+}
+
+
+.admin-user-form__input::placeholder {
+    color:
+        #b0b7c3;
+}
+
+
+/* ==========================================================================
+   Password section
+   ========================================================================== */
+
+.admin-user-form__password-section {
+    margin-top:
+        5px;
+
+    padding-top:
+        24px;
+
+    border-top:
+        1px solid
+        #edf1f5;
+}
+
+
+.admin-user-form__section-heading {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    margin-bottom:
+        17px;
+}
+
+
+.admin-user-form__section-heading-icon {
+    width:
+        30px;
+
+    height:
+        30px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    border-radius:
+        8px;
+
+    font-size:
+        13px;
+}
+
+
+.admin-user-form__section-heading strong {
+    color:
+        #344054;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+}
+
+
+.admin-user-form__section-heading span {
+    display:
+        block;
+
+    margin-top:
+        1px;
+
+    color:
+        #98a2b3;
+
+    font-size:
+        9px;
+}
+
+
+/* ==========================================================================
+   Checkbox
+   ========================================================================== */
+
+.admin-user-form__checkbox {
+    min-height:
+        47px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    padding:
+        10px
+        13px;
+
+    background:
+        #fbfcfd;
+
+    border:
+        1px solid
+        #d0d5dd;
+
+    border-radius:
+        10px;
+
+    color:
+        #344054;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+    transition:
+        background 160ms ease,
+        border-color 160ms ease;
+}
+
+
+.admin-user-form__checkbox:hover {
+    background:
+        #ffffff;
+
+    border-color:
+        #b8c0cc;
+}
+
+
+.admin-user-form__checkbox input {
+    width:
+        17px;
+
+    height:
+        17px;
+
+    margin:
+        0;
+
+    accent-color:
+        #2563eb;
+}
+
+
+.admin-user-form__checkbox span {
+    min-width:
+        0;
+}
+
+
+/* ==========================================================================
+   Errors
+   ========================================================================== */
+
+.admin-user-form__errors {
+    margin:
+        0
+        28px
+        22px;
+
+    padding:
+        14px
+        16px;
+
+    background:
+        #fef2f2;
+
+    border:
+        1px solid
+        #fecaca;
+
+    border-radius:
+        11px;
+
+    color:
+        #991b1b;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.8;
+}
+
+
+.admin-user-form__errors strong {
+    display:
+        block;
+
+    margin-bottom:
+        5px;
+
+    font-size:
+        11px;
+}
+
+
+.admin-user-form__errors ul {
+    margin:
+        0;
+
+    padding-right:
+        18px;
+}
+
+
+/* ==========================================================================
+   Form actions
+   ========================================================================== */
+
+.admin-user-form__actions {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    gap:
+        8px;
+
+    margin-top:
+        26px;
+
+    padding-top:
+        20px;
+
+    border-top:
+        1px solid
+        #edf1f5;
+}
+
+
+.admin-user-form__cancel,
+.admin-user-form__save {
+    min-height:
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        0
+        16px;
+
+    border-radius:
+        9px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    cursor:
+        pointer;
+}
+
+
+.admin-user-form__cancel {
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        #e2e8f0;
+
+    color:
+        #475467;
+}
+
+
+.admin-user-form__cancel:hover {
+    background:
+        #f8fafc;
+
+    border-color:
+        #cbd5e1;
+}
+
+
+.admin-user-form__save {
+    background:
+        linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+
+    border:
+        1px solid
+        #1d4ed8;
+
+    color:
+        #ffffff;
+
+    box-shadow:
+        0
+        6px
+        15px
+        rgba(
+            37,
+            99,
+            235,
+            0.15
+        );
+}
+
+
+.admin-user-form__save:hover {
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #1e40af
+        );
+}
+
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 850px) {
+
+    .admin-users__header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+
+    .admin-users__header-action,
+    .admin-users__create-button {
+        width:
+            100%;
+    }
+
+
+    .admin-users__panel-header {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        padding:
+            18px;
+    }
+
+
+    .admin-user-form__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .admin-user-form__field--full {
+        grid-column:
+            auto;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .admin-users {
+        padding-bottom:
+            30px;
+    }
+
+
+    .admin-users__header h1 {
+        font-size:
+            29px;
+    }
+
+
+    .admin-users__header p {
+        font-size:
+            12px;
+    }
+
+
+    .admin-users__panel {
+        border-radius:
+            14px;
+    }
+
+
+    .admin-users__table th,
+    .admin-users__table td {
+        padding:
+            12px
+            14px;
+    }
+
+
+    .admin-user-form__panel {
+        border-radius:
+            14px;
+    }
+
+
+    .admin-user-form__header {
+        padding:
+            18px;
+        }
+
+    .admin-user-form__body {
+        padding:
+            20px
+            18px;
+    }
+
+
+    .admin-user-form__errors {
+        margin:
+            18px
+            18px
+            0;
+    }
+
+
+    .admin-user-form__actions {
+        flex-direction:
+            column-reverse;
+
+        align-items:
+            stretch;
+    }
+
+
+    .admin-user-form__cancel,
+    .admin-user-form__save {
+        width:
+            100%;
+    }
+
+}
+
+
+@media (max-width: 430px) {
+
+    .admin-users__identity {
+        min-width:
+            170px;
+    }
+
+
+    .admin-users__avatar {
+        width:
+            36px;
+
+        height:
+            36px;
+
+        flex-basis:
+            36px;
+
+        border-radius:
+            10px;
+    }
+
+
+    .admin-users__identity-name {
+        font-size:
+            11px;
+    }
+
+
+    .admin-users__identity-username {
+        font-size:
+            8px;
+    }
+
+
+    .admin-user-form__header-icon {
+        width:
+            36px;
+
+        height:
+            36px;
+
+        flex-basis:
+            36px;
+    }
+
+}

@@ -22,6 +22,7 @@ final class Router
      */
     private static array $routes = [];
 
+
     /**
      * Register a GET route.
      *
@@ -42,6 +43,7 @@ final class Router
             $middleware
         );
     }
+
 
     /**
      * Register a POST route.
@@ -64,6 +66,7 @@ final class Router
         );
     }
 
+
     /**
      * Register a route.
      *
@@ -79,22 +82,41 @@ final class Router
     ): void {
         $method =
             strtoupper(
-                trim($method)
+                trim(
+                    $method
+                )
             );
+
+        if (
+            $method === ''
+        ) {
+            throw new RuntimeException(
+                'Route HTTP method cannot be empty.'
+            );
+        }
+
 
         $path =
             self::normalizePath(
                 $path
             );
 
-        if ($name !== null) {
-            $name =
-                trim($name);
 
-            if ($name === '') {
+        if (
+            $name !== null
+        ) {
+            $name =
+                trim(
+                    $name
+                );
+
+            if (
+                $name === ''
+            ) {
                 $name = null;
             }
         }
+
 
         foreach (
             self::$routes
@@ -113,6 +135,7 @@ final class Router
                 );
             }
 
+
             if (
                 $name !== null
                 && $route['name'] === $name
@@ -125,6 +148,7 @@ final class Router
                 );
             }
         }
+
 
         self::$routes[] = [
             'method' =>
@@ -144,8 +168,11 @@ final class Router
         ];
     }
 
+
     /**
      * Dispatch the current request.
+     *
+     * The returned route value is also emitted when it is a string.
      */
     public static function dispatch(): mixed
     {
@@ -157,17 +184,20 @@ final class Router
                 )
             );
 
+
         $uri =
             (string) (
                 $_SERVER['REQUEST_URI']
                 ?? '/'
             );
 
+
         $path =
             parse_url(
                 $uri,
                 PHP_URL_PATH
             );
+
 
         if (
             !is_string($path)
@@ -176,22 +206,27 @@ final class Router
             $path = '/';
         }
 
+
         $path =
             self::normalizePath(
                 $path
             );
+
 
         foreach (
             self::$routes
             as $route
         ) {
             if (
-                $route['method'] !== $method
+                $route['method']
+                !== $method
             ) {
                 continue;
             }
 
+
             $matches = [];
+
 
             if (
                 !self::matches(
@@ -203,21 +238,162 @@ final class Router
                 continue;
             }
 
-            return self::runRoute(
-                $route,
-                $matches
+
+            $result =
+                self::runRoute(
+                    $route,
+                    $matches
+                );
+
+
+            self::emitResult(
+                $result
             );
+
+
+            return $result;
         }
+
+
+        /*
+         * ---------------------------------------------------------------
+         * Unmatched route
+         * ---------------------------------------------------------------
+         *
+         * English URLs get the English 404 page.
+         *
+         * Everything else continues to use the normal Persian 404.
+         *
+         * Examples:
+         *
+         * /english/whatever
+         * /english/not-found
+         * /english/something/random
+         *
+         * => English 404
+         *
+         * /whatever
+         * /this-page-does-not-exist
+         *
+         * => Persian 404
+         * ---------------------------------------------------------------
+         */
+
+        if (
+            self::isEnglishPath(
+                $path
+            )
+        ) {
+            return self::englishNotFound();
+        }
+
 
         /*
          * A POST to a GET route or GET to a POST route
-         * should still result in a normal 404 response
-         * from this simple router.
+         * currently results in a normal 404 response.
          */
-        Response::notFound(
+
+        return Response::notFound(
             'صفحه مورد نظر پیدا نشد.'
         );
     }
+
+
+    /**
+     * Determine whether the request belongs to the English site.
+     */
+    private static function isEnglishPath(
+        string $path
+    ): bool {
+        $path =
+            self::normalizePath(
+                $path
+            );
+
+
+        /*
+         * Exact English homepage.
+         */
+        if (
+            $path === '/english'
+        ) {
+            return true;
+        }
+
+
+        /*
+         * Any nested English URL.
+         *
+         * We deliberately require the next character to be "/"
+         * so that something unrelated such as "/englishman"
+         * does not accidentally receive the English 404 page.
+         */
+        return str_starts_with(
+            $path,
+            '/english/'
+        );
+    }
+
+
+    /**
+     * Render the English 404 page.
+     *
+     * This is intentionally kept inside the router because this
+     * method handles URLs that never matched a controller route.
+     */
+    private static function englishNotFound(): string
+    {
+        http_response_code(
+            404
+        );
+
+
+        $message =
+            'The page you are looking for could not be found.';
+
+
+        $result =
+            View::renderIntoLayout(
+                'layouts/english',
+                'english/404',
+                [
+                    'title' =>
+                        'Page Not Found | Sadra Institute',
+
+                    'description' =>
+                        'The requested English page could not be found.',
+
+                    'message' =>
+                        $message,
+                ]
+            );
+
+
+        self::emitResult(
+            $result
+        );
+
+
+        return is_string($result)
+            ? $result
+            : '';
+    }
+
+
+    /**
+     * Emit a route result when appropriate.
+     */
+    private static function emitResult(
+        mixed $result
+    ): void {
+        if (
+            is_string($result)
+            && $result !== ''
+        ) {
+            echo $result;
+        }
+    }
+
 
     /**
      * Execute middleware and the route handler.
@@ -239,8 +415,10 @@ final class Router
         $handler =
             $route['handler'];
 
+
         $middleware =
             $route['middleware'];
+
 
         $pipeline =
             static function () use (
@@ -253,18 +431,19 @@ final class Router
                 );
             };
 
+
         /*
-         * Middleware are executed in the order in which
-         * they were registered.
+         * Middleware are wrapped in reverse order so they execute
+         * in the same order in which they were registered.
          */
         foreach (
             array_reverse(
                 $middleware
-            )
-            as $middlewareItem
+            ) as $middlewareItem
         ) {
             $next =
                 $pipeline;
+
 
             $pipeline =
                 static function () use (
@@ -278,8 +457,10 @@ final class Router
                 };
         }
 
+
         return $pipeline();
     }
+
 
     /**
      * Execute a middleware item.
@@ -301,6 +482,7 @@ final class Router
             $instance =
                 new $middleware();
 
+
             if (
                 !method_exists(
                     $instance,
@@ -315,10 +497,12 @@ final class Router
                 );
             }
 
+
             return $instance->handle(
                 $next
             );
         }
+
 
         if (
             is_object($middleware)
@@ -332,18 +516,23 @@ final class Router
             );
         }
 
+
         if (
-            is_callable($middleware)
+            is_callable(
+                $middleware
+            )
         ) {
             return $middleware(
                 $next
             );
         }
 
+
         throw new RuntimeException(
             'Invalid middleware definition.'
         );
     }
+
 
     /**
      * Invoke a route controller or closure.
@@ -367,12 +556,14 @@ final class Router
                     (string) $handler[1]
                 );
 
+
             return self::invokeCallable(
                 $reflection,
                 $handler,
                 $parameters
             );
         }
+
 
         if (
             $handler instanceof Closure
@@ -382,6 +573,7 @@ final class Router
                     $handler
                 );
 
+
             return self::invokeCallable(
                 $reflection,
                 $handler,
@@ -389,10 +581,12 @@ final class Router
             );
         }
 
+
         $reflection =
             new \ReflectionFunction(
                 $handler
             );
+
 
         return self::invokeCallable(
             $reflection,
@@ -400,6 +594,7 @@ final class Router
             $parameters
         );
     }
+
 
     /**
      * Invoke a callable according to its parameters.
@@ -415,12 +610,14 @@ final class Router
     ): mixed {
         $arguments = [];
 
+
         foreach (
             $reflection->getParameters()
             as $parameter
         ) {
             $name =
                 $parameter->getName();
+
 
             if (
                 array_key_exists(
@@ -431,8 +628,10 @@ final class Router
                 $arguments[] =
                     $routeParameters[$name];
 
+
                 continue;
             }
+
 
             if (
                 $parameter->isDefaultValueAvailable()
@@ -440,8 +639,10 @@ final class Router
                 $arguments[] =
                     $parameter->getDefaultValue();
 
+
                 continue;
             }
+
 
             if (
                 $parameter->allowsNull()
@@ -449,8 +650,10 @@ final class Router
                 $arguments[] =
                     null;
 
+
                 continue;
             }
+
 
             throw new RuntimeException(
                 sprintf(
@@ -460,10 +663,12 @@ final class Router
             );
         }
 
+
         return $handler(
             ...$arguments
         );
     }
+
 
     /**
      * Build a URL for a named route.
@@ -482,26 +687,35 @@ final class Router
         array $parameters = []
     ): string {
         $name =
-            trim($name);
+            trim(
+                $name
+            );
 
-        if ($name === '') {
+
+        if (
+            $name === ''
+        ) {
             throw new RuntimeException(
                 'Route name cannot be empty.'
             );
         }
+
 
         foreach (
             self::$routes
             as $route
         ) {
             if (
-                $route['name'] !== $name
+                $route['name']
+                !== $name
             ) {
                 continue;
             }
 
+
             $path =
                 $route['path'];
+
 
             preg_match_all(
                 '/\{([A-Za-z_][A-Za-z0-9_]*)\}/',
@@ -509,9 +723,11 @@ final class Router
                 $matches
             );
 
+
             $parameterNames =
                 $matches[1]
                 ?? [];
+
 
             foreach (
                 $parameterNames
@@ -532,10 +748,10 @@ final class Router
                     );
                 }
 
+
                 $value =
-                    $parameters[
-                        $parameterName
-                    ];
+                    $parameters[$parameterName];
+
 
                 if (
                     !is_scalar($value)
@@ -550,24 +766,28 @@ final class Router
                     );
                 }
 
+
                 $encodedValue =
                     rawurlencode(
                         (string) $value
                     );
 
+
                 $path =
                     str_replace(
-                        '{' . $parameterName . '}',
+                        '{'
+                        . $parameterName
+                        . '}',
                         $encodedValue,
                         $path
                     );
 
+
                 unset(
-                    $parameters[
-                        $parameterName
-                    ]
+                    $parameters[$parameterName]
                 );
             }
+
 
             if (
                 $parameters !== []
@@ -580,6 +800,7 @@ final class Router
                         PHP_QUERY_RFC3986
                     );
 
+
                 if (
                     $queryString !== ''
                 ) {
@@ -589,10 +810,12 @@ final class Router
                 }
             }
 
+
             return self::buildUrl(
                 $path
             );
         }
+
 
         throw new RuntimeException(
             sprintf(
@@ -601,6 +824,7 @@ final class Router
             )
         );
     }
+
 
     /**
      * Check whether a named route exists.
@@ -619,8 +843,10 @@ final class Router
             }
         }
 
+
         return false;
     }
+
 
     /**
      * Return all registered routes.
@@ -638,6 +864,7 @@ final class Router
         return self::$routes;
     }
 
+
     /**
      * Match a route path against a request path.
      *
@@ -653,10 +880,12 @@ final class Router
                 $routePath
             );
 
+
         $requestSegments =
             self::segments(
                 $requestPath
             );
+
 
         if (
             count($routeSegments)
@@ -665,16 +894,17 @@ final class Router
             return false;
         }
 
+
         $parameters = [];
+
 
         foreach (
             $routeSegments
             as $index => $routeSegment
         ) {
             $requestSegment =
-                $requestSegments[
-                    $index
-                ];
+                $requestSegments[$index];
+
 
             if (
                 preg_match(
@@ -683,15 +913,15 @@ final class Router
                     $match
                 )
             ) {
-                $parameters[
-                    $match[1]
-                ] =
+                $parameters[$match[1]] =
                     rawurldecode(
                         $requestSegment
                     );
 
+
                 continue;
             }
+
 
             if (
                 $routeSegment
@@ -701,8 +931,10 @@ final class Router
             }
         }
 
+
         return true;
     }
+
 
     /**
      * Normalize route paths.
@@ -715,6 +947,7 @@ final class Router
                 $path
             );
 
+
         if (
             $path === ''
             || $path === '/'
@@ -722,11 +955,13 @@ final class Router
             return '/';
         }
 
+
         $path =
             parse_url(
                 $path,
                 PHP_URL_PATH
             );
+
 
         if (
             !is_string($path)
@@ -735,15 +970,18 @@ final class Router
             $path = '/';
         }
 
+
         $path =
-            '/' .
-            trim(
+            '/'
+            . trim(
                 $path,
                 '/'
             );
 
+
         return $path;
     }
+
 
     /**
      * Split a path into segments.
@@ -759,17 +997,20 @@ final class Router
                 '/'
             );
 
+
         if (
             $path === ''
         ) {
             return [];
         }
 
+
         return explode(
             '/',
             $path
         );
     }
+
 
     /**
      * Build the public application URL.
@@ -786,11 +1027,13 @@ final class Router
                 '/'
             );
 
+
         if (
             $baseUrl === ''
         ) {
             return $path;
         }
+
 
         return $baseUrl
             . '/'

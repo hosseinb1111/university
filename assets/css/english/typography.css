@@ -1,0 +1,262 @@
+/*
+|--------------------------------------------------------------------------
+| English — Typography
+|--------------------------------------------------------------------------
+| Self-hosted font declarations plus global type rules:
+|
+|   - Inter
+|   - Manrope
+|   - Body typography
+|   - Headings
+|   - Hero heading weights
+|   - Navigation typography
+|
+| Colors are intentionally NOT defined here.
+| They are controlled by the English theme tokens in base.css.
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   INTER
+========================================================================== */
+
+@font-face {
+    font-family:
+        "Inter";
+
+    src:
+        url(
+            "../../fonts/inter/Inter-Regular.woff2"
+        )
+        format(
+            "woff2"
+        );
+
+    font-style:
+        normal;
+
+    font-weight:
+        400;
+
+    font-display:
+        swap;
+}
+
+
+/* ==========================================================================
+   MANROPE
+========================================================================== */
+
+@font-face {
+    font-family:
+        "Manrope";
+
+    src:
+        url(
+            "../../fonts/manrope/ManropeVariable.woff2"
+        )
+        format(
+            "woff2"
+        );
+
+    font-style:
+        normal;
+
+    font-weight:
+        200 800;
+
+    font-display:
+        swap;
+}
+
+
+/* ==========================================================================
+   BASE TYPE
+========================================================================== */
+
+html {
+    font-family:
+        "Inter",
+        Arial,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+body,
+button,
+input,
+textarea,
+select {
+    font-family:
+        "Inter",
+        "Segoe UI",
+        Roboto,
+        Helvetica,
+        Arial,
+        sans-serif;
+}
+
+
+body {
+    font-weight:
+        400;
+
+    font-feature-settings:
+        "liga" 1,
+        "calt" 1;
+}
+
+
+a {
+    font-family:
+        inherit;
+}
+
+
+strong {
+    font-weight:
+        700;
+}
+
+
+/* ==========================================================================
+   HEADINGS
+========================================================================== */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family:
+        "Inter",
+        Arial,
+        "Segoe UI",
+        sans-serif;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        -0.025em;
+}
+
+
+/* ==========================================================================
+   HERO HEADINGS
+========================================================================== */
+
+.english-hero h1,
+.english-page__hero h1,
+.english-presidency-hero h1,
+.english-programs-hero h1,
+.english-faculty-hero h1,
+.english-program-detail-hero h1,
+.english-contact-hero h1,
+.english-announcements-hero h1,
+.english-announcement-hero h1,
+.english-research-hero h1,
+.english-faculties-hero h1,
+.english-about-hero h1 {
+    font-family:
+        "Inter",
+        Arial,
+        "Segoe UI",
+        sans-serif;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        -0.055em;
+}
+
+
+/* ==========================================================================
+   NAVIGATION / LABEL TYPOGRAPHY
+========================================================================== */
+
+.english-nav__link,
+.english-nav__language,
+.english-eyebrow,
+.english-section__heading span,
+.english-page__hero > span {
+    font-family:
+        "Inter",
+        Arial,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* ==========================================================================
+   ENGLISH HOMEPAGE TYPOGRAPHY
+========================================================================== */
+
+.english-home-slide__content h1 {
+    font-family:
+        "Inter",
+        Arial,
+        "Segoe UI",
+        sans-serif;
+
+    font-weight:
+        800;
+}
+
+
+/* ==========================================================================
+   SMALL TYPOGRAPHY NORMALIZATION
+========================================================================== */
+
+button,
+input,
+textarea,
+select {
+    font-size:
+        inherit;
+}
+
+
+/* ==========================================================================
+   FONT FALLBACK SAFETY
+========================================================================== */
+
+@supports not (font-variation-settings: normal) {
+
+    body,
+    button,
+    input,
+    textarea,
+    select,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family:
+            "Inter",
+            Arial,
+            "Segoe UI",
+            sans-serif;
+    }
+
+}
+
+
+/* ==========================================================================
+   REDUCED MOTION
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior:
+            auto;
+    }
+
+}

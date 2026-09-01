@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Core\Session;
+use App\Core\View;
+
 $formPage =
     Session::getFlash(
         'page_form'
@@ -12,27 +15,229 @@ $formErrors =
         'page_errors'
     );
 
+$defaults = [
+
+    'id' =>
+        null,
+
+    'parent_id' =>
+        null,
+
+    'slug' =>
+        '',
+
+    'title' =>
+        '',
+
+    'excerpt' =>
+        '',
+
+    'content' =>
+        '',
+
+    'featured_image' =>
+        '',
+
+    'status' =>
+        'draft',
+
+    'seo_title' =>
+        '',
+
+    'seo_description' =>
+        '',
+
+    'seo_keywords' =>
+        '',
+
+    'published_at' =>
+        null,
+
+    'created_by' =>
+        null,
+
+    'updated_by' =>
+        null,
+
+];
+
+$page =
+    is_array(
+        $page ?? null
+    )
+        ? array_merge(
+            $defaults,
+            $page
+        )
+        : $defaults;
+
+
 if (
     is_array($formPage)
 ) {
-    $page = array_merge(
-        $page,
-        $formPage
-    );
+    $page =
+        array_merge(
+            $page,
+            $formPage
+        );
 }
+
+
+$errors =
+    is_array($formErrors)
+        ? $formErrors
+        : [];
+
+
+$pageId =
+    filter_var(
+        $page['id'] ?? null,
+        FILTER_VALIDATE_INT,
+        [
+            'options' => [
+                'min_range' => 1,
+            ],
+        ]
+    );
+
 
 if (
-    is_array($formErrors)
+    $pageId === false
 ) {
-    $errors = $formErrors;
+    $pageId = 0;
 }
 
+
 $action =
-    '/admin/pages/'
-    . (int) $page['id'];
+    $pageId > 0
+        ? View::url(
+            '/admin/pages/'
+            . $pageId
+        )
+        : View::route(
+            'admin.pages.store'
+        );
+
 
 $submitLabel =
-    'ذخیره تغییرات';
+    $pageId > 0
+        ? 'ذخیره تغییرات'
+        : 'ایجاد صفحه';
 
-require __DIR__
-    . '/_form.php';
+
+$errorMessage =
+    Session::getFlash(
+        'error'
+    );
+
+?>
+
+<div class="admin-pages">
+
+    <header class="admin-pages__header">
+
+        <div class="admin-pages__header-main">
+
+            <span class="admin-pages__eyebrow">
+                مدیریت صفحات
+            </span>
+
+            <h1>
+                ویرایش صفحه
+            </h1>
+
+            <p>
+                اطلاعات، محتوا، ساختار و تنظیمات SEO این صفحه را ویرایش کنید.
+            </p>
+
+        </div>
+
+
+        <div class="admin-pages__header-actions">
+
+            <a
+                href="<?= View::route(
+                    'admin.pages.index'
+                ) ?>"
+                class="
+                    admin-pages__button
+                    admin-pages__button--secondary
+                "
+            >
+                بازگشت به صفحات
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <?php if (
+        is_string($errorMessage)
+        && $errorMessage !== ''
+    ): ?>
+
+        <div
+            class="
+                admin-pages__alert
+                admin-pages__alert--error
+            "
+            role="alert"
+        >
+
+            <strong>
+                خطا
+            </strong>
+
+            <span>
+                <?= View::escape(
+                    $errorMessage
+                ) ?>
+            </span>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <section class="admin-pages__panel">
+
+        <header class="admin-pages__panel-header">
+
+            <div class="admin-pages__panel-heading">
+
+                <div
+                    class="admin-pages__panel-icon"
+                    aria-hidden="true"
+                >
+                    ✎
+                </div>
+
+                <div>
+
+                    <strong>
+                        ویرایش صفحه
+                    </strong>
+
+                    <span>
+                        شناسه صفحه:
+                        #<?= (int) $pageId ?>
+                    </span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <?php
+
+        require __DIR__
+            . '/_form.php';
+
+        ?>
+
+    </section>
+
+</div>

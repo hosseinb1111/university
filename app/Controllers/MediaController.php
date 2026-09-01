@@ -54,6 +54,7 @@ final class MediaController
         );
     }
 
+
     /**
      * Upload form.
      */
@@ -64,15 +65,17 @@ final class MediaController
             'admin/media/create',
             [
                 'title' =>
-                    'آپلود رسانه | صدرا',
+                    'افزودن رسانه | صدرا',
 
-                'errors' => [],
+                'errors' =>
+                    [],
             ]
         );
     }
 
+
     /**
-     * Store uploaded media.
+     * Store one or multiple uploaded media files.
      */
     public function store(): never
     {
@@ -89,116 +92,253 @@ final class MediaController
             );
         }
 
-        $file =
-            $_FILES['file']
-            ?? null;
-
-        if (
-            !is_array($file)
-        ) {
-            Session::flash(
-                'error',
-                'لطفاً یک فایل انتخاب کنید.'
-            );
-
-            Response::redirectRoute(
-                'admin.media.create'
-            );
-        }
-
-        try {
-            $allowed =
-                $this->allowedMimeTypes();
-
-            $stored =
-                Storage::storeUploadedFile(
-                    $file,
-                    $allowed
-                );
-
-            $altText =
-                $this->nullableString(
-                    $_POST['alt_text']
-                    ?? null
-                );
-
-            $mediaId =
-                Media::create(
-                    [
-                        'file_name' =>
-                            $stored['file_name'],
-
-                        'original_name' =>
-                            $stored['original_name'],
-
-                        'file_path' =>
-                            $stored['file_path'],
-
-                        'mime_type' =>
-                            $stored['mime_type'],
-
-                        'file_size' =>
-                            $stored['file_size'],
-
-                        'alt_text' =>
-                            $altText,
-
-                        'width' =>
-                            $stored['width'],
-
-                        'height' =>
-                            $stored['height'],
-
-                        'storage_disk' =>
-                            'local',
-                    ],
-                    $userId
-                );
-
-        } catch (
-            RuntimeException $exception
-        ) {
-            Session::flash(
-                'error',
-                $exception->getMessage()
-            );
-
-            Response::redirectRoute(
-                'admin.media.create'
-            );
-        }
 
         /*
-         * Database insertion should not silently fail
-         * after the physical file has been stored.
+         * New uploader:
+         *
+         *     name="media[]"
+         *
+         * Old uploader:
+         *
+         *     name="file"
+         *
+         * Support both.
          */
-        if (
-            !isset($mediaId)
-            || (int) $mediaId <= 0
-        ) {
-            Storage::delete(
-                $stored['file_path']
+        $uploadedInput =
+            $_FILES['media']
+            ?? $_FILES['file']
+            ?? null;
+
+
+        $files =
+            $this->normalizeUploadedFiles(
+                $uploadedInput
             );
 
+
+        if (
+            $files === []
+        ) {
             Session::flash(
                 'error',
-                'ثبت فایل در پایگاه داده انجام نشد.'
+                'لطفاً حداقل یک فایل انتخاب کنید.'
             );
 
             Response::redirectRoute(
                 'admin.media.create'
             );
         }
+
+
+        $allowed =
+            $this->allowedMimeTypes();
+
+
+        $altText =
+            $this->nullableString(
+                $_POST['alt_text']
+                ?? null
+            );
+
+
+        $uploadedCount =
+            0;
+
+
+        $failedFiles =
+            [];
+
+
+        foreach (
+            $files
+            as $file
+        ) {
+
+            /*
+             * Skip files that PHP rejected before
+             * they reached our storage layer.
+             */
+            $uploadError =
+                (int) (
+                    $file['error']
+                    ?? UPLOAD_ERR_NO_FILE
+                );
+
+
+            if (
+                $uploadError !== UPLOAD_ERR_OK
+            ) {
+
+                $failedFiles[] =
+                    $this->fileName(
+                        $file
+                    );
+
+                continue;
+            }
+
+
+            try {
+
+                /*
+                 * Store the physical file.
+                 */
+                $stored =
+                    Storage::storeUploadedFile(
+                        $file,
+                        $allowed
+                    );
+
+
+                /*
+                 * Register the file in the database.
+                 */
+                $mediaId =
+                    Media::create(
+                        [
+                            'file_name' =>
+                                $stored['file_name'],
+
+                            'original_name' =>
+                                $stored['original_name'],
+
+                            'file_path' =>
+                                $stored['file_path'],
+
+                            'mime_type' =>
+                                $stored['mime_type'],
+
+                            'file_size' =>
+                                $stored['file_size'],
+
+                            'alt_text' =>
+                                $altText,
+
+                            'width' =>
+                                $stored['width']
+                                ?? null,
+
+                            'height' =>
+                                $stored['height']
+                                ?? null,
+
+                            'storage_disk' =>
+                                'local',
+                        ],
+                        $userId
+                    );
+
+
+                /*
+                 * Database insertion failed.
+                 * Remove the already stored physical file.
+                 */
+                if (
+                    (int) $mediaId <= 0
+                ) {
+
+                    Storage::delete(
+                        (string) (
+                            $stored['file_path']
+                            ?? ''
+                        )
+                    );
+
+
+                    $failedFiles[] =
+                        $this->fileName(
+                            $file
+                        );
+
+                    continue;
+                }
+
+
+                $uploadedCount++;
+
+            } catch (
+                RuntimeException $exception
+            ) {
+
+                /*
+                 * Do not kill the whole upload because
+                 * one file failed.
+                 */
+                $failedFiles[] =
+                    $this->fileName(
+                        $file
+                    );
+            }
+        }
+
+
+        /*
+         * Nothing uploaded successfully.
+         */
+        if (
+            $uploadedCount === 0
+        ) {
+
+            Session::flash(
+                'error',
+                'هیچ فایلی با موفقیت آپلود نشد.'
+            );
+
+            Response::redirectRoute(
+                'admin.media.create'
+            );
+        }
+
+
+        /*
+         * Success message.
+         */
+        if (
+            $uploadedCount === 1
+        ) {
+
+            $successMessage =
+                'فایل با موفقیت آپلود شد.';
+
+        } else {
+
+            $successMessage =
+                number_format(
+                    $uploadedCount
+                )
+                . ' فایل با موفقیت آپلود شد.';
+        }
+
+
+        /*
+         * Let the administrator know if
+         * some files failed.
+         */
+        if (
+            $failedFiles !== []
+        ) {
+
+            $successMessage .=
+                ' برخی فایل‌ها آپلود نشدند: '
+                . implode(
+                    '، ',
+                    $failedFiles
+                )
+                . '.';
+        }
+
 
         Session::flash(
             'success',
-            'فایل با موفقیت آپلود شد.'
+            $successMessage
         );
+
 
         Response::redirectRoute(
             'admin.media.index'
         );
     }
+
 
     /**
      * Delete media.
@@ -208,15 +348,18 @@ final class MediaController
     ): never {
         Csrf::requireValid();
 
+
         $mediaId =
             $this->positiveId(
                 $id
             );
 
+
         $media =
             Media::find(
                 $mediaId
             );
+
 
         if (
             $media === null
@@ -231,10 +374,12 @@ final class MediaController
             );
         }
 
+
         $deleted =
             Media::delete(
                 $mediaId
             );
+
 
         if (
             !$deleted
@@ -249,6 +394,7 @@ final class MediaController
             );
         }
 
+
         Storage::delete(
             (string) (
                 $media['file_path']
@@ -256,15 +402,18 @@ final class MediaController
             )
         );
 
+
         Session::flash(
             'success',
             'فایل با موفقیت حذف شد.'
         );
 
+
         Response::redirectRoute(
             'admin.media.index'
         );
     }
+
 
     /**
      * Serve a stored media file.
@@ -278,6 +427,7 @@ final class MediaController
                 true
             );
 
+
         if (
             $decoded === false
             || $decoded === ''
@@ -287,10 +437,12 @@ final class MediaController
             );
         }
 
+
         $relativePath =
             $this->normalizePath(
                 $decoded
             );
+
 
         if (
             $relativePath === ''
@@ -300,10 +452,12 @@ final class MediaController
             );
         }
 
+
         $uploadDirectory =
             realpath(
                 Storage::ensureUploadDirectory()
             );
+
 
         if (
             $uploadDirectory === false
@@ -312,6 +466,7 @@ final class MediaController
                 'فایل پیدا نشد.'
             );
         }
+
 
         $fullPath =
             $uploadDirectory
@@ -322,10 +477,12 @@ final class MediaController
                 $relativePath
             );
 
+
         $realPath =
             realpath(
                 $fullPath
             );
+
 
         if (
             $realPath === false
@@ -338,14 +495,19 @@ final class MediaController
             );
         }
 
+
+        $uploadRoot =
+            rtrim(
+                $uploadDirectory,
+                DIRECTORY_SEPARATOR
+            )
+            . DIRECTORY_SEPARATOR;
+
+
         if (
             !str_starts_with(
                 $realPath,
-                rtrim(
-                    $uploadDirectory,
-                    DIRECTORY_SEPARATOR
-                )
-                . DIRECTORY_SEPARATOR
+                $uploadRoot
             )
         ) {
             Response::notFound(
@@ -353,15 +515,18 @@ final class MediaController
             );
         }
 
+
         $mime =
             $this->detectMimeType(
                 $realPath
             );
 
+
         $size =
             filesize(
                 $realPath
             );
+
 
         if (
             $size === false
@@ -369,30 +534,194 @@ final class MediaController
             $size = 0;
         }
 
+
         header(
             'Content-Type: '
             . $mime
         );
+
 
         header(
             'Content-Length: '
             . $size
         );
 
+
         header(
             'X-Content-Type-Options: nosniff'
         );
+
 
         header(
             'Cache-Control: public, max-age=31536000, immutable'
         );
 
+
         readfile(
             $realPath
         );
 
+
         exit;
     }
+
+
+    /**
+     * Normalize PHP's $_FILES structure.
+     *
+     * Supports both:
+     *
+     * $_FILES['file']
+     *
+     * and:
+     *
+     * $_FILES['media']
+     *
+     * where media is a multiple-file field.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeUploadedFiles(
+        mixed $input
+    ): array {
+        if (
+            !is_array(
+                $input
+            )
+        ) {
+            return [];
+        }
+
+
+        /*
+         * Single file upload.
+         */
+        if (
+            isset(
+                $input['name']
+            )
+            && is_string(
+                $input['name']
+            )
+        ) {
+
+            return [
+                $input,
+            ];
+        }
+
+
+        /*
+         * Multiple file upload.
+         */
+        $names =
+            $input['name']
+            ?? [];
+
+
+        if (
+            !is_array(
+                $names
+            )
+        ) {
+            return [];
+        }
+
+
+        $types =
+            $input['type']
+            ?? [];
+
+
+        $tmpNames =
+            $input['tmp_name']
+            ?? [];
+
+
+        $errors =
+            $input['error']
+            ?? [];
+
+
+        $sizes =
+            $input['size']
+            ?? [];
+
+
+        $files =
+            [];
+
+
+        foreach (
+            $names
+            as $index =>
+            $name
+        ) {
+
+            if (
+                !is_string(
+                    $name
+                )
+            ) {
+                continue;
+            }
+
+
+            $files[] = [
+                'name' =>
+                    $name,
+
+                'type' =>
+                    $types[$index]
+                    ?? '',
+
+                'tmp_name' =>
+                    $tmpNames[$index]
+                    ?? '',
+
+                'error' =>
+                    $errors[$index]
+                    ?? UPLOAD_ERR_NO_FILE,
+
+                'size' =>
+                    $sizes[$index]
+                    ?? 0,
+            ];
+        }
+
+
+        return $files;
+    }
+
+
+    /**
+     * Safely get a file name.
+     */
+    private function fileName(
+        array $file
+    ): string {
+        $name =
+            $file['name']
+            ?? 'فایل نامشخص';
+
+
+        if (
+            !is_string(
+                $name
+            )
+            || trim(
+                $name
+            ) === ''
+        ) {
+            return 'فایل نامشخص';
+        }
+
+
+        return trim(
+            $name
+        );
+    }
+
 
     /**
      * Allowed MIME types.
@@ -407,20 +736,26 @@ final class MediaController
                 []
             );
 
+
         $documents =
             config(
                 'app.uploads.allowed_documents',
                 []
             );
 
+
         return array_values(
             array_unique(
                 array_merge(
-                    is_array($images)
+                    is_array(
+                        $images
+                    )
                         ? $images
                         : [],
 
-                    is_array($documents)
+                    is_array(
+                        $documents
+                    )
                         ? $documents
                         : []
                 )
@@ -428,8 +763,9 @@ final class MediaController
         );
     }
 
+
     /**
-     * Detect file MIME.
+     * Detect file MIME type.
      */
     private function detectMimeType(
         string $path
@@ -439,16 +775,23 @@ final class MediaController
                 FILEINFO_MIME_TYPE
             );
 
+
         $mime =
             $finfo->file(
                 $path
             );
 
-        return is_string($mime)
+
+        return (
+            is_string(
+                $mime
+            )
             && $mime !== ''
-                ? $mime
-                : 'application/octet-stream';
+        )
+            ? $mime
+            : 'application/octet-stream';
     }
+
 
     /**
      * Normalize a media path.
@@ -460,8 +803,11 @@ final class MediaController
             str_replace(
                 '\\',
                 '/',
-                trim($path)
+                trim(
+                    $path
+                )
             );
+
 
         $parts =
             explode(
@@ -469,12 +815,16 @@ final class MediaController
                 $path
             );
 
-        $safe = [];
+
+        $safe =
+            [];
+
 
         foreach (
             $parts
             as $part
         ) {
+
             if (
                 $part === ''
                 || $part === '.'
@@ -483,15 +833,18 @@ final class MediaController
                 continue;
             }
 
+
             $safe[] =
                 $part;
         }
+
 
         return implode(
             '/',
             $safe
         );
     }
+
 
     /**
      * Nullable text input.
@@ -500,18 +853,25 @@ final class MediaController
         mixed $value
     ): ?string {
         if (
-            !is_string($value)
+            !is_string(
+                $value
+            )
         ) {
             return null;
         }
 
+
         $value =
-            trim($value);
+            trim(
+                $value
+            );
+
 
         return $value === ''
             ? null
             : $value;
     }
+
 
     /**
      * Positive route ID.
@@ -530,6 +890,7 @@ final class MediaController
                 ]
             );
 
+
         if (
             $value === false
         ) {
@@ -537,6 +898,7 @@ final class MediaController
                 'شناسه فایل معتبر نیست.'
             );
         }
+
 
         return (int) $value;
     }

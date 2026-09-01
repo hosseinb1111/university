@@ -6,10 +6,20 @@ use App\Core\Csrf;
 use App\Core\Storage;
 use App\Core\View;
 
+
+/*
+|--------------------------------------------------------------------------
+| Media data
+|--------------------------------------------------------------------------
+*/
+
 $items =
-    is_array($media['items'] ?? null)
+    is_array(
+        $media['items'] ?? null
+    )
         ? $media['items']
         : [];
+
 
 $currentPage =
     max(
@@ -20,6 +30,7 @@ $currentPage =
         )
     );
 
+
 $totalPages =
     max(
         1,
@@ -29,110 +40,419 @@ $totalPages =
         )
     );
 
+
 $total =
     (int) (
         $media['total']
         ?? 0
     );
+
+
+/*
+|--------------------------------------------------------------------------
+| Helpers
+|--------------------------------------------------------------------------
+*/
+
+$formatFileSize =
+    static function (
+        mixed $bytes
+    ): string {
+
+        $bytes =
+            max(
+                0,
+                (int) $bytes
+            );
+
+
+        if (
+            $bytes === 0
+        ) {
+            return '۰ بایت';
+        }
+
+
+        $units = [
+            'بایت',
+            'کیلوبایت',
+            'مگابایت',
+            'گیگابایت',
+        ];
+
+
+        $size =
+            (float) $bytes;
+
+
+        $unitIndex =
+            0;
+
+
+        while (
+            $size >= 1024
+            && $unitIndex < count($units) - 1
+        ) {
+
+            $size /=
+                1024;
+
+            $unitIndex++;
+        }
+
+
+        if (
+            $unitIndex === 0
+        ) {
+
+            $display =
+                number_format(
+                    $size,
+                    0
+                );
+
+        } elseif (
+            $size < 10
+        ) {
+
+            $display =
+                number_format(
+                    $size,
+                    1
+                );
+
+        } else {
+
+            $display =
+                number_format(
+                    $size,
+                    0
+                );
+        }
+
+
+        return
+            $display
+            . ' '
+            . $units[$unitIndex];
+    };
+
+
+$formatDate =
+    static function (
+        mixed $date
+    ): string {
+
+        if (
+            !is_string($date)
+            || trim($date) === ''
+        ) {
+            return '—';
+        }
+
+
+        /*
+         * The database normally stores Gregorian
+         * DATETIME values. Use the existing Jalali
+         * formatter when available.
+         */
+        if (
+            function_exists(
+                'jalali_date_fa'
+            )
+        ) {
+
+            return
+                jalali_date_fa(
+                    $date,
+                    'j F Y، H:i'
+                );
+        }
+
+
+        return
+            $date;
+    };
+
+
+$getFileType =
+    static function (
+        string $mime
+    ): string {
+
+        if (
+            str_starts_with(
+                $mime,
+                'image/'
+            )
+        ) {
+            return 'تصویر';
+        }
+
+
+        if (
+            $mime === 'application/pdf'
+        ) {
+            return 'PDF';
+        }
+
+
+        if (
+            str_starts_with(
+                $mime,
+                'video/'
+            )
+        ) {
+            return 'ویدئو';
+        }
+
+
+        if (
+            str_starts_with(
+                $mime,
+                'audio/'
+            )
+        ) {
+            return 'صوت';
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'word'
+            )
+            || str_contains(
+                $mime,
+                'document'
+            )
+        ) {
+            return 'سند';
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'excel'
+            )
+            || str_contains(
+                $mime,
+                'spreadsheet'
+            )
+        ) {
+            return 'Excel';
+        }
+
+
+        return 'فایل';
+    };
+
 ?>
 
-<div class="admin-page">
+<div class="admin-page media-library-page">
 
-    <div class="admin-page__header">
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+
+    <header class="admin-page__header media-library-page__header">
 
         <div>
 
             <span class="admin-page__eyebrow">
-                فایل‌ها
+                فایل‌ها و رسانه‌ها
             </span>
+
 
             <h1>
                 کتابخانه رسانه
             </h1>
 
+
             <p>
-                تصاویر و فایل‌های ذخیره‌شده سایت.
+                تصاویر و فایل‌های ذخیره‌شده سایت را
+                مدیریت، مشاهده یا حذف کنید.
             </p>
 
         </div>
 
 
-        <a
-            href="<?= View::url(
-                '/admin/media/create'
-            ) ?>"
-            class="button button--primary"
-        >
-            آپلود فایل
-        </a>
+        <div class="media-library-page__header-actions">
 
-    </div>
+            <span class="media-library-page__total">
 
-
-    <?php if (
-        !empty($success)
-    ): ?>
-
-        <div
-            class="admin-alert admin-alert--success"
-            role="status"
-        >
-            <?= View::escape(
-                (string) $success
-            ) ?>
-        </div>
-
-    <?php endif; ?>
-
-
-    <?php if (
-        !empty($error)
-    ): ?>
-
-        <div
-            class="admin-alert admin-alert--error"
-            role="alert"
-        >
-            <?= View::escape(
-                (string) $error
-            ) ?>
-        </div>
-
-    <?php endif; ?>
-
-
-    <div class="admin-panel">
-
-        <div class="admin-panel__header">
-
-            <strong>
-                <?= number_format(
-                    $total
-                ) ?>
+                <strong>
+                    <?= number_format(
+                        $total
+                    ) ?>
+                </strong>
 
                 فایل
-            </strong>
+
+            </span>
+
+
+            <a
+                href="<?= View::url(
+                    '/admin/media/create'
+                ) ?>"
+                class="button button--primary"
+            >
+                <span aria-hidden="true">
+                    +
+                </span>
+
+                آپلود رسانه
+
+            </a>
 
         </div>
 
+    </header>
+
+
+    <!-- =========================================================
+         ALERTS
+    ========================================================== -->
+
+    <?php if (
+        is_string($success)
+        && $success !== ''
+    ): ?>
+
+        <div
+            class="admin-alert admin-alert--success media-library-page__alert"
+            role="status"
+        >
+
+            <span
+                class="media-library-page__alert-icon"
+                aria-hidden="true"
+            >
+                ✓
+            </span>
+
+            <span>
+                <?= View::escape(
+                    $success
+                ) ?>
+            </span>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <?php if (
+        is_string($error)
+        && $error !== ''
+    ): ?>
+
+        <div
+            class="admin-alert admin-alert--error media-library-page__alert"
+            role="alert"
+        >
+
+            <span
+                class="media-library-page__alert-icon"
+                aria-hidden="true"
+            >
+                !
+            </span>
+
+            <span>
+                <?= View::escape(
+                    $error
+                ) ?>
+            </span>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <!-- =========================================================
+         LIBRARY PANEL
+    ========================================================== -->
+
+    <section class="admin-panel media-library-page__panel">
+
+
+        <!-- =====================================================
+             PANEL HEADER
+        ====================================================== -->
+
+        <div class="admin-panel__header media-library-page__panel-header">
+
+            <div>
+
+                <strong>
+                    رسانه‌های شما
+                </strong>
+
+                <span>
+                    <?= number_format(
+                        $total
+                    ) ?>
+                    فایل در کتابخانه
+                </span>
+
+            </div>
+
+
+            <?php if (
+                $total > 0
+            ): ?>
+
+                <a
+                    href="<?= View::url(
+                        '/admin/media/create'
+                    ) ?>"
+                    class="media-library-page__compact-upload"
+                >
+                    + افزودن فایل
+                </a>
+
+            <?php endif; ?>
+
+        </div>
+
+
+        <!-- =====================================================
+             EMPTY STATE
+        ====================================================== -->
 
         <?php if (
             $items === []
         ): ?>
 
-            <div class="admin-empty">
+            <div class="media-library-empty">
 
-                <div class="admin-empty__icon">
+                <div
+                    class="media-library-empty__icon"
+                    aria-hidden="true"
+                >
                     🖼
                 </div>
 
+
+                <span class="media-library-empty__eyebrow">
+                    کتابخانه خالی
+                </span>
+
+
                 <h2>
-                    کتابخانه رسانه خالی است.
+                    هنوز فایلی در کتابخانه نیست
                 </h2>
 
+
                 <p>
-                    اولین فایل خود را آپلود کنید.
+                    تصاویر و فایل‌های مورد نیاز سایت
+                    را با انتخاب چند فایل یا
+                    Drag & Drop اضافه کنید.
                 </p>
+
 
                 <a
                     href="<?= View::url(
@@ -140,14 +460,19 @@ $total =
                     ) ?>"
                     class="button button--primary"
                 >
-                    آپلود فایل
+                    اولین رسانه را آپلود کنید
                 </a>
 
             </div>
 
         <?php else: ?>
 
-            <div class="media-grid">
+
+            <!-- =================================================
+                 MEDIA GRID
+            ================================================== -->
+
+            <div class="media-grid media-library-page__grid">
 
                 <?php foreach (
                     $items
@@ -155,11 +480,13 @@ $total =
                 ): ?>
 
                     <?php
+
                     $id =
                         (int) (
                             $item['id']
                             ?? 0
                         );
+
 
                     $mime =
                         (string) (
@@ -167,29 +494,124 @@ $total =
                             ?? ''
                         );
 
+
                     $path =
                         (string) (
                             $item['file_path']
                             ?? ''
                         );
 
+
                     $url =
                         Storage::publicUrl(
                             $path
                         );
+
 
                     $isImage =
                         str_starts_with(
                             $mime,
                             'image/'
                         );
+
+
+                    $fileType =
+                        $getFileType(
+                            $mime
+                        );
+
+
+                    $originalName =
+                        trim(
+                            (string) (
+                                $item['original_name']
+                                ?? 'file'
+                            )
+                        );
+
+
+                    if (
+                        $originalName === ''
+                    ) {
+                        $originalName =
+                            'file';
+                    }
+
+
+                    $altText =
+                        trim(
+                            (string) (
+                                $item['alt_text']
+                                ?? ''
+                            )
+                        );
+
+
+                    $dimensions =
+                        '';
+
+
+                    if (
+                        $isImage
+                        && !empty(
+                            $item['width']
+                        )
+                        && !empty(
+                            $item['height']
+                        )
+                    ) {
+
+                        $dimensions =
+                            (int) $item['width']
+                            . ' × '
+                            . (int) $item['height'];
+
+                    }
+
+
+                    $fileSize =
+                        $formatFileSize(
+                            $item['file_size']
+                            ?? 0
+                        );
+
+
+                    $uploadedAt =
+                        $formatDate(
+                            $item['created_at']
+                            ?? null
+                        );
+
                     ?>
 
+
                     <article
-                        class="media-card"
+                        class="
+                            media-card
+                            media-library-card
+                            <?= $isImage
+                                ? 'media-library-card--image'
+                                : 'media-library-card--file'
+                            ?>
+                        "
                     >
 
-                        <div class="media-card__preview">
+
+                        <!-- =====================================
+                             PREVIEW
+                        ====================================== -->
+
+                        <a
+                            href="<?= View::escape(
+                                $url
+                            ) ?>"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="media-card__preview"
+                            aria-label="مشاهده <?= View::escape(
+                                $originalName
+                            ) ?>"
+                        >
 
                             <?php if (
                                 $isImage
@@ -200,8 +622,9 @@ $total =
                                         $url
                                     ) ?>"
                                     alt="<?= View::escape(
-                                        $item['alt_text']
-                                        ?? ''
+                                        $altText !== ''
+                                            ? $altText
+                                            : $originalName
                                     ) ?>"
                                     loading="lazy"
                                 >
@@ -212,54 +635,97 @@ $total =
                                     class="media-card__file"
                                     aria-hidden="true"
                                 >
-                                    📄
+
+                                    <span>
+                                        📄
+                                    </span>
+
+                                    <small>
+                                        <?= View::escape(
+                                            $fileType
+                                        ) ?>
+                                    </small>
+
                                 </div>
 
                             <?php endif; ?>
 
-                        </div>
 
+                            <span class="media-card__type-badge">
+
+                                <?= View::escape(
+                                    $fileType
+                                ) ?>
+
+                            </span>
+
+                        </a>
+
+
+                        <!-- =====================================
+                             BODY
+                        ====================================== -->
 
                         <div class="media-card__body">
 
-                            <strong>
-                                <?= View::escape(
-                                    $item['original_name']
-                                    ?? 'file'
-                                ) ?>
-                            </strong>
+
+                            <div class="media-card__title-row">
+
+                                <strong
+                                    title="<?= View::escape(
+                                        $originalName
+                                    ) ?>"
+                                >
+                                    <?= View::escape(
+                                        $originalName
+                                    ) ?>
+                                </strong>
+
+                            </div>
 
 
-                            <?php if (
-                                $isImage
-                                && !empty(
-                                    $item['width']
-                                )
-                                && !empty(
-                                    $item['height']
-                                )
-                            ): ?>
+                            <!-- Metadata -->
 
-                                <span>
-                                    <?= (int) $item['width'] ?>
-                                    ×
-                                    <?= (int) $item['height'] ?>
-                                </span>
+                            <div class="media-card__meta">
 
-                            <?php elseif (
-                                !empty(
-                                    $item['mime_type']
-                                )
-                            ): ?>
+                                <?php if (
+                                    $dimensions !== ''
+                                ): ?>
+
+                                    <span>
+                                        <?= View::escape(
+                                            $dimensions
+                                        ) ?>
+                                    </span>
+
+                                    <span
+                                        aria-hidden="true"
+                                    >
+                                        •
+                                    </span>
+
+                                <?php endif; ?>
+
 
                                 <span>
                                     <?= View::escape(
-                                        $item['mime_type']
+                                        $fileSize
                                     ) ?>
                                 </span>
 
-                            <?php endif; ?>
+                            </div>
 
+
+                            <div class="media-card__date">
+
+                                <?= View::escape(
+                                    $uploadedAt
+                                ) ?>
+
+                            </div>
+
+
+                            <!-- Actions -->
 
                             <div class="media-card__actions">
 
@@ -269,7 +735,11 @@ $total =
                                     ) ?>"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="button button--secondary button--small"
+                                    class="
+                                        button
+                                        button--secondary
+                                        button--small
+                                    "
                                 >
                                     مشاهده
                                 </a>
@@ -287,9 +757,14 @@ $total =
 
                                     <?= Csrf::field() ?>
 
+
                                     <button
                                         type="submit"
-                                        class="button button--danger button--small"
+                                        class="
+                                            button
+                                            button--danger
+                                            button--small
+                                        "
                                     >
                                         حذف
                                     </button>
@@ -307,12 +782,16 @@ $total =
             </div>
 
 
+            <!-- =================================================
+                 PAGINATION
+            ================================================== -->
+
             <?php if (
                 $totalPages > 1
             ): ?>
 
                 <nav
-                    class="admin-pagination"
+                    class="admin-pagination media-library-page__pagination"
                     aria-label="صفحه‌بندی رسانه"
                 >
 
@@ -322,18 +801,29 @@ $total =
 
                         <a
                             href="?page=<?= $currentPage - 1 ?>"
+                            class="admin-pagination__link"
                         >
+                            <span aria-hidden="true">
+                                →
+                            </span>
+
                             قبلی
                         </a>
 
                     <?php endif; ?>
 
 
-                    <span>
+                    <span
+                        class="admin-pagination__current"
+                    >
                         صفحه
-                        <?= $currentPage ?>
+                        <?= number_format(
+                            $currentPage
+                        ) ?>
                         از
-                        <?= $totalPages ?>
+                        <?= number_format(
+                            $totalPages
+                        ) ?>
                     </span>
 
 
@@ -343,8 +833,13 @@ $total =
 
                         <a
                             href="?page=<?= $currentPage + 1 ?>"
+                            class="admin-pagination__link"
                         >
                             بعدی
+
+                            <span aria-hidden="true">
+                                ←
+                            </span>
                         </a>
 
                     <?php endif; ?>
@@ -355,6 +850,6 @@ $total =
 
         <?php endif; ?>
 
-    </div>
+    </section>
 
 </div>

@@ -1,0 +1,235 @@
+/*
+|--------------------------------------------------------------------------
+| English — Footer
+|--------------------------------------------------------------------------
+|
+| Institutional footer.
+|
+| The footer remains intentionally dark in both themes, while using
+| theme-aware English variables so its surfaces, text, borders and
+| interactions stay consistent with the rest of the English site.
+|
+|--------------------------------------------------------------------------
+*/
+
+.english-footer {
+    margin-top:
+        0;
+
+    padding:
+        58px
+        0
+        22px;
+
+    background:
+        var(--english-dark-surface);
+
+    color:
+        var(--english-dark-text);
+
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+
+.english-footer__grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        1.4fr
+        1fr
+        1fr;
+
+    gap:
+        50px;
+
+    padding-bottom:
+        34px;
+}
+
+
+.english-footer h2 {
+    margin:
+        0
+        0
+        10px;
+
+    color:
+        var(--english-dark-text);
+
+    font-size:
+        16px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.5;
+}
+
+
+.english-footer p {
+    max-width:
+        380px;
+
+    margin:
+        0;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.8;
+}
+
+
+.english-footer a {
+    display:
+        block;
+
+    margin-top:
+        8px;
+
+    color:
+        var(--english-dark-link);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.7;
+
+    text-decoration:
+        none;
+
+    transition:
+        color var(--english-transition);
+}
+
+
+.english-footer a:hover {
+    color:
+        var(--english-dark-text);
+}
+
+
+.english-footer__bottom {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    padding-top:
+        20px;
+
+    border-top:
+        1px solid
+        var(--english-dark-border);
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        11px;
+
+    line-height:
+        1.7;
+}
+
+
+/* ==========================================================================
+   Responsive
+========================================================================== */
+
+@media (max-width: 900px) {
+
+    .english-footer__grid {
+        grid-template-columns:
+            1fr
+            1fr;
+
+        gap:
+            35px;
+    }
+
+
+    .english-footer__grid
+    > div:first-child {
+        grid-column:
+            1 / -1;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .english-footer {
+        padding:
+            48px
+            0
+            20px;
+    }
+
+
+    .english-footer__grid {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            28px;
+
+        padding-bottom:
+            28px;
+    }
+
+
+    .english-footer__grid
+    > div:first-child {
+        grid-column:
+            auto;
+    }
+
+
+    .english-footer__bottom {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+        gap:
+            8px;
+
+        padding-top:
+            17px;
+    }
+
+}
+
+
+/* ==========================================================================
+   Reduced Motion
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .english-footer,
+    .english-footer a {
+        transition:
+            none;
+    }
+
+}

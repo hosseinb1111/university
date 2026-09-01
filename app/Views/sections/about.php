@@ -1,6 +1,111 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Core\View;
+
+$section =
+    is_array(
+        $section ?? null
+    )
+        ? $section
+        : [];
+
+
+$eyebrow =
+    (string) (
+        $section['eyebrow']
+        ?? 'معرفی موسسه'
+    );
+
+$title =
+    (string) (
+        $section['title']
+        ?? 'موسسه آموزش عالی صدرالمتالهین'
+    );
+
+$intro =
+    (string) (
+        $section['intro']
+        ?? ''
+    );
+
+
+$cardEyebrow =
+    (string) (
+        $section['card_eyebrow']
+        ?? 'درباره ما'
+    );
+
+$cardTitle =
+    (string) (
+        $section['card_title']
+        ?? 'معرفی موسسه'
+    );
+
+$cardText1 =
+    (string) (
+        $section['card_text_1']
+        ?? ''
+    );
+
+$cardText2 =
+    (string) (
+        $section['card_text_2']
+        ?? ''
+    );
+
+
+$goalsEyebrow =
+    (string) (
+        $section['goals_eyebrow']
+        ?? 'اهداف'
+    );
+
+$goalsTitle =
+    (string) (
+        $section['goals_title']
+        ?? 'اهداف و رویکرد'
+    );
+
+$goalsText =
+    (string) (
+        $section['goals_text']
+        ?? ''
+    );
+
+
+$structureEyebrow =
+    (string) (
+        $section['structure_eyebrow']
+        ?? 'ساختار'
+    );
+
+$structureTitle =
+    (string) (
+        $section['structure_title']
+        ?? 'ساختار دانشگاهی'
+    );
+
+$structureText =
+    (string) (
+        $section['structure_text']
+        ?? ''
+    );
+
+
+$moreEyebrow =
+    (string) (
+        $section['more_eyebrow']
+        ?? 'اطلاعات بیشتر'
+    );
+
+$moreTitle =
+    (string) (
+        $section['more_title']
+        ?? 'مسیرهای دسترسی'
+    );
+
 ?>
 
 <section class="institution-page">
@@ -10,17 +115,21 @@ declare(strict_types=1);
         <header class="institution-hero">
 
             <span>
-                معرفی موسسه
+                <?= View::escape(
+                    $eyebrow
+                ) ?>
             </span>
 
             <h1>
-                موسسه آموزش عالی صدرالمتالهین
+                <?= View::escape(
+                    $title
+                ) ?>
             </h1>
 
             <p>
-                موسسه آموزش عالی صدرالمتالهین (صدرا)،
-                یک مجموعه آموزش عالی با تمرکز بر آموزش،
-                توسعه علمی و فعالیت‌های پژوهشی است.
+                <?= View::escape(
+                    $intro
+                ) ?>
             </p>
 
         </header>
@@ -31,23 +140,63 @@ declare(strict_types=1);
             <article class="institution-card">
 
                 <span class="institution-card__eyebrow">
-                    درباره ما
+                    <?= View::escape(
+                        $cardEyebrow
+                    ) ?>
                 </span>
 
                 <h2>
-                    معرفی موسسه
+                    <?= View::escape(
+                        $cardTitle
+                    ) ?>
+                </h2>
+
+                <?php if (
+                    $cardText1 !== ''
+                ): ?>
+
+                    <p>
+                        <?= View::escape(
+                            $cardText1
+                        ) ?>
+                    </p>
+
+                <?php endif; ?>
+
+
+                <?php if (
+                    $cardText2 !== ''
+                ): ?>
+
+                    <p>
+                        <?= View::escape(
+                            $cardText2
+                        ) ?>
+                    </p>
+
+                <?php endif; ?>
+
+            </article>
+
+
+            <article class="institution-card">
+
+                <span class="institution-card__eyebrow">
+                    <?= View::escape(
+                        $goalsEyebrow
+                    ) ?>
+                </span>
+
+                <h2>
+                    <?= View::escape(
+                        $goalsTitle
+                    ) ?>
                 </h2>
 
                 <p>
-                    این بخش برای ارائه معرفی رسمی موسسه،
-                    تاریخچه، ساختار و اطلاعات عمومی آن
-                    طراحی شده است.
-                </p>
-
-                <p>
-                    محتوای رسمی و قابل ویرایش می‌تواند
-                    در ادامه از طریق پنل مدیریت به این
-                    بخش متصل شود.
+                    <?= View::escape(
+                        $goalsText
+                    ) ?>
                 </p>
 
             </article>
@@ -56,17 +205,21 @@ declare(strict_types=1);
             <article class="institution-card">
 
                 <span class="institution-card__eyebrow">
-                    اهداف
+                    <?= View::escape(
+                        $structureEyebrow
+                    ) ?>
                 </span>
 
                 <h2>
-                    اهداف و رویکرد
+                    <?= View::escape(
+                        $structureTitle
+                    ) ?>
                 </h2>
 
                 <p>
-                    توسعه آموزش عالی، تقویت فعالیت‌های علمی
-                    و پژوهشی و فراهم کردن محیط مناسب برای
-                    رشد دانشجویان و اعضای هیئت علمی.
+                    <?= View::escape(
+                        $structureText
+                    ) ?>
                 </p>
 
             </article>
@@ -75,30 +228,15 @@ declare(strict_types=1);
             <article class="institution-card">
 
                 <span class="institution-card__eyebrow">
-                    ساختار
+                    <?= View::escape(
+                        $moreEyebrow
+                    ) ?>
                 </span>
 
                 <h2>
-                    ساختار دانشگاهی
-                </h2>
-
-                <p>
-                    ساختار موسسه شامل بخش‌های آموزشی،
-                    پژوهشی، دانشجویی، اداری و پشتیبانی
-                    است.
-                </p>
-
-            </article>
-
-
-            <article class="institution-card">
-
-                <span class="institution-card__eyebrow">
-                    دسترسی
-                </span>
-
-                <h2>
-                    بخش‌های اصلی
+                    <?= View::escape(
+                        $moreTitle
+                    ) ?>
                 </h2>
 
                 <div class="institution-link-list">
@@ -149,11 +287,15 @@ declare(strict_types=1);
                 <div>
 
                     <span>
-                        اطلاعات بیشتر
+                        <?= View::escape(
+                            $moreEyebrow
+                        ) ?>
                     </span>
 
                     <h2>
-                        مسیرهای دسترسی
+                        <?= View::escape(
+                            $moreTitle
+                        ) ?>
                     </h2>
 
                 </div>

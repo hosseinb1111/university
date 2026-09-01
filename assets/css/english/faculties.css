@@ -1,0 +1,2199 @@
+/*
+|--------------------------------------------------------------------------
+| English — Faculties listing page
+|--------------------------------------------------------------------------
+|
+| Dedicated styling for:
+|
+|   /english/faculties
+|
+| Design direction:
+|
+|   - Institutional
+|   - Editorial
+|   - Calm
+|   - Professional
+|   - Structured academic presentation
+|   - Restrained interaction
+|   - Full light / dark theme support
+|
+| This file intentionally does not style:
+|
+|   - Global English header/footer
+|   - Generic English buttons
+|   - Generic English container
+|   - Homepage faculty cards
+|   - Faculty detail page
+|
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   PAGE
+========================================================================== */
+
+.english-faculties-page {
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+
+    transition:
+        background-color 180ms ease,
+        color 180ms ease;
+}
+
+
+/* ==========================================================================
+   HERO
+========================================================================== */
+
+.english-faculties-hero {
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    padding:
+        104px
+        0
+        96px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--english-background) 0%,
+            var(--english-background-soft) 48%,
+            var(--english-surface-soft) 100%
+        );
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    isolation:
+        isolate;
+
+    transition:
+        background 180ms ease,
+        border-color 180ms ease;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Decorative shape
+|--------------------------------------------------------------------------
+*/
+
+.english-faculties-hero::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        -250px;
+
+    right:
+        -170px;
+
+    width:
+        620px;
+
+    height:
+        620px;
+
+    border:
+        1px solid
+        var(--english-decoration-border);
+
+    border-radius:
+        50%;
+
+    background:
+        radial-gradient(
+            circle,
+            var(--english-decoration-primary) 0%,
+            var(--english-decoration-primary-soft) 42%,
+            transparent 72%
+        );
+
+    pointer-events:
+        none;
+}
+
+
+.english-faculties-hero::after {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        10%;
+
+    bottom:
+        -260px;
+
+    width:
+        470px;
+
+    height:
+        470px;
+
+    border:
+        1px solid
+        var(--english-decoration-border-soft);
+
+    border-radius:
+        50%;
+
+    pointer-events:
+        none;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Hero container
+|--------------------------------------------------------------------------
+*/
+
+.english-faculties-hero .english-container {
+    position:
+        relative;
+
+    z-index:
+        2;
+
+    display:
+        flex;
+
+    align-items:
+        flex-end;
+
+    justify-content:
+        space-between;
+
+    gap:
+        45px;
+}
+
+
+/* ==========================================================================
+   HERO CONTENT
+========================================================================== */
+
+.english-faculties-hero__content {
+    width:
+        min(
+            840px,
+            100%
+        );
+
+    min-width:
+        0;
+}
+
+
+.english-faculties-hero__content > span {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    margin-bottom:
+        14px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.4;
+
+    letter-spacing:
+        0.13em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-faculties-hero__content > span::before {
+    content:
+        "";
+
+    width:
+        27px;
+
+    height:
+        1px;
+
+    flex:
+        0
+        0
+        27px;
+
+    background:
+        var(--english-decoration-line);
+}
+
+
+.english-faculties-hero h1 {
+    max-width:
+        850px;
+
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            44px,
+            6vw,
+            72px
+        );
+
+    font-weight:
+        900;
+
+    line-height:
+        1.03;
+
+    letter-spacing:
+        -0.062em;
+
+    text-wrap:
+        balance;
+}
+
+
+.english-faculties-hero p {
+    width:
+        min(
+            700px,
+            100%
+        );
+
+    margin:
+        22px
+        0
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        15px;
+
+    line-height:
+        1.95;
+}
+
+
+/* ==========================================================================
+   HERO COUNT
+========================================================================== */
+
+.english-faculties-hero__count {
+    min-width:
+        145px;
+
+    flex:
+        0
+        0
+        auto;
+
+    padding:
+        20px
+        22px
+        19px;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--english-surface) 0%,
+            var(--english-surface-soft) 100%
+        );
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        var(--english-radius-lg);
+
+    box-shadow:
+        var(--english-shadow-xs);
+
+    text-align:
+        left;
+
+    transition:
+        background 180ms ease,
+        border-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+
+.english-faculties-hero__count strong {
+    display:
+        block;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        38px;
+
+    font-weight:
+        900;
+
+    line-height:
+        1;
+
+    letter-spacing:
+        -0.04em;
+}
+
+
+.english-faculties-hero__count span {
+    display:
+        block;
+
+    margin-top:
+        7px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.5;
+}
+
+
+/* ==========================================================================
+   INTRO
+========================================================================== */
+
+.english-faculties-intro {
+    padding:
+        100px
+        0;
+
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+}
+
+
+.english-faculties-intro__grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            0,
+            0.9fr
+        )
+        minmax(
+            0,
+            1.1fr
+        );
+
+    gap:
+        clamp(
+            55px,
+            8vw,
+            100px
+        );
+
+    align-items:
+        start;
+}
+
+
+.english-faculties-intro__grid
+> div:first-child
+> span {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    margin-bottom:
+        11px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.4;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-faculties-intro__grid
+> div:first-child
+> span::before {
+    content:
+        "";
+
+    width:
+        24px;
+
+    height:
+        1px;
+
+    flex:
+        0
+        0
+        24px;
+
+    background:
+        var(--english-decoration-line);
+}
+
+
+.english-faculties-intro h2 {
+    max-width:
+        630px;
+
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            31px,
+            4vw,
+            48px
+        );
+
+    font-weight:
+        850;
+
+    line-height:
+        1.1;
+
+    letter-spacing:
+        -0.047em;
+
+    text-wrap:
+        balance;
+}
+
+
+.english-faculties-intro__grid
+> div:last-child {
+    max-width:
+        710px;
+
+    padding-top:
+        4px;
+}
+
+
+.english-faculties-intro__grid p {
+    margin:
+        0
+        0
+        19px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        14px;
+
+    line-height:
+        1.95;
+}
+
+
+.english-faculties-intro__grid p:last-child {
+    margin-bottom:
+        0;
+}
+
+
+/* ==========================================================================
+   MAIN SECTION
+========================================================================== */
+
+.english-faculties-section {
+    padding:
+        94px
+        0;
+
+    background:
+        linear-gradient(
+            180deg,
+            var(--english-background-soft) 0%,
+            var(--english-background) 100%
+        );
+
+    border-top:
+        1px solid
+        var(--english-border);
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    transition:
+        background 180ms ease,
+        border-color 180ms ease;
+}
+
+
+/* ==========================================================================
+   SECTION HEADING
+========================================================================== */
+
+.english-faculties-section__heading {
+    display:
+        flex;
+
+    align-items:
+        flex-end;
+
+    justify-content:
+        space-between;
+
+    gap:
+        30px;
+
+    margin-bottom:
+        40px;
+}
+
+
+.english-faculties-section__heading > div {
+    min-width:
+        0;
+}
+
+
+.english-faculties-section__heading
+> div
+> span {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    margin-bottom:
+        9px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.4;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-faculties-section__heading
+> div
+> span::before {
+    content:
+        "";
+
+    width:
+        24px;
+
+    height:
+        1px;
+
+    flex:
+        0
+        0
+        24px;
+
+    background:
+        var(--english-decoration-line);
+}
+
+
+.english-faculties-section__heading h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            30px,
+            4vw,
+            45px
+        );
+
+    font-weight:
+        850;
+
+    line-height:
+        1.08;
+
+    letter-spacing:
+        -0.045em;
+
+    text-wrap:
+        balance;
+}
+
+
+.english-faculties-section__heading > a {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    flex:
+        0
+        0
+        auto;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.5;
+
+    text-decoration:
+        none;
+
+    transition:
+        color 160ms ease,
+        transform 160ms ease;
+}
+
+
+.english-faculties-section__heading > a strong {
+    font-size:
+        16px;
+
+    font-weight:
+        700;
+
+    transition:
+        transform 160ms ease;
+}
+
+
+.english-faculties-section__heading > a:hover {
+    color:
+        var(--english-accent);
+}
+
+
+.english-faculties-section__heading > a:hover strong {
+    transform:
+        translateX(4px);
+}
+
+
+/* ==========================================================================
+   FACULTY GRID
+========================================================================== */
+
+.english-faculties-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        18px;
+}
+
+
+/* ==========================================================================
+   FACULTY CARD
+========================================================================== */
+
+.english-faculty-card {
+    position:
+        relative;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            205px,
+            0.76fr
+        )
+        minmax(
+            0,
+            1fr
+        );
+
+    min-width:
+        0;
+
+    min-height:
+        330px;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        var(--english-radius-lg);
+
+    box-shadow:
+        var(--english-shadow-xs);
+
+    color:
+        var(--english-text);
+
+    transition:
+        transform 200ms ease,
+        box-shadow 200ms ease,
+        border-color 200ms ease,
+        background-color 200ms ease;
+}
+
+
+.english-faculty-card:hover {
+    transform:
+        translateY(-4px);
+
+    border-color:
+        var(--english-border-strong);
+
+    box-shadow:
+        var(--english-shadow-md);
+}
+
+
+/* ==========================================================================
+   FACULTY VISUAL
+========================================================================== */
+
+.english-faculty-card__visual {
+    position:
+        relative;
+
+    min-width:
+        0;
+
+    min-height:
+        100%;
+
+    overflow:
+        hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--english-surface-soft) 0%,
+            var(--english-background-soft) 100%
+        );
+}
+
+
+.english-faculty-card__visual img {
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        330px;
+
+    object-fit:
+        cover;
+
+    transition:
+        transform 350ms ease,
+        filter 250ms ease;
+}
+
+
+.english-faculty-card:hover
+.english-faculty-card__visual img {
+    transform:
+        scale(
+            1.035
+        );
+}
+
+
+.english-faculty-card__visual::after {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                15,
+                23,
+                42,
+                0.02
+            ) 0%,
+            rgba(
+                15,
+                23,
+                42,
+                0.06
+            ) 60%,
+            rgba(
+                15,
+                23,
+                42,
+                0.16
+            ) 100%
+        );
+
+    pointer-events:
+        none;
+}
+
+
+/* ==========================================================================
+   PLACEHOLDER
+========================================================================== */
+
+.english-faculty-card__placeholder {
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        330px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--english-surface-soft) 0%,
+            var(--english-background-soft) 100%
+        );
+}
+
+
+.english-faculty-card__placeholder span {
+    width:
+        104px;
+
+    height:
+        104px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        28px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        52px;
+
+    font-weight:
+        900;
+
+    line-height:
+        1;
+
+    box-shadow:
+        var(--english-shadow-sm);
+}
+
+
+/* ==========================================================================
+   CARD NUMBER
+========================================================================== */
+
+.english-faculty-card__number {
+    position:
+        absolute;
+
+    top:
+        15px;
+
+    right:
+        15px;
+
+    z-index:
+        3;
+
+    min-width:
+        36px;
+
+    padding:
+        7px
+        9px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--english-surface) 92%,
+            transparent
+        );
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        8px;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.2;
+
+    text-align:
+        center;
+
+    backdrop-filter:
+        blur(
+            10px
+        );
+
+    -webkit-backdrop-filter:
+        blur(
+            10px
+        );
+}
+
+
+/* ==========================================================================
+   CARD BODY
+========================================================================== */
+
+.english-faculty-card__body {
+    min-width:
+        0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    padding:
+        27px
+        26px;
+}
+
+
+.english-faculty-card__eyebrow {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    width:
+        fit-content;
+
+    margin-bottom:
+        10px;
+
+    color:
+        var(--english-muted-light);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.4;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-faculty-card__eyebrow::before {
+    content:
+        "";
+
+    width:
+        18px;
+
+    height:
+        1px;
+
+    background:
+        var(--english-decoration-line);
+}
+
+
+.english-faculty-card h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        22px;
+
+    font-weight:
+        850;
+
+    line-height:
+        1.28;
+
+    letter-spacing:
+        -0.025em;
+
+    text-wrap:
+        balance;
+}
+
+
+.english-faculty-card__body p {
+    margin:
+        13px
+        0
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.9;
+
+    overflow-wrap:
+        anywhere;
+}
+
+
+/* ==========================================================================
+   CARD LINK
+========================================================================== */
+
+.english-faculty-card__link {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    margin-top:
+        auto;
+
+    padding-top:
+        21px;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.5;
+
+    text-decoration:
+        none;
+
+    border-top:
+        1px solid
+        var(--english-border);
+
+    transition:
+        color 160ms ease;
+}
+
+
+.english-faculty-card__link span {
+    min-width:
+        0;
+}
+
+
+.english-faculty-card__link strong {
+    flex:
+        0
+        0
+        auto;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        18px;
+
+    font-weight:
+        700;
+
+    line-height:
+        1;
+
+    transition:
+        transform 180ms ease,
+        color 180ms ease;
+}
+
+
+.english-faculty-card:hover
+.english-faculty-card__link {
+    color:
+        var(--english-accent);
+}
+
+
+.english-faculty-card:hover
+.english-faculty-card__link strong {
+    transform:
+        translateX(4px);
+
+    color:
+        var(--english-accent);
+}
+
+
+.english-faculty-card__link--disabled {
+    color:
+        var(--english-muted-light);
+
+    cursor:
+        default;
+}
+
+
+.english-faculty-card__link--disabled strong {
+    color:
+        var(--english-muted-light);
+}
+
+
+/* ==========================================================================
+   EMPTY STATE
+========================================================================== */
+
+.english-faculties-empty {
+    padding:
+        70px
+        24px;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--english-surface) 0%,
+            var(--english-background-soft) 100%
+        );
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        var(--english-radius-lg);
+
+    box-shadow:
+        var(--english-shadow-xs);
+
+    color:
+        var(--english-text);
+
+    text-align:
+        center;
+}
+
+
+.english-faculties-empty__icon {
+    width:
+        58px;
+
+    height:
+        58px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin:
+        0
+        auto
+        18px;
+
+    background:
+        var(--english-background-soft);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        16px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        26px;
+
+    font-weight:
+        500;
+}
+
+
+.english-faculties-empty h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        21px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.4;
+
+    text-wrap:
+        balance;
+}
+
+
+.english-faculties-empty p {
+    max-width:
+        560px;
+
+    margin:
+        10px
+        auto
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.85;
+}
+
+
+/* ==========================================================================
+   CTA
+|--------------------------------------------------------------------------
+| Intentionally dark editorial section in both themes.
+========================================================================== */
+
+.english-faculties-cta {
+    position:
+        relative;
+
+    overflow:
+        hidden;
+
+    padding:
+        82px
+        0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--english-dark-surface) 0%,
+            var(--english-dark-surface-soft) 58%,
+            var(--english-dark-surface-alt) 100%
+        );
+
+    color:
+        var(--english-dark-text);
+
+    isolation:
+        isolate;
+}
+
+
+.english-faculties-cta::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    right:
+        -190px;
+
+    top:
+        -245px;
+
+    width:
+        520px;
+
+    height:
+        520px;
+
+    border:
+        1px solid
+        var(--english-dark-decoration);
+
+    border-radius:
+        50%;
+
+    pointer-events:
+        none;
+}
+
+
+.english-faculties-cta::after {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        -150px;
+
+    bottom:
+        -290px;
+
+    width:
+        470px;
+
+    height:
+        470px;
+
+    border:
+        1px solid
+        var(--english-dark-decoration-soft);
+
+    border-radius:
+        50%;
+
+    pointer-events:
+        none;
+}
+
+
+.english-faculties-cta .english-container {
+    position:
+        relative;
+
+    z-index:
+        2;
+}
+
+
+.english-faculties-cta__inner {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        45px;
+}
+
+
+.english-faculties-cta__inner > div {
+    max-width:
+        740px;
+}
+
+
+.english-faculties-cta__inner
+> div
+> span {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    margin-bottom:
+        9px;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.4;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-faculties-cta__inner
+> div
+> span::before {
+    content:
+        "";
+
+    width:
+        24px;
+
+    height:
+        1px;
+
+    background:
+        var(--english-dark-line);
+}
+
+
+.english-faculties-cta h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-dark-text);
+
+    font-size:
+        clamp(
+            29px,
+            4vw,
+            45px
+        );
+
+    font-weight:
+        850;
+
+    line-height:
+        1.08;
+
+    letter-spacing:
+        -0.045em;
+
+    text-wrap:
+        balance;
+}
+
+
+.english-faculties-cta p {
+    max-width:
+        660px;
+
+    margin:
+        15px
+        0
+        0;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.9;
+}
+
+
+.english-faculties-cta .english-button--primary {
+    flex:
+        0
+        0
+        auto;
+
+    background:
+        var(--english-dark-text);
+
+    border-color:
+        var(--english-dark-text);
+
+    color:
+        var(--english-dark-surface);
+
+    box-shadow:
+        0
+        8px
+        24px
+        rgba(
+            0,
+            0,
+            0,
+            0.20
+        );
+}
+
+
+/* ==========================================================================
+   DARK MODE REFINEMENT
+|--------------------------------------------------------------------------
+| Keeps the page visually layered in dark mode.
+|--------------------------------------------------------------------------
+*/
+
+html[data-theme="dark"]
+.english-faculties-page {
+
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+}
+
+
+html[data-theme="dark"]
+.english-faculty-card__visual::after {
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                0,
+                0,
+                0,
+                0.02
+            ) 0%,
+            rgba(
+                0,
+                0,
+                0,
+                0.16
+            ) 62%,
+            rgba(
+                0,
+                0,
+                0,
+                0.38
+            ) 100%
+        );
+}
+
+
+html[data-theme="dark"]
+.english-faculties-hero__count,
+html[data-theme="dark"]
+.english-faculty-card,
+html[data-theme="dark"]
+.english-faculties-empty {
+
+    box-shadow:
+        0
+        5px
+        22px
+        rgba(
+            0,
+            0,
+            0,
+            0.20
+        );
+}
+
+
+/* ==========================================================================
+   FOCUS
+========================================================================== */
+
+.english-faculties-page
+a:focus-visible {
+    outline:
+        3px
+        solid
+        var(--english-focus);
+
+    outline-offset:
+        4px;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 1100px
+========================================================================== */
+
+@media (max-width: 1100px) {
+
+    .english-faculties-hero {
+        padding:
+            94px
+            0
+            88px;
+    }
+
+
+    .english-faculties-hero__count {
+        min-width:
+            132px;
+    }
+
+
+    .english-faculties-intro__grid {
+        gap:
+            60px;
+    }
+
+
+    .english-faculty-card {
+        grid-template-columns:
+            minmax(
+                185px,
+                0.72fr
+            )
+            minmax(
+                0,
+                1fr
+            );
+    }
+
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 1000px
+========================================================================== */
+
+@media (max-width: 1000px) {
+
+    .english-faculties-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .english-faculty-card {
+        min-height:
+            315px;
+    }
+
+
+    .english-faculty-card__visual img,
+    .english-faculty-card__placeholder {
+        min-height:
+            315px;
+    }
+
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 850px
+========================================================================== */
+
+@media (max-width: 850px) {
+
+    .english-faculties-hero
+    .english-container {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+
+    .english-faculties-hero__count {
+        min-width:
+            126px;
+    }
+
+
+    .english-faculties-intro__grid {
+        grid-template-columns:
+            1fr;
+
+        gap:
+            36px;
+    }
+
+
+    .english-faculties-section__heading {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+
+    .english-faculties-cta__inner {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 650px
+========================================================================== */
+
+@media (max-width: 650px) {
+
+    .english-faculties-hero {
+        padding:
+            66px
+            0
+            70px;
+    }
+
+
+    .english-faculties-hero h1 {
+        font-size:
+            clamp(
+                38px,
+                10vw,
+                48px
+            );
+    }
+
+
+    .english-faculties-hero p {
+        margin-top:
+            18px;
+
+        font-size:
+            14px;
+
+        line-height:
+            1.88;
+    }
+
+
+    .english-faculties-hero__count {
+        min-width:
+            116px;
+
+        padding:
+            17px
+            18px;
+    }
+
+
+    .english-faculties-hero__count strong {
+        font-size:
+            33px;
+    }
+
+
+    .english-faculties-hero__count span {
+        font-size:
+            10px;
+    }
+
+
+    .english-faculties-intro {
+        padding:
+            66px
+            0;
+    }
+
+
+    .english-faculties-intro h2 {
+        font-size:
+            31px;
+    }
+
+
+    .english-faculties-intro__grid p {
+        font-size:
+            13px;
+
+        line-height:
+            1.9;
+    }
+
+
+    .english-faculties-section {
+        padding:
+            66px
+            0;
+    }
+
+
+    .english-faculties-section__heading {
+        margin-bottom:
+            29px;
+    }
+
+
+    .english-faculties-section__heading h2 {
+        font-size:
+            31px;
+    }
+
+
+    .english-faculties-section__heading > a {
+        font-size:
+            11px;
+    }
+
+
+    .english-faculty-card {
+        grid-template-columns:
+            1fr;
+
+        min-height:
+            0;
+    }
+
+
+    .english-faculty-card__visual {
+        min-height:
+            225px;
+    }
+
+
+    .english-faculty-card__visual img,
+    .english-faculty-card__placeholder {
+        min-height:
+            225px;
+
+        height:
+            225px;
+    }
+
+
+    .english-faculty-card__placeholder span {
+        width:
+            84px;
+
+        height:
+            84px;
+
+        border-radius:
+            23px;
+
+        font-size:
+            42px;
+    }
+
+
+    .english-faculty-card__number {
+        top:
+            13px;
+
+        right:
+            13px;
+    }
+
+
+    .english-faculty-card__body {
+        padding:
+            22px
+            20px
+            21px;
+    }
+
+
+    .english-faculty-card h2 {
+        font-size:
+            20px;
+    }
+
+
+    .english-faculty-card__body p {
+        font-size:
+            12px;
+    }
+
+
+    .english-faculty-card__link {
+        padding-top:
+            18px;
+
+        margin-top:
+            22px;
+    }
+
+
+    .english-faculties-empty {
+        padding:
+            55px
+            20px;
+    }
+
+
+    .english-faculties-empty h2 {
+        font-size:
+            19px;
+    }
+
+
+    .english-faculties-cta {
+        padding:
+            64px
+            0;
+    }
+
+
+    .english-faculties-cta h2 {
+        font-size:
+            34px;
+    }
+
+
+    .english-faculties-cta p {
+        font-size:
+            12px;
+    }
+
+
+    .english-faculties-cta .english-button {
+        width:
+            100%;
+    }
+
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 400px
+========================================================================== */
+
+@media (max-width: 400px) {
+
+    .english-faculties-hero {
+        padding:
+            58px
+            0
+            62px;
+    }
+
+
+    .english-faculties-hero h1 {
+        font-size:
+            35px;
+    }
+
+
+    .english-faculties-intro h2,
+    .english-faculties-section__heading h2 {
+        font-size:
+            28px;
+    }
+
+
+    .english-faculties-cta h2 {
+        font-size:
+            30px;
+    }
+
+
+    .english-faculties-hero__content > span,
+    .english-faculties-intro__grid
+    > div:first-child
+    > span,
+    .english-faculties-section__heading
+    > div
+    > span,
+    .english-faculties-cta__inner
+    > div
+    > span {
+        font-size:
+            9px;
+    }
+
+
+    .english-faculty-card__body {
+        padding:
+            20px
+            18px;
+    }
+
+
+    .english-faculty-card h2 {
+        font-size:
+            19px;
+    }
+
+}
+
+
+/* ==========================================================================
+   REDUCED MOTION
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .english-faculties-page *,
+    .english-faculties-page *::before,
+    .english-faculties-page *::after {
+
+        scroll-behavior:
+            auto;
+
+        transition-duration:
+            0.01ms !important;
+
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+    }
+
+}

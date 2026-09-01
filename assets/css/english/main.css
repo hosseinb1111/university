@@ -1,0 +1,29 @@
+/*
+|--------------------------------------------------------------------------
+| English stylesheet — entry point
+|--------------------------------------------------------------------------
+| Single stylesheet loaded by layouts/english.php. Import order matters:
+| base/typography/layout/header/footer/buttons establish shared
+| foundations first, then the slider (used on the homepage), then each
+| page's own styles, then the (currently empty) global responsive file
+| last so any future cross-cutting override wins.
+*/
+
+@import url("./base.css?v=2");
+@import url("./typography.css?v=2");
+@import url("./layout.css?v=2");
+@import url("./header.css?v=2");
+@import url("./footer.css?v=2");
+@import url("./buttons.css?v=2");
+@import url("./slider.css?v=2");
+@import url("./home.css?v=2");
+@import url("./about.css?v=2");
+@import url("./presidency.css?v=2");
+@import url("./faculties.css?v=2");
+@import url("./faculty.css?v=2");
+@import url("./programs.css?v=2");
+@import url("./program.css?v=2");
+@import url("./research.css?v=2");
+@import url("./announcements.css?v=2");
+@import url("./contact.css?v=2");
+@import url("./responsive.css?v=2");

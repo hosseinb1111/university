@@ -59,6 +59,21 @@ final class DocumentController
      */
     public function create(): string
     {
+        $form = Session::getFlash('document_form');
+        $formErrors = Session::getFlash('document_errors');
+
+        $document = [
+            'category_id' => 0,
+            'title' => '',
+            'description' => '',
+            'is_active' => 1,
+            'published_at' => '',
+        ];
+
+        if (is_array($form)) {
+            $document = array_merge($document, $form);
+        }
+
         return View::renderIntoLayout(
             'layouts/admin',
             'admin/documents/create',
@@ -66,11 +81,12 @@ final class DocumentController
                 'title' =>
                     'افزودن سند | صدرا',
 
+                'document' => $document,
+
                 'categories' =>
                     Document::categories(),
 
-                'errors' =>
-                    [],
+                'errors' => is_array($formErrors) ? $formErrors : [],
             ]
         );
     }
@@ -135,6 +151,10 @@ final class DocumentController
                 'admin.documents.create'
             );
         }
+
+        // Admin typed/picked this in Jalali; convert to Gregorian only
+        // now, right before it's written to the database.
+        $data['published_at'] = jalali_parse_datetime($data['published_at']);
 
         try {
             $stored =
@@ -261,11 +281,20 @@ final class DocumentController
         if (
             is_array($form)
         ) {
+            // Restoring after a failed submission: keep exactly what
+            // the admin typed (still a raw Jalali string).
             $document =
                 array_merge(
                     $document,
                     $form
                 );
+        } else {
+            // Fresh load from the database: convert the stored
+            // Gregorian datetime to Jalali for display/editing.
+            $document['published_at'] = jalali_date(
+                $document['published_at'] ?? null,
+                'Y/m/d H:i'
+            );
         }
 
         return View::renderIntoLayout(
@@ -355,6 +384,10 @@ final class DocumentController
                 ]
             );
         }
+
+        // Convert the admin's Jalali input to Gregorian right before
+        // it touches the database.
+        $data['published_at'] = jalali_parse_datetime($data['published_at']);
 
         $newFile =
             null;
@@ -873,8 +906,11 @@ final class DocumentController
                     ? 1
                     : 0,
 
+            // Raw Jalali string as typed/picked by the admin. Converted
+            // to Gregorian only after validation passes (see store()/
+            // update()) so a failed submission re-shows what was typed.
             'published_at' =>
-                $this->normalizeDateTime(
+                $this->nullableString(
                     $_POST['published_at']
                     ?? null
                 ),
@@ -930,15 +966,7 @@ final class DocumentController
             $data['published_at']
             ?? null;
 
-        if (
-            is_string(
-                $publishedAt
-            )
-            && $publishedAt !== ''
-            && strtotime(
-                $publishedAt
-            ) === false
-        ) {
+        if (!jalali_is_valid_datetime_input($publishedAt)) {
             $errors['published_at'] =
                 'تاریخ انتشار معتبر نیست.';
         }
@@ -1005,48 +1033,6 @@ final class DocumentController
         return $value === ''
             ? null
             : $value;
-    }
-
-    /**
-     * Normalize datetime-local input.
-     */
-    private function normalizeDateTime(
-        mixed $value
-    ): ?string {
-        if (
-            !is_string(
-                $value
-            )
-        ) {
-            return null;
-        }
-
-        $value =
-            trim(
-                $value
-            );
-
-        if (
-            $value === ''
-        ) {
-            return null;
-        }
-
-        $timestamp =
-            strtotime(
-                $value
-            );
-
-        if (
-            $timestamp === false
-        ) {
-            return $value;
-        }
-
-        return date(
-            'Y-m-d H:i:s',
-            $timestamp
-        );
     }
 
     /**

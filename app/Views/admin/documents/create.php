@@ -23,11 +23,10 @@ $formErrors =
         'document_errors'
     );
 
-if (
-    !is_array($form)
-) {
-    $form = [];
-}
+$form =
+    is_array($form)
+        ? $form
+        : [];
 
 $errors =
     is_array($formErrors)
@@ -40,13 +39,13 @@ $errorMessage =
     );
 ?>
 
-<div class="admin-page">
+<div class="admin-documents">
 
-    <div class="admin-page__header">
+    <div class="admin-documents__header">
 
-        <div>
+        <div class="admin-documents__header-main">
 
-            <span class="admin-page__eyebrow">
+            <span class="admin-documents__eyebrow">
                 اسناد و فرم‌ها
             </span>
 
@@ -55,38 +54,41 @@ $errorMessage =
             </h1>
 
             <p>
-                فایل جدید را در دسته‌بندی مناسب منتشر کنید.
+                فایل جدید را با مشخصات مورد نظر در کتابخانه اسناد ثبت کنید.
             </p>
 
         </div>
 
+        <div class="admin-documents__header-actions">
 
-        <a
-            href="<?= View::url(
-                '/admin/documents'
-            ) ?>"
-            class="button button--secondary"
-        >
-            بازگشت
-        </a>
+            <a
+                href="<?= View::url(
+                    '/admin/documents'
+                ) ?>"
+                class="button button--secondary"
+            >
+                بازگشت
+            </a>
+
+        </div>
 
     </div>
 
 
     <?php if (
-        is_string(
-            $errorMessage
-        )
+        is_string($errorMessage)
         && $errorMessage !== ''
     ): ?>
 
         <div
-            class="admin-alert admin-alert--error"
+            class="admin-documents__alert admin-documents__alert--error"
             role="alert"
         >
-            <?= View::escape(
-                $errorMessage
-            ) ?>
+            <strong>
+                <?= View::escape(
+                    $errorMessage
+                ) ?>
+            </strong>
         </div>
 
     <?php endif; ?>
@@ -97,7 +99,7 @@ $errorMessage =
     ): ?>
 
         <div
-            class="admin-alert admin-alert--error"
+            class="admin-documents__errors"
             role="alert"
         >
 
@@ -127,7 +129,28 @@ $errorMessage =
     <?php endif; ?>
 
 
-    <div class="admin-panel">
+    <section class="admin-documents__panel">
+
+        <div class="admin-documents__panel-header">
+
+            <div>
+
+                <span>
+                    سند جدید
+                </span>
+
+                <h2>
+                    اطلاعات سند
+                </h2>
+
+                <p>
+                    دسته‌بندی، عنوان، تاریخ انتشار و فایل سند را مشخص کنید.
+                </p>
+
+            </div>
+
+        </div>
+
 
         <form
             method="POST"
@@ -135,16 +158,17 @@ $errorMessage =
                 '/admin/documents'
             ) ?>"
             enctype="multipart/form-data"
-            class="admin-form"
+            class="admin-documents__form"
+            id="document-create-form"
         >
 
             <?= Csrf::field() ?>
 
 
-            <div class="admin-form__grid">
+            <div class="admin-documents__grid">
 
 
-                <div class="admin-form__field">
+                <div class="admin-documents__field">
 
                     <label
                         for="category_id"
@@ -193,7 +217,7 @@ $errorMessage =
                 </div>
 
 
-                <div class="admin-form__field">
+                <div class="admin-documents__field">
 
                     <label
                         for="title"
@@ -216,12 +240,7 @@ $errorMessage =
                 </div>
 
 
-                <div
-                    class="
-                        admin-form__field
-                        admin-form__field--full
-                    "
-                >
+                <div class="admin-documents__field admin-documents__field--full">
 
                     <label
                         for="description"
@@ -241,43 +260,128 @@ $errorMessage =
                 </div>
 
 
-                <div
-                    class="
-                        admin-form__field
-                        admin-form__field--full
-                    "
-                >
+                <div class="admin-documents__field admin-documents__field--full">
 
-                    <label
-                        for="file"
-                    >
+                    <label>
                         فایل *
                     </label>
 
-                    <input
-                        id="file"
-                        name="file"
-                        type="file"
-                        required
-                        accept="
-                            application/pdf,
-                            application/msword,
-                            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-                            application/vnd.ms-excel,
-                            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-                            application/vnd.ms-powerpoint,
-                            application/vnd.openxmlformats-officedocument.presentationml.presentation
-                        "
-                    >
+
+                    <div class="document-upload">
+
+                        <label
+                            class="document-upload__dropzone"
+                            id="document-dropzone"
+                            for="document-file"
+                            tabindex="0"
+                        >
+
+                            <input
+                                id="document-file"
+                                name="file"
+                                type="file"
+                                class="document-upload__input"
+                                required
+                                accept="
+                                    application/pdf,
+                                    application/msword,
+                                    application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+                                    application/vnd.ms-excel,
+                                    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
+                                    application/vnd.ms-powerpoint,
+                                    application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                "
+                            >
+
+
+                            <div
+                                class="document-upload__icon"
+                                aria-hidden="true"
+                            >
+                                ↑
+                            </div>
+
+
+                            <div>
+
+                                <div class="document-upload__title">
+                                    فایل را اینجا رها کنید
+                                </div>
+
+                                <div class="document-upload__subtitle">
+                                    یا برای انتخاب فایل کلیک کنید
+                                </div>
+
+                                <div class="document-upload__hint">
+                                    PDF، Word، Excel و PowerPoint
+                                </div>
+
+                            </div>
+
+
+                            <span
+                                class="document-upload__choose"
+                            >
+                                انتخاب فایل
+                            </span>
+
+
+                            <div
+                                class="document-upload__selected"
+                                id="document-selected"
+                            >
+
+                                <div
+                                    class="document-upload__selected-icon"
+                                    aria-hidden="true"
+                                >
+                                    📄
+                                </div>
+
+
+                                <div
+                                    class="document-upload__selected-info"
+                                >
+
+                                    <strong
+                                        id="document-selected-name"
+                                    >
+                                        -
+                                    </strong>
+
+                                    <span
+                                        id="document-selected-size"
+                                    >
+                                        -
+                                    </span>
+
+                                </div>
+
+
+                                <button
+                                    type="button"
+                                    class="document-upload__remove"
+                                    id="document-remove"
+                                    aria-label="حذف فایل انتخاب‌شده"
+                                >
+                                    ×
+                                </button>
+
+                            </div>
+
+                        </label>
+
+                    </div>
+
 
                     <small>
-                        PDF، Word، Excel و PowerPoint مجاز هستند.
+                        در هر بار ارسال یک فایل انتخاب کنید.
                     </small>
 
                 </div>
 
 
-                <div class="admin-form__field">
+                <div class="admin-documents__field">
 
                     <label
                         for="published_at"
@@ -288,40 +392,41 @@ $errorMessage =
                     <input
                         id="published_at"
                         name="published_at"
-                        type="datetime-local"
+                        type="text"
+                        dir="ltr"
+                        placeholder="1405/05/31 14:05"
                         value="<?= View::escape(
-                            !empty(
-                                $form['published_at']
-                            )
-                                ? date(
-                                    'Y-m-d\TH:i',
-                                    strtotime(
-                                        $form['published_at']
-                                    )
-                                )
-                                : ''
+                            $form['published_at']
+                            ?? ''
                         ) ?>"
+                        data-jalali-datepicker
+                        autocomplete="off"
                     >
+
+                    <small>
+                        خالی بگذارید تا سند بلافاصله قابل دانلود باشد.
+                    </small>
 
                 </div>
 
 
-                <div class="admin-form__field">
+                <div class="admin-documents__field">
 
-                    <label class="admin-checkbox">
+                    <label class="admin-documents__checkbox">
 
                         <input
                             type="checkbox"
                             name="is_active"
                             value="1"
                             <?= (
-                                isset(
-                                    $form['is_active']
+                                (
+                                    (int) (
+                                        $form['is_active']
+                                        ?? 1
+                                    )
                                 )
-                                    ? (int) $form['is_active']
-                                    : 1
-                            )
                                 === 1
+                            )
                                 ? 'checked'
                                 : ''
                             ?>
@@ -338,15 +443,7 @@ $errorMessage =
             </div>
 
 
-            <div class="admin-form__actions">
-
-                <button
-                    type="submit"
-                    class="button button--primary"
-                >
-                    ذخیره سند
-                </button>
-
+            <div class="admin-documents__actions">
 
                 <a
                     href="<?= View::url(
@@ -357,10 +454,225 @@ $errorMessage =
                     انصراف
                 </a>
 
+
+                <button
+                    type="submit"
+                    class="button button--primary"
+                >
+                    ذخیره سند
+                </button>
+
             </div>
 
         </form>
 
-    </div>
+    </section>
 
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const input =
+        document.getElementById('document-file');
+
+    const dropzone =
+        document.getElementById('document-dropzone');
+
+    const removeButton =
+        document.getElementById('document-remove');
+
+    const selectedName =
+        document.getElementById('document-selected-name');
+
+    const selectedSize =
+        document.getElementById('document-selected-size');
+
+    if (
+        !input
+        || !dropzone
+    ) {
+        return;
+    }
+
+    const formatBytes = function (bytes) {
+
+        if (bytes < 1024) {
+            return bytes + ' B';
+        }
+
+        if (bytes < 1024 * 1024) {
+            return (
+                (bytes / 1024).toFixed(1)
+                + ' KB'
+            );
+        }
+
+        if (bytes < 1024 * 1024 * 1024) {
+            return (
+                (bytes / (1024 * 1024)).toFixed(1)
+                + ' MB'
+            );
+        }
+
+        return (
+            (bytes / (1024 * 1024 * 1024)).toFixed(1)
+            + ' GB'
+        );
+    };
+
+
+    const updateFile = function (file) {
+
+        if (!file) {
+            return;
+        }
+
+        selectedName.textContent =
+            file.name;
+
+        selectedSize.textContent =
+            formatBytes(file.size);
+
+        dropzone.classList.add(
+            'document-upload__dropzone--has-file'
+        );
+    };
+
+
+    input.addEventListener(
+        'change',
+        function () {
+
+            const file =
+                input.files[0];
+
+            if (!file) {
+                return;
+            }
+
+            updateFile(file);
+        }
+    );
+
+
+    removeButton.addEventListener(
+        'click',
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            input.value = '';
+
+            selectedName.textContent =
+                '-';
+
+            selectedSize.textContent =
+                '-';
+
+            dropzone.classList.remove(
+                'document-upload__dropzone--has-file'
+            );
+        }
+    );
+
+
+    [
+        'dragenter',
+        'dragover'
+    ].forEach(function (eventName) {
+
+        dropzone.addEventListener(
+            eventName,
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                dropzone.classList.add(
+                    'document-upload__dropzone--dragging'
+                );
+            }
+        );
+
+    });
+
+
+    [
+        'dragleave',
+        'dragend'
+    ].forEach(function (eventName) {
+
+        dropzone.addEventListener(
+            eventName,
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                dropzone.classList.remove(
+                    'document-upload__dropzone--dragging'
+                );
+            }
+        );
+
+    });
+
+
+    dropzone.addEventListener(
+        'drop',
+        function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            dropzone.classList.remove(
+                'document-upload__dropzone--dragging'
+            );
+
+            const files =
+                event.dataTransfer.files;
+
+            if (
+                !files
+                || files.length === 0
+            ) {
+                return;
+            }
+
+            const file =
+                files[0];
+
+            const dataTransfer =
+                new DataTransfer();
+
+            dataTransfer.items.add(file);
+
+            input.files =
+                dataTransfer.files;
+
+            updateFile(file);
+        }
+    );
+
+
+    dropzone.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (
+                event.key === 'Enter'
+                || event.key === ' '
+            ) {
+
+                event.preventDefault();
+
+                input.click();
+            }
+        }
+    );
+
+});
+</script>

@@ -2,33 +2,84 @@
 
 declare(strict_types=1);
 
-$errors = $errors ?? [];
+use App\Core\Csrf;
+use App\Core\View;
 
-$announcement = $announcement ?? [];
 
-$action = $action ?? '';
-$submitLabel = $submitLabel ?? 'ذخیره';
+$errors =
+    is_array(
+        $errors
+        ?? null
+    )
+        ? $errors
+        : [];
+
+
+$announcement =
+    is_array(
+        $announcement
+        ?? null
+    )
+        ? $announcement
+        : [];
+
+
+$action =
+    is_string(
+        $action
+        ?? null
+    )
+        ? $action
+        : '';
+
+
+$submitLabel =
+    is_string(
+        $submitLabel
+        ?? null
+    )
+        ? $submitLabel
+        : 'ذخیره';
+
+
+$status =
+    (string) (
+        $announcement['status']
+        ?? 'draft'
+    );
+
+
 ?>
 
 <form
     method="POST"
-    action="<?= View::escape($action) ?>"
-    class="admin-form"
+    action="<?= View::escape(
+        $action
+    ) ?>"
+    class="admin-announcement-form"
 >
 
-    <?= \App\Core\Csrf::field() ?>
+    <?= Csrf::field() ?>
 
 
-    <?php if ($errors !== []): ?>
+    <?php if (
+        $errors !== []
+    ): ?>
 
         <div
-            class="form-errors"
+            class="admin-announcement-form-errors"
             role="alert"
         >
 
-            <strong>
-                لطفاً موارد زیر را اصلاح کنید:
-            </strong>
+            <div class="admin-announcement-form-errors__title">
+
+                <span aria-hidden="true">
+                    !
+                </span>
+
+                لطفاً موارد زیر را اصلاح کنید.
+            </div>
+
 
             <ul>
 
@@ -37,11 +88,18 @@ $submitLabel = $submitLabel ?? 'ذخیره';
                     as $error
                 ): ?>
 
-                    <li>
-                        <?= View::escape(
-                            $error
-                        ) ?>
-                    </li>
+                    <?php if (
+                        is_string($error)
+                        && trim($error) !== ''
+                    ): ?>
+
+                        <li>
+                            <?= View::escape(
+                                $error
+                            ) ?>
+                        </li>
+
+                    <?php endif; ?>
 
                 <?php endforeach; ?>
 
@@ -52,324 +110,584 @@ $submitLabel = $submitLabel ?? 'ذخیره';
     <?php endif; ?>
 
 
-    <div class="form-grid">
+    <!-- =========================================================
+         BASIC INFORMATION
+    ========================================================== -->
 
-        <div class="form-field form-field--full">
+    <section class="admin-announcement-form-section">
 
-            <label
-                for="title"
-                class="form-field__label"
+        <div class="admin-announcement-form-section__header">
+
+            <div>
+
+                <span>
+                    اطلاعات اصلی
+                </span>
+
+                <h2>
+                    مشخصات اطلاعیه
+                </h2>
+
+            </div>
+
+            <p>
+                عنوان، آدرس و اولویت اطلاعیه را مشخص کنید.
+            </p>
+
+        </div>
+
+
+        <div class="admin-announcement-form-grid">
+
+
+            <!-- Title -->
+
+            <div
+                class="
+                    admin-announcement-field
+                    admin-announcement-field--full
+                "
             >
-                عنوان اطلاعیه
-            </label>
 
-            <input
-                id="title"
-                name="title"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $announcement['title']
-                    ?? ''
-                ) ?>"
-                maxlength="255"
-                required
-            >
+                <label
+                    for="title"
+                    class="admin-announcement-field__label"
+                >
+                    عنوان اطلاعیه
+                    <span>*</span>
+                </label>
 
-            <?php if (
-                isset($errors['title'])
-            ): ?>
 
-                <small class="form-field__error">
-                    <?= View::escape(
+                <input
+                    id="title"
+                    name="title"
+                    type="text"
+                    class="admin-announcement-field__input"
+                    value="<?= View::escape(
+                        $announcement['title']
+                        ?? ''
+                    ) ?>"
+                    maxlength="255"
+                    autocomplete="off"
+                    required
+                >
+
+
+                <?php if (
+                    isset(
                         $errors['title']
-                    ) ?>
+                    )
+                ): ?>
+
+                    <small class="admin-announcement-field__error">
+                        <?= View::escape(
+                            $errors['title']
+                        ) ?>
+                    </small>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <!-- Slug -->
+
+            <div class="admin-announcement-field">
+
+                <label
+                    for="slug"
+                    class="admin-announcement-field__label"
+                >
+                    آدرس صفحه
+                </label>
+
+
+                <input
+                    id="slug"
+                    name="slug"
+                    type="text"
+                    class="admin-announcement-field__input admin-announcement-field__input--ltr"
+                    value="<?= View::escape(
+                        $announcement['slug']
+                        ?? ''
+                    ) ?>"
+                    maxlength="255"
+                    autocomplete="off"
+                    placeholder="announcement-example"
+                >
+
+
+                <small class="admin-announcement-field__hint">
+                    در صورت خالی بودن، آدرس به‌صورت خودکار ساخته می‌شود.
                 </small>
 
-            <?php endif; ?>
 
-        </div>
-
-
-        <div class="form-field">
-
-            <label
-                for="slug"
-                class="form-field__label"
-            >
-                آدرس صفحه
-            </label>
-
-            <input
-                id="slug"
-                name="slug"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $announcement['slug']
-                    ?? ''
-                ) ?>"
-                maxlength="255"
-                placeholder="مثلاً registration-semester-1405"
-            >
-
-            <?php if (
-                isset($errors['slug'])
-            ): ?>
-
-                <small class="form-field__error">
-                    <?= View::escape(
+                <?php if (
+                    isset(
                         $errors['slug']
-                    ) ?>
+                    )
+                ): ?>
+
+                    <small class="admin-announcement-field__error">
+                        <?= View::escape(
+                            $errors['slug']
+                        ) ?>
+                    </small>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <!-- Priority -->
+
+            <div class="admin-announcement-field">
+
+                <label
+                    for="priority"
+                    class="admin-announcement-field__label"
+                >
+                    اولویت نمایش
+                </label>
+
+
+                <input
+                    id="priority"
+                    name="priority"
+                    type="number"
+                    class="admin-announcement-field__input"
+                    value="<?= View::escape(
+                        $announcement['priority']
+                        ?? 0
+                    ) ?>"
+                    min="-1000"
+                    max="1000"
+                    step="1"
+                >
+
+
+                <small class="admin-announcement-field__hint">
+                    عدد بزرگ‌تر باعث قرارگیری بالاتر در فهرست می‌شود.
                 </small>
 
-            <?php endif; ?>
-
-        </div>
+            </div>
 
 
-        <div class="form-field">
+            <!-- Status -->
 
-            <label
-                for="priority"
-                class="form-field__label"
-            >
-                اولویت
-            </label>
+            <div class="admin-announcement-field">
 
-            <input
-                id="priority"
-                name="priority"
-                type="number"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $announcement['priority']
-                    ?? 0
-                ) ?>"
-                min="-1000"
-                max="1000"
-            >
-
-        </div>
-
-
-        <div class="form-field">
-
-            <label
-                for="status"
-                class="form-field__label"
-            >
-                وضعیت
-            </label>
-
-            <select
-                id="status"
-                name="status"
-                class="form-field__input"
-            >
-
-                <option
-                    value="draft"
-                    <?= (
-                        ($announcement['status'] ?? 'draft')
-                        === 'draft'
-                    )
-                        ? 'selected'
-                        : ''
-                    ?>
+                <label
+                    for="status"
+                    class="admin-announcement-field__label"
                 >
-                    پیش‌نویس
-                </option>
+                    وضعیت
+                    <span>*</span>
+                </label>
 
-                <option
-                    value="published"
-                    <?= (
-                        ($announcement['status'] ?? '')
-                        === 'published'
-                    )
-                        ? 'selected'
-                        : ''
-                    ?>
+
+                <select
+                    id="status"
+                    name="status"
+                    class="admin-announcement-field__input"
                 >
-                    منتشر شده
-                </option>
 
-                <option
-                    value="archived"
-                    <?= (
-                        ($announcement['status'] ?? '')
-                        === 'archived'
-                    )
-                        ? 'selected'
-                        : ''
-                    ?>
+                    <option
+                        value="draft"
+                        <?= $status === 'draft'
+                            ? 'selected'
+                            : ''
+                        ?>
+                    >
+                        پیش‌نویس
+                    </option>
+
+
+                    <option
+                        value="published"
+                        <?= $status === 'published'
+                            ? 'selected'
+                            : ''
+                        ?>
+                    >
+                        منتشر شده
+                    </option>
+
+
+                    <option
+                        value="archived"
+                        <?= $status === 'archived'
+                            ? 'selected'
+                            : ''
+                        ?>
+                    >
+                        بایگانی شده
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SCHEDULE
+    ========================================================== -->
+
+    <section class="admin-announcement-form-section">
+
+        <div class="admin-announcement-form-section__header">
+
+            <div>
+
+                <span>
+                    زمان‌بندی
+                </span>
+
+                <h2>
+                    انتشار و انقضا
+                </h2>
+
+            </div>
+
+            <p>
+                می‌توانید انتشار اطلاعیه را برای زمان آینده تنظیم کنید.
+            </p>
+
+        </div>
+
+
+        <div class="admin-announcement-form-grid">
+
+
+            <!-- Published -->
+
+            <div class="admin-announcement-field">
+
+                <label
+                    for="published_at"
+                    class="admin-announcement-field__label"
                 >
-                    بایگانی شده
-                </option>
+                    تاریخ انتشار
+                </label>
 
-            </select>
+
+                <input
+                    id="published_at"
+                    name="published_at"
+                    type="text"
+                    dir="ltr"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="
+                        admin-announcement-field__input
+                        admin-announcement-field__input--ltr
+                        <?= isset(
+                            $errors['published_at']
+                        )
+                            ? 'admin-announcement-field__input--error'
+                            : ''
+                        ?>
+                    "
+                    value="<?= View::escape(
+                        $announcement['published_at']
+                        ?? ''
+                    ) ?>"
+                    placeholder="1405/05/31 14:05"
+                    data-jalali-picker
+                >
+
+
+                <small class="admin-announcement-field__hint">
+                    خالی = استفاده از زمان فعلی هنگام انتشار.
+                </small>
+
+
+                <?php if (
+                    isset(
+                        $errors['published_at']
+                    )
+                ): ?>
+
+                    <small class="admin-announcement-field__error">
+                        <?= View::escape(
+                            $errors['published_at']
+                        ) ?>
+                    </small>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <!-- Expires -->
+
+            <div class="admin-announcement-field">
+
+                <label
+                    for="expires_at"
+                    class="admin-announcement-field__label"
+                >
+                    تاریخ انقضا
+                </label>
+
+
+                <input
+                    id="expires_at"
+                    name="expires_at"
+                    type="text"
+                    dir="ltr"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="
+                        admin-announcement-field__input
+                        admin-announcement-field__input--ltr
+                        <?= isset(
+                            $errors['expires_at']
+                        )
+                            ? 'admin-announcement-field__input--error'
+                            : ''
+                        ?>
+                    "
+                    value="<?= View::escape(
+                        $announcement['expires_at']
+                        ?? ''
+                    ) ?>"
+                    placeholder="1405/06/31 14:05"
+                    data-jalali-picker
+                >
+
+
+                <small class="admin-announcement-field__hint">
+                    خالی = بدون تاریخ انقضا.
+                </small>
+
+
+                <?php if (
+                    isset(
+                        $errors['expires_at']
+                    )
+                ): ?>
+
+                    <small class="admin-announcement-field__error">
+                        <?= View::escape(
+                            $errors['expires_at']
+                        ) ?>
+                    </small>
+
+                <?php endif; ?>
+
+            </div>
 
         </div>
 
 
-        <div class="form-field">
+        <div class="admin-announcement-schedule-note">
 
-            <label
-                for="published_at"
-                class="form-field__label"
-            >
-                تاریخ انتشار
-            </label>
+            <span aria-hidden="true">
+                ⏱
+            </span>
 
-            <input
-                id="published_at"
-                name="published_at"
-                type="datetime-local"
-                class="form-field__input"
-                value="<?= View::escape(
-    !empty($announcement['published_at'])
-        ? date(
-            'Y-m-d\TH:i',
-            strtotime(
-                $announcement['published_at']
-            )
-        )
-        : ''
-) ?>"
-            >
+            <div>
+
+                <strong>
+                    اطلاعیه زمان‌بندی‌شده
+                </strong>
+
+                <p>
+                    اگر تاریخ انتشار در آینده باشد، اطلاعیه در پنل مدیریت
+                    قابل مشاهده خواهد بود اما تا رسیدن زمان تعیین‌شده
+                    در سایت عمومی نمایش داده نمی‌شود.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         CONTENT
+    ========================================================== -->
+
+    <section class="admin-announcement-form-section">
+
+        <div class="admin-announcement-form-section__header">
+
+            <div>
+
+                <span>
+                    محتوا
+                </span>
+
+                <h2>
+                    متن اطلاعیه
+                </h2>
+
+            </div>
+
+            <p>
+                محتوایی که کاربران در صفحه اطلاعیه خواهند دید.
+            </p>
 
         </div>
 
 
-        <div class="form-field">
+        <div class="admin-announcement-form-grid">
 
-            <label
-                for="expires_at"
-                class="form-field__label"
-            >
-                تاریخ انقضا
-            </label>
 
-            <input
-                id="expires_at"
-                name="expires_at"
-                type="datetime-local"
-                class="form-field__input"
-                value="<?= View::escape(
-    !empty($announcement['expires_at'])
-        ? date(
-            'Y-m-d\TH:i',
-            strtotime(
-                $announcement['expires_at']
-            )
-        )
-        : ''
-) ?>"
+            <!-- Featured image -->
+
+            <div
+                class="
+                    admin-announcement-field
+                    admin-announcement-field--full
+                "
             >
 
-        </div>
+                <label
+                    for="featured_image"
+                    class="admin-announcement-field__label"
+                >
+                    تصویر شاخص
+                </label>
 
 
-        <div class="form-field form-field--full">
+                <input
+                    id="featured_image"
+                    name="featured_image"
+                    type="text"
+                    class="
+                        admin-announcement-field__input
+                        admin-announcement-field__input--ltr
+                    "
+                    value="<?= View::escape(
+                        $announcement['featured_image']
+                        ?? ''
+                    ) ?>"
+                    maxlength="500"
+                    placeholder="/uploads/..."
+                >
 
-            <label
-                for="featured_image"
-                class="form-field__label"
+
+                <small class="admin-announcement-field__hint">
+                    اختیاری است. در صورت خالی بودن هیچ تصویر پیش‌فرضی نمایش داده نمی‌شود.
+                </small>
+
+            </div>
+
+
+            <!-- Excerpt -->
+
+            <div
+                class="
+                    admin-announcement-field
+                    admin-announcement-field--full
+                "
             >
-                تصویر شاخص
-            </label>
 
-            <input
-                id="featured_image"
-                name="featured_image"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $announcement['featured_image']
+                <label
+                    for="excerpt"
+                    class="admin-announcement-field__label"
+                >
+                    خلاصه اطلاعیه
+                </label>
+
+
+                <textarea
+                    id="excerpt"
+                    name="excerpt"
+                    class="admin-announcement-field__textarea"
+                    rows="4"
+                ><?= View::escape(
+                    $announcement['excerpt']
                     ?? ''
-                ) ?>"
-                maxlength="500"
-                placeholder="/uploads/..."
-            >
-
-        </div>
+                ) ?></textarea>
 
 
-        <div class="form-field form-field--full">
-
-            <label
-                for="excerpt"
-                class="form-field__label"
-            >
-                خلاصه
-            </label>
-
-            <textarea
-                id="excerpt"
-                name="excerpt"
-                class="form-field__textarea"
-                rows="4"
-            ><?= View::escape(
-                $announcement['excerpt']
-                ?? ''
-            ) ?></textarea>
-
-        </div>
-
-
-        <div class="form-field form-field--full">
-
-            <label
-                for="content"
-                class="form-field__label"
-            >
-                متن اطلاعیه
-            </label>
-
-            <textarea
-                id="content"
-                name="content"
-                class="form-field__textarea"
-                rows="16"
-                required
-            ><?= View::escape(
-                $announcement['content']
-                ?? ''
-            ) ?></textarea>
-
-            <?php if (
-                isset($errors['content'])
-            ): ?>
-
-                <small class="form-field__error">
-                    <?= View::escape(
-                        $errors['content']
-                    ) ?>
+                <small class="admin-announcement-field__hint">
+                    یک خلاصه کوتاه که در فهرست اطلاعیه‌ها نمایش داده می‌شود.
                 </small>
 
-            <?php endif; ?>
+            </div>
+
+
+            <!-- Content -->
+
+            <div
+                class="
+                    admin-announcement-field
+                    admin-announcement-field--full
+                "
+            >
+
+                <label
+                    for="content"
+                    class="admin-announcement-field__label"
+                >
+                    متن کامل اطلاعیه
+                    <span>*</span>
+                </label>
+
+
+                <textarea
+                    id="content"
+                    name="content"
+                    class="admin-announcement-field__textarea admin-announcement-field__textarea--large"
+                    rows="16"
+                    required
+                ><?= View::escape(
+                    $announcement['content']
+                    ?? ''
+                ) ?></textarea>
+
+
+                <?php if (
+                    isset(
+                        $errors['content']
+                    )
+                ): ?>
+
+                    <small class="admin-announcement-field__error">
+                        <?= View::escape(
+                            $errors['content']
+                        ) ?>
+                    </small>
+
+                <?php endif; ?>
+
+            </div>
 
         </div>
 
-    </div>
+    </section>
 
 
-    <div class="admin-form__actions">
+    <!-- =========================================================
+         ACTIONS
+    ========================================================== -->
+
+    <div class="admin-announcement-form-actions">
 
         <button
             type="submit"
-            class="button button--primary"
+            class="admin-announcement-form-button admin-announcement-form-button--primary"
         >
             <?= View::escape(
                 $submitLabel
             ) ?>
         </button>
 
+
         <a
             href="<?= View::route(
                 'admin.announcements.index'
             ) ?>"
-            class="button button--secondary"
+            class="admin-announcement-form-button admin-announcement-form-button--secondary"
         >
             انصراف
         </a>

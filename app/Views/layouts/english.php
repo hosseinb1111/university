@@ -11,6 +11,8 @@ use App\Core\View;
  * English Public Application Layout
  * =========================================================
  *
+ * English public-facing layout.
+ *
  * Variables expected:
  *
  * @var string $content
@@ -29,12 +31,17 @@ use App\Core\View;
 */
 
 $title =
-    $title
-    ?? 'Sadra Institute of Higher Education';
+    is_string($title ?? null)
+    && trim($title) !== ''
+        ? $title
+        : 'Sadra Institute of Higher Education';
+
 
 $description =
-    $description
-    ?? 'Official website of Sadra Institute of Higher Education, Tehran, Iran.';
+    is_string($description ?? null)
+    && trim($description) !== ''
+        ? $description
+        : 'Official website of Sadra Institute of Higher Education, Tehran, Iran.';
 
 
 /*
@@ -43,13 +50,14 @@ $description =
 |--------------------------------------------------------------------------
 */
 
-$baseUrl = rtrim(
-    (string) config(
-        'app.url',
-        ''
-    ),
-    '/'
-);
+$baseUrl =
+    rtrim(
+        (string) config(
+            'app.url',
+            ''
+        ),
+        '/'
+    );
 
 
 /*
@@ -58,16 +66,21 @@ $baseUrl = rtrim(
 |--------------------------------------------------------------------------
 */
 
-$currentPath = parse_url(
-    $_SERVER['REQUEST_URI'] ?? '/english',
-    PHP_URL_PATH
-);
+$currentPath =
+    parse_url(
+        $_SERVER['REQUEST_URI'] ?? '/english',
+        PHP_URL_PATH
+    );
+
 
 if (
     !is_string($currentPath)
-    || $currentPath === ''
+    || trim($currentPath) === ''
 ) {
-    $currentPath = '/english';
+
+    $currentPath =
+        '/english';
+
 }
 
 
@@ -80,7 +93,7 @@ if (
 $canonicalUrl =
     isset($canonical)
     && is_string($canonical)
-    && $canonical !== ''
+    && trim($canonical) !== ''
         ? $canonical
         : $baseUrl . $currentPath;
 
@@ -91,31 +104,101 @@ $canonicalUrl =
 |--------------------------------------------------------------------------
 */
 
-$persianPath = match ($currentPath) {
-    '/english' =>
-        '/',
+$persianPath =
+    match (true) {
 
-    '/english/about' =>
-        '/about',
+        $currentPath === '/english' =>
+            '/',
 
-    '/english/presidency' =>
-        '/presidency',
 
-    '/english/faculties' =>
-        '/faculties',
+        $currentPath === '/english/about' =>
+            '/about',
 
-    '/english/research' =>
-        '/research-centers',
 
-    '/english/announcements' =>
-        '/announcements',
+        $currentPath === '/english/presidency' =>
+            '/presidency',
 
-    '/english/contact' =>
-        '/contact',
 
-    default =>
-        '/',
-};
+        $currentPath === '/english/faculties' =>
+            '/faculties',
+
+
+        str_starts_with(
+            $currentPath,
+            '/english/faculties/'
+        ) =>
+            '/faculties/'
+            . ltrim(
+                substr(
+                    $currentPath,
+                    strlen('/english/faculties/')
+                ),
+                '/'
+            ),
+
+
+        $currentPath === '/english/programs' =>
+            '/programs',
+
+
+        str_starts_with(
+            $currentPath,
+            '/english/programs/'
+        ) =>
+            '/programs/'
+            . ltrim(
+                substr(
+                    $currentPath,
+                    strlen('/english/programs/')
+                ),
+                '/'
+            ),
+
+
+        $currentPath === '/english/research' =>
+            '/research-centers',
+
+
+        str_starts_with(
+            $currentPath,
+            '/english/research/'
+        ) =>
+            '/research-centers/'
+            . ltrim(
+                substr(
+                    $currentPath,
+                    strlen('/english/research/')
+                ),
+                '/'
+            ),
+
+
+        $currentPath === '/english/announcements' =>
+            '/announcements',
+
+
+        str_starts_with(
+            $currentPath,
+            '/english/announcements/'
+        ) =>
+            '/announcements/'
+            . ltrim(
+                substr(
+                    $currentPath,
+                    strlen('/english/announcements/')
+                ),
+                '/'
+            ),
+
+
+        $currentPath === '/english/contact' =>
+            '/contact',
+
+
+        default =>
+            '/',
+    };
+
 
 $persianUrl =
     $baseUrl
@@ -128,26 +211,32 @@ $persianUrl =
 |--------------------------------------------------------------------------
 */
 
-$active = static function (
-    string $path
-) use (
-    $currentPath
-): string {
-    if (
-        $path === '/english'
-    ) {
-        return $currentPath === '/english'
+$active =
+    static function (
+        string $path
+    ) use (
+        $currentPath
+    ): string {
+
+        if (
+            $path === '/english'
+        ) {
+
+            return $currentPath === '/english'
+                ? 'english-nav__link--active'
+                : '';
+
+        }
+
+
+        return str_starts_with(
+            $currentPath,
+            $path
+        )
             ? 'english-nav__link--active'
             : '';
-    }
 
-    return str_starts_with(
-        $currentPath,
-        $path
-    )
-        ? 'english-nav__link--active'
-        : '';
-};
+    };
 
 
 /*
@@ -161,6 +250,7 @@ $errorMessage =
         'error'
     );
 
+
 $successMessage =
     Session::getFlash(
         'success'
@@ -173,20 +263,25 @@ $successMessage =
 |--------------------------------------------------------------------------
 */
 
-$contactEmail = config(
-    'app.contact.email',
-    'info@sadra.ac.ir'
-);
+$contactEmail =
+    (string) config(
+        'app.contact.email',
+        'info@sadra.ac.ir'
+    );
 
-$contactPhone = config(
-    'app.contact.phone',
-    ''
-);
 
-$contactAddress = config(
-    'app.contact.address',
-    'Tehran, Iran'
-);
+$contactPhone =
+    (string) config(
+        'app.contact.phone',
+        ''
+    );
+
+
+$contactAddress =
+    (string) config(
+        'app.contact.address',
+        'Tehran, Iran'
+    );
 
 
 /*
@@ -202,13 +297,60 @@ $phoneHref =
         $contactPhone
     );
 
+
 if (
     !is_string($phoneHref)
 ) {
-    $phoneHref = '';
+
+    $phoneHref =
+        '';
+
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| Shared theme logos
+|--------------------------------------------------------------------------
+|
+| The English and Persian public applications use the same logo files.
+|
+| JavaScript reads these values from data-theme-logo-light and
+| data-theme-logo-dark and switches the displayed logo according
+| to html[data-theme].
+|
+*/
+
+$logoLight =
+    View::asset(
+        'images/logo-light.png'
+    );
+
+
+$logoDark =
+    View::asset(
+        'images/logo-dark.png'
+    );
+
+
+/*
+|--------------------------------------------------------------------------
+| Favicon
+|--------------------------------------------------------------------------
+|
+| The favicon is completely separate from the theme logos.
+|
+| It is a single static favicon.ico and does NOT change with theme.
+|
+*/
+
+$faviconUrl =
+    View::asset(
+        'favicon.ico'
+    );
+
 ?>
+
 
 <!DOCTYPE html>
 
@@ -218,6 +360,7 @@ if (
 >
 
 <head>
+
 
     <meta charset="UTF-8">
 
@@ -229,7 +372,7 @@ if (
 
 
     <!-- ===================================================
-         Primary SEO
+         SEO
     ==================================================== -->
 
     <meta
@@ -243,7 +386,7 @@ if (
     <meta
         name="robots"
         content="<?= View::escape(
-            config(
+            (string) config(
                 'app.seo.robots',
                 'index,follow'
             )
@@ -349,7 +492,7 @@ if (
     <meta
         name="twitter:card"
         content="<?= View::escape(
-            config(
+            (string) config(
                 'app.seo.twitter_card',
                 'summary'
             )
@@ -374,18 +517,53 @@ if (
 
 
     <!-- ===================================================
-         General metadata
+         General
     ==================================================== -->
 
     <meta
         name="theme-color"
         content="#ffffff"
+        id="theme-color-meta"
     >
 
 
     <meta
         name="application-name"
         content="Sadra Institute"
+    >
+
+
+    <!-- ===================================================
+         FAVICON
+    ==================================================== -->
+
+    <link
+        rel="icon"
+        type="image/x-icon"
+        href="<?= View::escape(
+            $faviconUrl
+        ) ?>"
+    >
+
+
+    <link
+        rel="shortcut icon"
+        type="image/x-icon"
+        href="<?= View::escape(
+            $faviconUrl
+        ) ?>"
+    >
+
+
+    <!-- ===================================================
+         APPLE TOUCH ICON
+    ==================================================== -->
+
+    <link
+        rel="apple-touch-icon"
+        href="<?= View::escape(
+            $logoLight
+        ) ?>"
     >
 
 
@@ -397,14 +575,87 @@ if (
 
 
     <!-- ===================================================
-         Styles
+         Prevent light-theme flash
+    ==================================================== -->
+
+    <script>
+        (function () {
+
+            try {
+
+                var savedTheme =
+                    localStorage.getItem(
+                        'sadra-theme'
+                    );
+
+
+                var systemDark =
+                    window.matchMedia
+                    && window.matchMedia(
+                        '(prefers-color-scheme: dark)'
+                    ).matches;
+
+
+                var theme =
+                    savedTheme === 'dark'
+                    || savedTheme === 'light'
+                        ? savedTheme
+                        : (
+                            systemDark
+                                ? 'dark'
+                                : 'light'
+                        );
+
+
+                document.documentElement.setAttribute(
+                    'data-theme',
+                    theme
+                );
+
+
+                var themeColorMeta =
+                    document.getElementById(
+                        'theme-color-meta'
+                    );
+
+
+                if (
+                    themeColorMeta
+                ) {
+
+                    themeColorMeta.setAttribute(
+                        'content',
+                        theme === 'dark'
+                            ? '#101317'
+                            : '#ffffff'
+                    );
+
+                }
+
+            } catch (
+                error
+            ) {
+
+                document.documentElement.setAttribute(
+                    'data-theme',
+                    'light'
+                );
+
+            }
+
+        })();
+    </script>
+
+
+    <!-- ===================================================
+         English stylesheet
     ==================================================== -->
 
     <link
         rel="stylesheet"
         href="<?= View::asset(
-            'css/english.css'
-        ) ?>"
+            'css/english/main.css'
+        ) ?>?v=3"
     >
 
 </head>
@@ -419,32 +670,70 @@ if (
 
 <header class="english-header">
 
-    <div class="english-container english-header__inner">
+    <div
+        class="
+            english-container
+            english-header__inner
+        "
+    >
 
 
-        <!-- Brand -->
+        <!-- =================================================
+             BRAND
+        ================================================== -->
 
         <a
             href="<?= View::url(
                 '/english'
             ) ?>"
+
             class="english-brand"
+
             aria-label="Sadra Institute of Higher Education"
         >
 
-            <span class="english-brand__logo">
-                S
+            <span
+                class="english-brand__logo"
+            >
+
+                <img
+                    src="<?= View::escape(
+                        $logoLight
+                    ) ?>"
+
+                    alt="Sadra Institute of Higher Education"
+
+                    width="44"
+
+                    height="44"
+
+                    loading="eager"
+
+                    data-theme-logo
+
+                    data-theme-logo-light="<?= View::escape(
+                        $logoLight
+                    ) ?>"
+
+                    data-theme-logo-dark="<?= View::escape(
+                        $logoDark
+                    ) ?>"
+                >
+
             </span>
 
 
-            <span>
+            <span
+                class="english-brand__text"
+            >
 
                 <strong>
                     Sadra Institute
                 </strong>
 
+
                 <small>
-                    of Higher Education
+                    Institute of Higher Education
                 </small>
 
             </span>
@@ -452,129 +741,251 @@ if (
         </a>
 
 
-        <!-- Mobile menu -->
-
-        <button
-            type="button"
-            class="english-menu-toggle"
-            id="english-menu-toggle"
-            aria-label="Open navigation"
-            aria-expanded="false"
-            aria-controls="english-navigation"
-        >
-
-            <span></span>
-
-            <span></span>
-
-            <span></span>
-
-        </button>
-
-
-        <!-- Navigation -->
+        <!-- =================================================
+             DESKTOP NAVIGATION
+        ================================================== -->
 
         <nav
             class="english-nav"
+
             id="english-navigation"
+
             aria-label="Primary navigation"
         >
+
+
+            <!-- Home -->
 
             <a
                 href="<?= View::url(
                     '/english'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english'
+                    ) ?>
+                "
             >
                 Home
             </a>
 
 
+            <!-- About -->
+
             <a
                 href="<?= View::url(
                     '/english/about'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english/about'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/about'
+                    ) ?>
+                "
             >
                 About
             </a>
 
 
+            <!-- Presidency -->
+
             <a
                 href="<?= View::url(
                     '/english/presidency'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english/presidency'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/presidency'
+                    ) ?>
+                "
             >
                 Presidency
             </a>
 
 
+            <!-- Faculties -->
+
             <a
                 href="<?= View::url(
                     '/english/faculties'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english/faculties'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/faculties'
+                    ) ?>
+                "
             >
                 Faculties
             </a>
 
 
+            <!-- Programs -->
+
+            <a
+                href="<?= View::url(
+                    '/english/programs'
+                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/programs'
+                    ) ?>
+                "
+            >
+                Programs
+            </a>
+
+
+            <!-- Research -->
+
             <a
                 href="<?= View::url(
                     '/english/research'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english/research'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/research'
+                    ) ?>
+                "
             >
                 Research
             </a>
 
 
+            <!-- Announcements -->
+
             <a
                 href="<?= View::url(
                     '/english/announcements'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english/announcements'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/announcements'
+                    ) ?>
+                "
             >
                 Announcements
             </a>
 
 
+            <!-- Contact -->
+
             <a
                 href="<?= View::url(
                     '/english/contact'
                 ) ?>"
-                class="english-nav__link <?= $active(
-                    '/english/contact'
-                ) ?>"
+
+                class="
+                    english-nav__link
+                    <?= $active(
+                        '/english/contact'
+                    ) ?>
+                "
             >
                 Contact
             </a>
 
 
+            <!-- =================================================
+                 LANGUAGE
+            ================================================== -->
+
             <a
-                href="<?= View::url(
-                    '/'
+                href="<?= View::escape(
+                    $persianUrl
                 ) ?>"
+
                 class="english-nav__language"
+
                 lang="fa"
+
+                aria-label="Switch to Persian"
             >
                 فارسی
             </a>
 
         </nav>
+
+
+        <!-- =================================================
+             HEADER ACTIONS
+        ================================================== -->
+
+        <div
+            class="english-header__actions"
+        >
+
+
+            <!-- =================================================
+                 THEME TOGGLE
+            ================================================== -->
+
+            <button
+                type="button"
+
+                class="english-theme-toggle"
+
+                data-theme-toggle
+
+                aria-pressed="false"
+
+                aria-label="Switch to dark mode"
+
+                title="Dark mode"
+            >
+
+                <span
+                    class="english-theme-toggle__icon"
+
+                    data-theme-icon
+
+                    aria-hidden="true"
+                >
+                    ☾
+                </span>
+
+            </button>
+
+
+            <!-- =================================================
+                 MOBILE MENU
+            ================================================== -->
+
+            <button
+                type="button"
+
+                class="english-menu-toggle"
+
+                id="english-menu-toggle"
+
+                aria-label="Open navigation"
+
+                aria-expanded="false"
+
+                aria-controls="english-navigation"
+            >
+
+                <span></span>
+
+                <span></span>
+
+                <span></span>
+
+            </button>
+
+        </div>
 
     </div>
 
@@ -587,13 +998,19 @@ if (
 
 <?php if (
     is_string($errorMessage)
-    && $errorMessage !== ''
+    && trim($errorMessage) !== ''
 ): ?>
 
-    <div class="english-container">
+    <div
+        class="english-container"
+    >
 
         <div
-            class="english-alert english-alert--error"
+            class="
+                english-alert
+                english-alert--error
+            "
+
             role="alert"
         >
 
@@ -610,13 +1027,19 @@ if (
 
 <?php if (
     is_string($successMessage)
-    && $successMessage !== ''
+    && trim($successMessage) !== ''
 ): ?>
 
-    <div class="english-container">
+    <div
+        class="english-container"
+    >
 
         <div
-            class="english-alert english-alert--success"
+            class="
+                english-alert
+                english-alert--success
+            "
+
             role="status"
         >
 
@@ -637,7 +1060,7 @@ if (
 
 <main>
 
-    <?= $content ?>
+    <?= $content ?? '' ?>
 
 </main>
 
@@ -653,13 +1076,16 @@ if (
         <div class="english-footer__grid">
 
 
-            <!-- Institution -->
+            <!-- =================================================
+                 Institution
+            ================================================== -->
 
             <div>
 
                 <h2>
                     Sadra Institute
                 </h2>
+
 
                 <p>
                     Sadra Institute of Higher Education,
@@ -669,13 +1095,24 @@ if (
             </div>
 
 
-            <!-- Quick links -->
+            <!-- =================================================
+                 Quick Links
+            ================================================== -->
 
             <div>
 
                 <h2>
                     Quick Links
                 </h2>
+
+
+                <a
+                    href="<?= View::url(
+                        '/english'
+                    ) ?>"
+                >
+                    Home
+                </a>
 
 
                 <a
@@ -707,6 +1144,15 @@ if (
 
                 <a
                     href="<?= View::url(
+                        '/english/programs'
+                    ) ?>"
+                >
+                    Programs
+                </a>
+
+
+                <a
+                    href="<?= View::url(
                         '/english/research'
                     ) ?>"
                 >
@@ -722,10 +1168,21 @@ if (
                     Announcements
                 </a>
 
+
+                <a
+                    href="<?= View::url(
+                        '/english/contact'
+                    ) ?>"
+                >
+                    Contact
+                </a>
+
             </div>
 
 
-            <!-- Contact -->
+            <!-- =================================================
+                 Contact
+            ================================================== -->
 
             <div>
 
@@ -735,7 +1192,7 @@ if (
 
 
                 <?php if (
-                    $contactEmail !== ''
+                    trim($contactEmail) !== ''
                 ): ?>
 
                     <a
@@ -767,16 +1224,7 @@ if (
 
                 <?php endif; ?>
 
-<a
-    href="<?= View::url(
-        '/english/faculties'
-    ) ?>"
-    class="english-nav__link <?= $active(
-        '/english/faculties'
-    ) ?>"
->
-    Programs
-</a>
+
                 <a
                     href="<?= View::url(
                         '/english/contact'
@@ -790,9 +1238,13 @@ if (
         </div>
 
 
-        <!-- Footer bottom -->
+        <!-- =================================================
+             Footer bottom
+        ================================================== -->
 
-        <div class="english-footer__bottom">
+        <div
+            class="english-footer__bottom"
+        >
 
             <span>
                 © <?= date('Y') ?>
@@ -814,13 +1266,13 @@ if (
 
 
 <!-- =======================================================
-     JAVASCRIPT
+     ENGLISH JAVASCRIPT
 ======================================================== -->
 
 <script
     src="<?= View::asset(
         'js/english.js'
-    ) ?>"
+    ) ?>?v=3"
     defer
 ></script>
 

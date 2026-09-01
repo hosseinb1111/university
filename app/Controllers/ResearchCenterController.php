@@ -133,7 +133,12 @@ final class ResearchCenterController
                 'title' =>
                     'پژوهشکده‌ها | صدرا',
 
-                'researchCenters' =>
+                // FIX: the view (admin/research-centers/index.php) reads
+                // $centers['items'] and $centers['total'], matching the
+                // shape returned by ResearchCenter::paginate(). Previously
+                // this array key was 'researchCenters', which left $centers
+                // undefined in the view and made the list appear empty.
+                'centers' =>
                     $researchCenters,
 
                 'success' =>

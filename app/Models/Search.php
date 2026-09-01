@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Core\Database;
 use PDO;
+use PDOStatement;
 
 final class Search
 {
@@ -621,7 +622,7 @@ final class Search
      * @param array<int, string> $columns
      */
     private static function bindSearchParameters(
-        PDO $statement,
+        PDOStatement $statement,
         string $term,
         array $columns,
         string $status,

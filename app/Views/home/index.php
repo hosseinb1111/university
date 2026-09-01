@@ -3,45 +3,23 @@
 declare(strict_types=1);
 
 use App\Core\View;
+use App\Models\SiteSetting;
 
-/**
- * =========================================================
- * Sadra University
- * Public Homepage
- * =========================================================
- *
- * Expected variables:
- *
- * @var array<int, array<string, mixed>> $slides
- * @var array<int, array<string, mixed>> $quickLinks
- * @var array<int, array<string, mixed>> $announcements
- * @var array<int, array<string, mixed>> $faculties
- * @var array<int, array<string, mixed>> $researchCenters
- * @var array<int, array<string, mixed>> $documents
- *
- * =========================================================
- */
-/**
- * =========================================================
- * Sadra University
- * Public Homepage
- * =========================================================
- *
- * Expected variables:
- *
- * @var array<int, array<string, mixed>> $slides
- * @var array<int, array<string, mixed>> $quickLinks
- * @var array<int, array<string, mixed>> $announcements
- * @var array<int, array<string, mixed>> $faculties
- * @var array<int, array<string, mixed>> $researchCenters
- * @var array<int, array<string, mixed>> $documents
- *
- * =========================================================
- */
+
+/*
+|--------------------------------------------------------------------------
+| Normalize homepage data
+|--------------------------------------------------------------------------
+*/
 
 $slides =
     is_array($slides ?? null)
         ? $slides
+        : [];
+
+$sliderSettings =
+    is_array($sliderSettings ?? null)
+        ? $sliderSettings
         : [];
 
 $quickLinks =
@@ -72,16 +50,260 @@ $documents =
 
 /*
 |--------------------------------------------------------------------------
-| Safe helper functions
+| Slider settings
 |--------------------------------------------------------------------------
 */
 
-/**
- * Determine whether a URL is external.
- */
+$sliderAutoplay =
+    !empty(
+        $sliderSettings['autoplay']
+        ?? true
+    );
+
+$sliderInterval =
+    (int) (
+        $sliderSettings['interval']
+        ?? 5000
+    );
+
+$sliderInterval =
+    max(
+        2000,
+        min(
+            30000,
+            $sliderInterval
+        )
+    );
+
+$sliderShowArrows =
+    !empty(
+        $sliderSettings['show_arrows']
+        ?? true
+    );
+
+$sliderShowDots =
+    !empty(
+        $sliderSettings['show_dots']
+        ?? true
+    );
+
+
+$sliderBackgroundMode =
+    trim(
+        (string) (
+            $sliderSettings['background_mode']
+            ?? 'blur'
+        )
+    );
+
+if (
+    !in_array(
+        $sliderBackgroundMode,
+        [
+            'blur',
+            'dominant',
+            'solid',
+            'gradient',
+            'none',
+        ],
+        true
+    )
+) {
+    $sliderBackgroundMode =
+        'blur';
+}
+
+
+$sliderBackgroundColor =
+    strtoupper(
+        trim(
+            (string) (
+                $sliderSettings['background_color']
+                ?? '#111827'
+            )
+        )
+    );
+
+if (
+    preg_match(
+        '/^#[0-9A-F]{6}$/i',
+        $sliderBackgroundColor
+    ) !== 1
+) {
+    $sliderBackgroundColor =
+        '#111827';
+}
+
+
+$sliderGradient =
+    trim(
+        (string) (
+            $sliderSettings['gradient']
+            ?? 'dark'
+        )
+    );
+
+if (
+    !in_array(
+        $sliderGradient,
+        [
+            'dark',
+            'ocean',
+            'purple',
+            'sunset',
+            'light',
+        ],
+        true
+    )
+) {
+    $sliderGradient =
+        'dark';
+}
+
+
+$sliderImageFit =
+    trim(
+        (string) (
+            $sliderSettings['image_fit']
+            ?? 'contain'
+        )
+    );
+
+if (
+    !in_array(
+        $sliderImageFit,
+        [
+            'contain',
+            'cover',
+            'fill',
+        ],
+        true
+    )
+) {
+    $sliderImageFit =
+        'contain';
+}
+
+
+$sliderImagePosition =
+    trim(
+        (string) (
+            $sliderSettings['image_position']
+            ?? 'center center'
+        )
+    );
+
+if (
+    !in_array(
+        $sliderImagePosition,
+        [
+            'center center',
+            'center top',
+            'center bottom',
+            'left center',
+            'right center',
+            'left top',
+            'right top',
+            'left bottom',
+            'right bottom',
+        ],
+        true
+    )
+) {
+    $sliderImagePosition =
+        'center center';
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| Slider gradient presets
+|--------------------------------------------------------------------------
+*/
+
+$sliderGradientCss = match (
+    $sliderGradient
+) {
+    'ocean' =>
+        'linear-gradient(135deg, #0f172a, #0369a1)',
+
+    'purple' =>
+        'linear-gradient(135deg, #1e1b4b, #7e22ce)',
+
+    'sunset' =>
+        'linear-gradient(135deg, #7c2d12, #db2777)',
+
+    'light' =>
+        'linear-gradient(135deg, #e5e7eb, #f8fafc)',
+
+    default =>
+        'linear-gradient(135deg, #0f172a, #1e293b)',
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Initial slider background
+|--------------------------------------------------------------------------
+*/
+
+$sliderInitialBackground =
+    match (
+        $sliderBackgroundMode
+    ) {
+        'solid' =>
+            $sliderBackgroundColor,
+
+        'gradient' =>
+            $sliderGradientCss,
+
+        'none' =>
+            'transparent',
+
+        default =>
+            '#111827',
+    };
+
+
+/*
+|--------------------------------------------------------------------------
+| Homepage quick links settings
+|--------------------------------------------------------------------------
+*/
+
+$quickLinksEyebrow =
+    (string) SiteSetting::get(
+        'homepage.quick_links.eyebrow',
+        'دسترسی سریع'
+    );
+
+$quickLinksTitle =
+    (string) SiteSetting::get(
+        'homepage.quick_links.title',
+        'سامانه‌ها و خدمات'
+    );
+
+$quickLinksDescription =
+    (string) SiteSetting::get(
+        'homepage.quick_links.description',
+        'دسترسی سریع به سامانه‌ها و خدمات مهم موسسه'
+    );
+
+
+/*
+|--------------------------------------------------------------------------
+| Helpers
+|--------------------------------------------------------------------------
+*/
+
 $isExternalUrl = static function (
     string $url
 ): bool {
+    $url =
+        trim(
+            $url
+        );
+
     return str_starts_with(
         $url,
         'http://'
@@ -93,12 +315,10 @@ $isExternalUrl = static function (
 };
 
 
-/**
- * Format announcement date.
- */
 $formatAnnouncementDate = static function (
     mixed $value
 ): string {
+
     if (
         !is_string($value)
         || trim($value) === ''
@@ -107,7 +327,9 @@ $formatAnnouncementDate = static function (
     }
 
     $timestamp =
-        strtotime($value);
+        strtotime(
+            $value
+        );
 
     if (
         $timestamp === false
@@ -115,20 +337,23 @@ $formatAnnouncementDate = static function (
         return 'جدید';
     }
 
-    return date(
-        'Y/m/d',
-        $timestamp
-    );
+    $formatted =
+        jalali_date_fa(
+            $value,
+            'Y/m/d'
+        );
+
+    return $formatted !== ''
+        ? $formatted
+        : 'جدید';
 };
 
 
-/**
- * Safely trim Persian/UTF-8 text.
- */
 $shortenText = static function (
     mixed $value,
     int $width
 ): string {
+
     if (
         !is_string($value)
         || trim($value) === ''
@@ -137,7 +362,7 @@ $shortenText = static function (
     }
 
     return mb_strimwidth(
-        $value,
+        trim($value),
         0,
         $width,
         '...',
@@ -152,13 +377,57 @@ $shortenText = static function (
 ======================================================== -->
 
 <?php if (
-    count($slides) > 0
+    $slides !== []
 ): ?>
 
     <section
         class="home-slider"
         data-home-slider
+
+        data-slider-autoplay="<?= $sliderAutoplay
+            ? 'true'
+            : 'false'
+        ?>"
+
+        data-slider-interval="<?= $sliderInterval ?>"
+
+        data-slider-arrows="<?= $sliderShowArrows
+            ? 'true'
+            : 'false'
+        ?>"
+
+        data-slider-dots="<?= $sliderShowDots
+            ? 'true'
+            : 'false'
+        ?>"
+
+        data-slider-background-mode="<?= View::escape(
+            $sliderBackgroundMode
+        ) ?>"
+
+        data-slider-background-color="<?= View::escape(
+            $sliderBackgroundColor
+        ) ?>"
+
+        data-slider-gradient="<?= View::escape(
+            $sliderGradient
+        ) ?>"
+
+        data-slider-image-fit="<?= View::escape(
+            $sliderImageFit
+        ) ?>"
+
+        data-slider-image-position="<?= View::escape(
+            $sliderImagePosition
+        ) ?>"
+
         aria-label="اسلایدهای صفحه اصلی"
+
+        style="
+            background: <?= View::escape(
+                $sliderInitialBackground
+            ) ?>;
+        "
     >
 
         <div class="home-slider__viewport">
@@ -169,6 +438,7 @@ $shortenText = static function (
             ): ?>
 
                 <?php
+
                 $isFirstSlide =
                     $index === 0;
 
@@ -227,6 +497,7 @@ $shortenText = static function (
                             ?? ''
                         )
                     );
+
                 ?>
 
                 <article
@@ -234,7 +505,9 @@ $shortenText = static function (
                         ? 'home-slide--active'
                         : ''
                     ?>"
+
                     data-home-slide
+
                     aria-hidden="<?= $isFirstSlide
                         ? 'false'
                         : 'true'
@@ -247,12 +520,25 @@ $shortenText = static function (
 
                         <picture>
 
+                            <img
+                                src="<?= View::escape(
+                                    $slideImage
+                                ) ?>"
+
+                                alt=""
+
+                                aria-hidden="true"
+
+                                class="home-slide__backdrop"
+                            >
+
+
                             <?php if (
                                 $slideMobileImage !== ''
                             ): ?>
 
                                 <source
-                                    media="(max-width: 700px)"
+                                    media="(max-width: 650px)"
                                     srcset="<?= View::escape(
                                         $slideMobileImage
                                     ) ?>"
@@ -265,10 +551,25 @@ $shortenText = static function (
                                 src="<?= View::escape(
                                     $slideImage
                                 ) ?>"
+
                                 alt="<?= View::escape(
-                                    $slideTitle
+                                    $slideTitle !== ''
+                                        ? $slideTitle
+                                        : 'اسلاید صفحه اصلی'
                                 ) ?>"
+
                                 class="home-slide__image"
+
+                                style="
+                                    object-fit: <?= View::escape(
+                                        $sliderImageFit
+                                    ) ?>;
+
+                                    object-position: <?= View::escape(
+                                        $sliderImagePosition
+                                    ) ?>;
+                                "
+
                                 <?= $isFirstSlide
                                     ? ''
                                     : 'loading="lazy"'
@@ -291,7 +592,6 @@ $shortenText = static function (
                     >
 
                         <div class="home-slide__content">
-
 
                             <?php if (
                                 $slideSubtitle !== ''
@@ -343,19 +643,26 @@ $shortenText = static function (
                                     href="<?= View::escape(
                                         $slideButtonUrl
                                     ) ?>"
+
                                     class="button button--primary"
+
                                     <?php if (
                                         $isExternalUrl(
                                             $slideButtonUrl
                                         )
                                     ): ?>
+
                                         target="_blank"
+
                                         rel="noopener noreferrer"
+
                                     <?php endif; ?>
                                 >
+
                                     <?= View::escape(
                                         $slideButtonText
                                     ) ?>
+
                                 </a>
 
                             <?php endif; ?>
@@ -375,69 +682,90 @@ $shortenText = static function (
             count($slides) > 1
         ): ?>
 
-            <button
-                type="button"
-                class="home-slider__button home-slider__button--prev"
-                data-home-slider-prev
-                aria-label="اسلاید قبلی"
-            >
-                <span aria-hidden="true">
-                    ‹
-                </span>
-            </button>
+            <?php if (
+                $sliderShowArrows
+            ): ?>
+
+                <button
+                    type="button"
+
+                    class="home-slider__button home-slider__button--prev"
+
+                    data-home-slider-prev
+
+                    aria-label="اسلاید قبلی"
+                >
+                    <span aria-hidden="true">
+                        ‹
+                    </span>
+                </button>
 
 
-            <button
-                type="button"
-                class="home-slider__button home-slider__button--next"
-                data-home-slider-next
-                aria-label="اسلاید بعدی"
-            >
-                <span aria-hidden="true">
-                    ›
-                </span>
-            </button>
+                <button
+                    type="button"
+
+                    class="home-slider__button home-slider__button--next"
+
+                    data-home-slider-next
+
+                    aria-label="اسلاید بعدی"
+                >
+                    <span aria-hidden="true">
+                        ›
+                    </span>
+                </button>
+
+            <?php endif; ?>
 
 
-            <div
-                class="home-slider__dots"
-                role="tablist"
-                aria-label="انتخاب اسلاید"
-            >
+            <?php if (
+                $sliderShowDots
+            ): ?>
 
-                <?php foreach (
-                    $slides
-                    as $index => $slide
-                ): ?>
+                <div
+                    class="home-slider__dots"
 
-                    <button
-                        type="button"
-                        class="home-slider__dot <?= $index === 0
-                            ? 'home-slider__dot--active'
-                            : ''
-                        ?>"
-                        data-home-slider-dot="<?= $index ?>"
-                        aria-label="اسلاید <?= $index + 1 ?>"
-                        aria-selected="<?= $index === 0
-                            ? 'true'
-                            : 'false'
-                        ?>"
-                        role="tab"
-                    ></button>
+                    role="tablist"
 
-                <?php endforeach; ?>
+                    aria-label="انتخاب اسلاید"
+                >
 
-            </div>
+                    <?php foreach (
+                        $slides
+                        as $index => $slide
+                    ): ?>
+
+                        <button
+                            type="button"
+
+                            class="home-slider__dot <?= $index === 0
+                                ? 'home-slider__dot--active'
+                                : ''
+                            ?>"
+
+                            data-home-slider-dot="<?= $index ?>"
+
+                            aria-label="اسلاید <?= $index + 1 ?>"
+
+                            aria-selected="<?= $index === 0
+                                ? 'true'
+                                : 'false'
+                            ?>"
+
+                            role="tab"
+                        ></button>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            <?php endif; ?>
 
         <?php endif; ?>
 
     </section>
 
 <?php else: ?>
-
-    <!-- ===================================================
-         HERO FALLBACK
-    ==================================================== -->
 
     <section class="home-hero">
 
@@ -449,16 +777,13 @@ $shortenText = static function (
                     موسسه آموزش عالی صدرالمتالهین
                 </span>
 
-
                 <h1>
                     صدرا
                 </h1>
 
-
                 <p>
                     محیطی برای آموزش، پژوهش، رشد علمی و پرورش نیروی متخصص.
                 </p>
-
 
                 <div class="home-hero__actions">
 
@@ -466,6 +791,7 @@ $shortenText = static function (
                         href="<?= View::url(
                             '/faculties'
                         ) ?>"
+
                         class="button button--primary"
                     >
                         مشاهده دانشکده‌ها
@@ -476,6 +802,7 @@ $shortenText = static function (
                         href="<?= View::url(
                             '/announcements'
                         ) ?>"
+
                         class="button button--secondary"
                     >
                         آخرین اطلاعیه‌ها
@@ -493,123 +820,165 @@ $shortenText = static function (
 
 
 <!-- =======================================================
-     QUICK LINKS
+     QUICK LINKS / SERVICES
 ======================================================== -->
 
-<section
-    class="home-section home-quick-links"
->
+<?php if (
+    $quickLinks !== []
+): ?>
 
-    <div class="container">
+    <section
+        class="home-section home-quick-links"
+    >
 
-        <div class="home-section__heading">
+        <div class="container">
 
-            <div>
+            <div class="home-section__heading">
 
-                <span>
-                    دسترسی سریع
-                </span>
+                <div>
 
-                <h2>
-                    سامانه‌ها و خدمات
-                </h2>
+                    <?php if (
+                        $quickLinksEyebrow !== ''
+                    ): ?>
+
+                        <span>
+                            <?= View::escape(
+                                $quickLinksEyebrow
+                            ) ?>
+                        </span>
+
+                    <?php endif; ?>
+
+
+                    <?php if (
+                        $quickLinksTitle !== ''
+                    ): ?>
+
+                        <h2>
+                            <?= View::escape(
+                                $quickLinksTitle
+                            ) ?>
+                        </h2>
+
+                    <?php endif; ?>
+
+
+                    <?php if (
+                        $quickLinksDescription !== ''
+                    ): ?>
+
+                        <p>
+                            <?= View::escape(
+                                $quickLinksDescription
+                            ) ?>
+                        </p>
+
+                    <?php endif; ?>
+
+                </div>
 
             </div>
 
-        </div>
-
-
-        <?php if (
-            $quickLinks === []
-        ): ?>
-
-            <div class="home-empty">
-                خدماتی برای نمایش وجود ندارد.
-            </div>
-
-        <?php else: ?>
 
             <div class="home-quick-grid">
 
                 <?php foreach (
                     $quickLinks
-                    as $link
+                    as $service
                 ): ?>
 
                     <?php
-                    $linkUrl =
-                        trim(
-                            (string) (
-                                $link['url']
-                                ?? '#'
-                            )
-                        );
 
-                    $linkTitle =
+                    $serviceTitle =
                         trim(
                             (string) (
-                                $link['title']
+                                $service['title']
                                 ?? ''
                             )
                         );
 
-                    $linkDescription =
+                    $serviceUrl =
                         trim(
                             (string) (
-                                $link['description']
+                                $service['url']
+                                ?? ''
+                            )
+                        );
+
+                    $serviceImage =
+                        trim(
+                            (string) (
+                                $service['image']
                                 ?? ''
                             )
                         );
 
                     $external =
                         $isExternalUrl(
-                            $linkUrl
+                            $serviceUrl
                         );
+
                     ?>
 
-                    <a
-                        href="<?= View::escape(
-                            $linkUrl
-                        ) ?>"
-                        class="home-quick-card"
-                        <?php if (
-                            $external
-                        ): ?>
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        <?php endif; ?>
-                    >
+                    <?php if (
+                        $serviceTitle !== ''
+                        && $serviceUrl !== ''
+                    ): ?>
 
-                        <strong>
-                            <?= View::escape(
-                                $linkTitle
-                            ) ?>
-                        </strong>
+                        <a
+                            href="<?= View::escape(
+                                $serviceUrl
+                            ) ?>"
+
+                            class="home-quick-card"
+
+                            <?php if (
+                                $external
+                            ): ?>
+
+                                target="_blank"
+
+                                rel="noopener noreferrer"
+
+                            <?php endif; ?>
+                        >
+
+                            <?php if (
+                                $serviceImage !== ''
+                            ): ?>
+
+                                <img
+                                    src="<?= View::escape(
+                                        $serviceImage
+                                    ) ?>"
+
+                                    alt=""
+
+                                    loading="lazy"
+                                >
+
+                            <?php endif; ?>
 
 
-                        <?php if (
-                            $linkDescription !== ''
-                        ): ?>
-
-                            <span>
+                            <strong>
                                 <?= View::escape(
-                                    $linkDescription
+                                    $serviceTitle
                                 ) ?>
-                            </span>
+                            </strong>
 
-                        <?php endif; ?>
+                        </a>
 
-                    </a>
+                    <?php endif; ?>
 
                 <?php endforeach; ?>
 
             </div>
 
-        <?php endif; ?>
+        </div>
 
-    </div>
+    </section>
 
-</section>
+<?php endif; ?>
 
 
 <!-- =======================================================
@@ -639,6 +1008,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/announcements'
                 ) ?>"
+
                 class="home-section__link"
             >
                 مشاهده همه
@@ -657,9 +1027,7 @@ $shortenText = static function (
 
         <?php else: ?>
 
-            <div
-                class="home-announcement-grid"
-            >
+            <div class="home-announcement-grid">
 
                 <?php foreach (
                     $announcements
@@ -667,6 +1035,7 @@ $shortenText = static function (
                 ): ?>
 
                     <?php
+
                     $announcementSlug =
                         trim(
                             (string) (
@@ -690,6 +1059,7 @@ $shortenText = static function (
                                 ?? ''
                             )
                         );
+
                     ?>
 
                     <article
@@ -764,6 +1134,7 @@ $shortenText = static function (
                                         $announcementSlug
                                     )
                                 ) ?>"
+
                                 class="home-card-link"
                             >
                                 ادامه مطلب
@@ -813,6 +1184,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/faculties'
                 ) ?>"
+
                 class="home-section__link"
             >
                 همه دانشکده‌ها
@@ -839,6 +1211,7 @@ $shortenText = static function (
                 ): ?>
 
                     <?php
+
                     $facultySlug =
                         trim(
                             (string) (
@@ -851,7 +1224,7 @@ $shortenText = static function (
                         trim(
                             (string) (
                                 $faculty['name']
-                                ?? ''
+                                ?? 'دانشکده'
                             )
                         );
 
@@ -870,88 +1243,209 @@ $shortenText = static function (
                                 ?? ''
                             )
                         );
+
+                    $facultyDescription =
+                        $shortenText(
+                            $faculty['description']
+                            ?? '',
+                            150
+                        );
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | Faculty card destination
+                    |--------------------------------------------------------------------------
+                    |
+                    | The entire card is now the link (see below), so this is
+                    | computed once and reused both for the wrapping <a> and,
+                    | when missing, to fall back to a plain, non-clickable
+                    | <div> instead of a link pointing nowhere.
+                    |
+                    */
+
+                    $facultyUrl =
+                        $facultySlug !== ''
+                            ? View::url(
+                                '/faculties/'
+                                . rawurlencode(
+                                    $facultySlug
+                                )
+                            )
+                            : '';
+
+                    $facultyCardTag =
+                        $facultyUrl !== ''
+                            ? 'a'
+                            : 'div';
+
                     ?>
 
-                    <article
-                        class="home-faculty-card"
-                    >
+                    <<?= $facultyCardTag ?>
 
                         <?php if (
-                            $facultyImage !== ''
+                            $facultyUrl !== ''
                         ): ?>
 
-                            <img
-                                src="<?= View::escape(
-                                    $facultyImage
-                                ) ?>"
-                                alt="<?= View::escape(
-                                    $facultyName
-                                ) ?>"
-                                loading="lazy"
-                            >
-
-                        <?php else: ?>
-
-                            <div
-                                class="home-faculty-card__placeholder"
-                                aria-hidden="true"
-                            >
-                                <?= View::escape(
-                                    mb_substr(
-                                        $facultyName,
-                                        0,
-                                        1,
-                                        'UTF-8'
-                                    )
-                                ) ?>
-                            </div>
+                            href="<?= View::escape(
+                                $facultyUrl
+                            ) ?>"
 
                         <?php endif; ?>
 
+                        class="home-faculty-card<?= $facultyUrl === ''
+                            ? ' home-faculty-card--static'
+                            : ''
+                        ?>"
+                    >
 
-                        <div>
+                        <div
+                            class="home-faculty-card__media"
+                        >
 
-                            <h3>
-                                <?= View::escape(
-                                    $facultyName
-                                ) ?>
-                            </h3>
+                            <?php if (
+                                $facultyImage !== ''
+                            ): ?>
+
+                                <img
+                                    src="<?= View::escape(
+                                        $facultyImage
+                                    ) ?>"
+
+                                    alt="<?= View::escape(
+                                        $facultyName
+                                    ) ?>"
+
+                                    loading="lazy"
+                                >
+
+                            <?php else: ?>
+
+                                <div
+                                    class="home-faculty-card__placeholder"
+                                    aria-hidden="true"
+                                >
+
+                                    <span>
+                                        <?= View::escape(
+                                            mb_substr(
+                                                $facultyName,
+                                                0,
+                                                1,
+                                                'UTF-8'
+                                            )
+                                        ) ?>
+                                    </span>
+
+                                </div>
+
+                            <?php endif; ?>
+
+
+                            <div
+                                class="home-faculty-card__media-overlay"
+                                aria-hidden="true"
+                            ></div>
+
+                        </div>
+
+
+                        <div
+                            class="home-faculty-card__content"
+                        >
+
+                            <div
+                                class="home-faculty-card__heading"
+                            >
+
+                                <h3>
+                                    <?= View::escape(
+                                        $facultyName
+                                    ) ?>
+                                </h3>
+
+
+                                <?php if (
+                                    $facultyShortName !== ''
+                                ): ?>
+
+                                    <span>
+                                        <?= View::escape(
+                                            $facultyShortName
+                                        ) ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+                            </div>
 
 
                             <?php if (
-                                $facultyShortName !== ''
+                                $facultyDescription !== ''
                             ): ?>
 
-                                <span>
+                                <p
+                                    class="home-faculty-card__description"
+                                >
                                     <?= View::escape(
-                                        $facultyShortName
+                                        $facultyDescription
                                     ) ?>
+                                </p>
+
+                            <?php else: ?>
+
+                                <p
+                                    class="home-faculty-card__description"
+                                >
+                                    اطلاعات و برنامه‌های آموزشی این دانشکده را مشاهده کنید.
+                                </p>
+
+                            <?php endif; ?>
+
+
+                            <?php if (
+                                $facultyUrl !== ''
+                            ): ?>
+
+                                <!--
+                                | This is plain text, not a nested link — the
+                                | whole card above is already the <a>. A link
+                                | inside a link is invalid HTML and would make
+                                | screen readers announce "دانشکده" twice for
+                                | the same destination.
+                                -->
+
+                                <span
+                                    class="home-faculty-card__cta"
+                                >
+
+                                    مشاهده دانشکده
+
+                                    <svg
+                                        class="home-faculty-card__cta-icon"
+                                        width="15"
+                                        height="15"
+                                        viewBox="0 0 20 20"
+                                        aria-hidden="true"
+                                    >
+
+                                        <path
+                                            d="M12.5 5 7 10l5.5 5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="1.7"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                        />
+
+                                    </svg>
+
                                 </span>
 
                             <?php endif; ?>
 
                         </div>
 
-
-                        <?php if (
-                            $facultySlug !== ''
-                        ): ?>
-
-                            <a
-                                href="<?= View::url(
-                                    '/faculties/'
-                                    . rawurlencode(
-                                        $facultySlug
-                                    )
-                                ) ?>"
-                                class="home-card-link"
-                            >
-                                مشاهده
-                            </a>
-
-                        <?php endif; ?>
-
-                    </article>
+                    </<?= $facultyCardTag ?>>
 
                 <?php endforeach; ?>
 
@@ -991,6 +1485,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/research-centers'
                 ) ?>"
+
                 class="home-section__link"
             >
                 مشاهده همه
@@ -1017,6 +1512,7 @@ $shortenText = static function (
                 ): ?>
 
                     <?php
+
                     $centerSlug =
                         trim(
                             (string) (
@@ -1029,7 +1525,7 @@ $shortenText = static function (
                         trim(
                             (string) (
                                 $center['name']
-                                ?? ''
+                                ?? 'پژوهشکده'
                             )
                         );
 
@@ -1039,6 +1535,7 @@ $shortenText = static function (
                             ?? '',
                             180
                         );
+
                     ?>
 
                     <article
@@ -1076,6 +1573,7 @@ $shortenText = static function (
                                         $centerSlug
                                     )
                                 ) ?>"
+
                                 class="home-card-link"
                             >
                                 مشاهده پژوهشکده
@@ -1110,7 +1608,9 @@ $shortenText = static function (
 
             <div>
 
-                <span>
+                <span
+                    class="home-documents__eyebrow"
+                >
                     منابع
                 </span>
 
@@ -1125,6 +1625,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/documents'
                 ) ?>"
+
                 class="home-section__link"
             >
                 مشاهده همه
@@ -1143,7 +1644,7 @@ $shortenText = static function (
 
         <?php else: ?>
 
-            <div class="home-document-list">
+            <div class="home-document-grid">
 
                 <?php foreach (
                     $documents
@@ -1151,6 +1652,7 @@ $shortenText = static function (
                 ): ?>
 
                     <?php
+
                     $documentCategory =
                         trim(
                             (string) (
@@ -1184,40 +1686,45 @@ $shortenText = static function (
                             $document['id']
                             ?? 0
                         );
+
                     ?>
+
 
                     <?php if (
                         $documentId > 0
                         && $documentCategory !== ''
                     ): ?>
 
-                        <a
-                            href="<?= View::url(
+                        <?php
+
+                        $documentUrl =
+                            View::url(
                                 '/documents/'
                                 . rawurlencode(
                                     $documentCategory
                                 )
                                 . '/'
                                 . $documentId
-                            ) ?>"
-                            class="home-document-item"
+                            );
+
+                        ?>
+
+
+                        <article
+                            class="home-document-card"
                         >
 
-                            <div>
-
-                                <strong>
-                                    <?= View::escape(
-                                        $documentTitle
-                                    ) ?>
-                                </strong>
-
+                            <div
+                                class="home-document-card__body"
+                            >
 
                                 <?php if (
-                                    $documentCategoryName
-                                    !== ''
+                                    $documentCategoryName !== ''
                                 ): ?>
 
-                                    <span>
+                                    <span
+                                        class="home-document-card__category"
+                                    >
                                         <?= View::escape(
                                             $documentCategoryName
                                         ) ?>
@@ -1225,14 +1732,69 @@ $shortenText = static function (
 
                                 <?php endif; ?>
 
+
+                                <h3
+                                    class="home-document-card__title"
+                                >
+
+                                    <a
+                                        href="<?= View::escape(
+                                            $documentUrl
+                                        ) ?>"
+                                    >
+                                        <?= View::escape(
+                                            $documentTitle
+                                        ) ?>
+                                    </a>
+
+                                </h3>
+
                             </div>
 
 
-                            <span>
-                                دانلود
-                            </span>
+                            <div
+                                class="home-document-card__footer"
+                            >
 
-                        </a>
+                                <?php if (
+                                    $documentCategoryName !== ''
+                                ): ?>
+
+                                    <span
+                                        class="home-document-card__type"
+                                    >
+                                        <?= View::escape(
+                                            $documentCategoryName
+                                        ) ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+
+                                <a
+                                    href="<?= View::escape(
+                                        $documentUrl
+                                    ) ?>"
+
+                                    class="home-document-card__link"
+                                >
+
+                                    <span>
+                                        مشاهده سند
+                                    </span>
+
+                                    <span
+                                        class="home-document-card__arrow"
+                                        aria-hidden="true"
+                                    >
+                                        ←
+                                    </span>
+
+                                </a>
+
+                            </div>
+
+                        </article>
 
                     <?php endif; ?>
 
@@ -1273,26 +1835,31 @@ $shortenText = static function (
 
 
         <div class="home-quick-grid">
-        <a
-    href="<?= View::url(
-        '/programs'
-    ) ?>"
-    class="home-quick-card"
->
 
-    <strong>
-        رشته‌ها و برنامه‌های آموزشی
-    </strong>
+            <a
+                href="<?= View::url(
+                    '/programs'
+                ) ?>"
 
-    <span>
-        مشاهده رشته‌ها، مقاطع و برنامه‌های تحصیلی
-    </span>
+                class="home-quick-card"
+            >
 
-</a>
+                <strong>
+                    رشته‌ها و برنامه‌های آموزشی
+                </strong>
+
+                <span>
+                    مشاهده رشته‌ها، مقاطع و برنامه‌های تحصیلی
+                </span>
+
+            </a>
+
+
             <a
                 href="<?= View::url(
                     '/about'
                 ) ?>"
+
                 class="home-quick-card"
             >
 
@@ -1311,6 +1878,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/presidency'
                 ) ?>"
+
                 class="home-quick-card"
             >
 
@@ -1329,6 +1897,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/student-affairs'
                 ) ?>"
+
                 class="home-quick-card"
             >
 
@@ -1347,6 +1916,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/support'
                 ) ?>"
+
                 class="home-quick-card"
             >
 
@@ -1383,11 +1953,9 @@ $shortenText = static function (
                     ارتباط با موسسه
                 </span>
 
-
                 <h2>
                     با ما در ارتباط باشید
                 </h2>
-
 
                 <p>
                     برای دریافت اطلاعات بیشتر می‌توانید با موسسه تماس بگیرید.
@@ -1400,6 +1968,7 @@ $shortenText = static function (
                 href="<?= View::url(
                     '/contact'
                 ) ?>"
+
                 class="button button--primary"
             >
                 تماس با ما

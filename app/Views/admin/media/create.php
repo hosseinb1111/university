@@ -2,258 +2,370 @@
 
 declare(strict_types=1);
 
-use App\Core\Csrf;
 use App\Core\Session;
 use App\Core\View;
 
-$errorMessage =
+$error =
     Session::getFlash(
         'error'
     );
 
-$oldAltText =
+$oldSuccess =
     Session::getFlash(
-        'media_alt_text'
+        'success'
     );
-
-if (
-    !is_string(
-        $oldAltText
-    )
-) {
-    $oldAltText = '';
-}
 
 ?>
 
-<div class="admin-page">
+<div class="media-admin--create">
 
-    <div class="admin-page__header">
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
 
-        <div>
-
-            <span class="admin-page__eyebrow">
-                کتابخانه رسانه
-            </span>
-
-            <h1>
-                آپلود فایل
-            </h1>
-
-            <p>
-                تصویر یا فایل مورد نیاز سایت را به کتابخانه رسانه اضافه کنید.
-            </p>
-
-        </div>
-
+    <header class="media-admin__header">
 
         <a
-            href="<?= View::url(
-                '/admin/media'
+            href="<?= View::route(
+                'admin.media.index'
             ) ?>"
-            class="button button--secondary"
+            class="media-admin__back"
         >
-            بازگشت
+
+            <span aria-hidden="true">
+                →
+            </span>
+
+            بازگشت به کتابخانه رسانه
+
         </a>
 
-    </div>
 
+        <span class="media-admin__eyebrow">
+            کتابخانه رسانه
+        </span>
+
+
+        <h1>
+            افزودن رسانه
+        </h1>
+
+
+        <p>
+            تصاویر و فایل‌های مورد نیاز سایت را
+            آپلود کنید.
+            می‌توانید چند فایل را هم‌زمان انتخاب
+            یا مستقیماً داخل کادر زیر بکشید.
+        </p>
+
+    </header>
+
+
+    <!-- =========================================================
+         ERROR
+    ========================================================== -->
 
     <?php if (
-        is_string(
-            $errorMessage
-        )
-        && $errorMessage !== ''
+        is_string($error)
+        && $error !== ''
     ): ?>
 
         <div
-            class="admin-alert admin-alert--error"
+            class="
+                media-admin__alert
+                media-admin__alert--error
+            "
             role="alert"
         >
 
-            <?= View::escape(
-                $errorMessage
-            ) ?>
+            <span
+                class="media-admin__alert-icon"
+                aria-hidden="true"
+            >
+                !
+            </span>
+
+            <span>
+                <?= View::escape(
+                    $error
+                ) ?>
+            </span>
 
         </div>
 
     <?php endif; ?>
 
 
-    <div class="admin-panel">
+    <!-- =========================================================
+         SUCCESS
+    ========================================================== -->
 
-        <div class="admin-panel__header">
+    <?php if (
+        is_string($oldSuccess)
+        && $oldSuccess !== ''
+    ): ?>
 
-            <div>
+        <div
+            class="
+                media-admin__alert
+                media-admin__alert--success
+            "
+            role="status"
+        >
 
-                <strong>
-                    فایل جدید
-                </strong>
+            <span
+                class="media-admin__alert-icon"
+                aria-hidden="true"
+            >
+                ✓
+            </span>
 
-                <span>
-                    حداکثر حجم:
-                    <?= number_format(
-                        (int) config(
-                            'app.uploads.max_file_size',
-                            10 * 1024 * 1024
-                        )
-                        / 1024
-                        / 1024,
-                        2
-                    ) ?>
-                    MB
-                </span>
+            <span>
+                <?= View::escape(
+                    $oldSuccess
+                ) ?>
+            </span>
 
-            </div>
+        </div>
+
+    <?php endif; ?>
+
+
+    <!-- =========================================================
+         PANEL
+    ========================================================== -->
+
+    <section class="media-admin__panel">
+
+
+        <!-- =====================================================
+             PANEL HEADER
+        ====================================================== -->
+
+        <div class="media-admin__panel-header">
+
+            <span>
+                Upload
+            </span>
+
+            <h2>
+                انتخاب فایل
+            </h2>
+
+            <p>
+                فایل‌ها را بکشید و اینجا رها کنید،
+                یا روی دکمه انتخاب فایل کلیک کنید.
+            </p>
 
         </div>
 
 
+        <!-- =====================================================
+             FORM
+        ====================================================== -->
+
         <form
             method="POST"
-            action="<?= View::url(
-                '/admin/media'
+            action="<?= View::route(
+                'admin.media.store'
             ) ?>"
             enctype="multipart/form-data"
-            class="admin-form"
+            class="media-upload-form"
+            id="media-upload-form"
         >
 
-            <?= Csrf::field() ?>
+            <?= \App\Core\Csrf::field() ?>
 
 
-            <div class="admin-form__grid">
+            <!-- =================================================
+                 REAL FILE INPUT
+            ================================================== -->
+
+            <input
+                id="media"
+                name="media[]"
+                type="file"
+                multiple
+                hidden
+                accept="
+                    image/jpeg,
+                    image/png,
+                    image/webp,
+                    image/gif,
+                    application/pdf
+                "
+            >
 
 
-                <!-- File -->
+            <!-- =================================================
+                 DROPZONE
+            ================================================== -->
+
+            <div
+                class="media-dropzone"
+                id="media-dropzone"
+                role="button"
+                tabindex="0"
+                aria-label="انتخاب یا رها کردن فایل‌ها برای آپلود"
+            >
 
                 <div
-                    class="
-                        admin-form__field
-                        admin-form__field--full
-                    "
+                    class="media-dropzone__icon"
+                    aria-hidden="true"
                 >
+                    ↑
+                </div>
 
-                    <label
-                        for="file"
-                    >
-                        فایل *
-                    </label>
 
-                    <input
-                        id="file"
-                        name="file"
-                        type="file"
-                        required
-                        accept="
-                            image/jpeg,
-                            image/png,
-                            image/webp,
-                            application/pdf,
-                            application/msword,
-                            application/vnd.openxmlformats-officedocument.wordprocessingml.document,
-                            application/vnd.ms-excel,
-                            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,
-                            application/vnd.ms-powerpoint,
-                            application/vnd.openxmlformats-officedocument.presentationml.presentation
-                        "
-                    >
+                <div class="media-dropzone__content">
+
+                    <strong>
+                        فایل‌ها را اینجا رها کنید
+                    </strong>
+
+                    <span>
+                        یا از دستگاه خود فایل انتخاب کنید
+                    </span>
 
                     <small>
-                        فرمت‌های مجاز:
-                        JPG، PNG، WebP، PDF، Word، Excel و PowerPoint.
+                        امکان انتخاب یا کشیدن چند فایل به صورت هم‌زمان وجود دارد.
                     </small>
 
                 </div>
 
 
-                <!-- Alt text -->
-
-                <div
-                    class="
-                        admin-form__field
-                        admin-form__field--full
-                    "
+                <button
+                    type="button"
+                    class="media-dropzone__button"
+                    id="media-select-button"
                 >
-
-                    <label
-                        for="alt_text"
-                    >
-                        متن جایگزین تصویر
-                    </label>
-
-                    <input
-                        id="alt_text"
-                        name="alt_text"
-                        type="text"
-                        value="<?= View::escape(
-                            $oldAltText
-                        ) ?>"
-                        maxlength="255"
-                        placeholder="مثلاً تصویر ساختمان اصلی موسسه"
-                    >
-
-                    <small>
-                        برای تصاویر، یک توضیح کوتاه و توصیفی وارد کنید.
-                    </small>
-
-                </div>
+                    انتخاب فایل
+                </button>
 
             </div>
 
 
-            <div class="admin-form__actions">
+            <!-- =================================================
+                 SELECTED FILES
+            ================================================== -->
 
-                <button
-                    type="submit"
-                    class="button button--primary"
+            <section
+                class="media-upload-list"
+                id="media-upload-list"
+                hidden
+            >
+
+                <header class="media-upload-list__header">
+
+                    <div>
+
+                        <strong>
+                            فایل‌های انتخاب‌شده
+                        </strong>
+
+                        <span id="media-upload-count">
+                            ۰ فایل
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="media-upload-list__clear"
+                        id="media-upload-clear"
+                    >
+                        حذف همه
+                    </button>
+
+                </header>
+
+
+                <div
+                    class="media-upload-list__items"
+                    id="media-upload-items"
+                ></div>
+
+
+                <div class="media-upload-summary">
+
+                    <span>
+                        حجم کل
+                    </span>
+
+                    <strong id="media-upload-total-size">
+                        ۰ بایت
+                    </strong>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 ALT TEXT
+            ================================================== -->
+
+            <div class="media-upload-field">
+
+                <label
+                    for="alt_text"
                 >
-                    آپلود فایل
-                </button>
+                    متن جایگزین تصویر
+                </label>
 
+
+                <input
+                    id="alt_text"
+                    name="alt_text"
+                    type="text"
+                    maxlength="255"
+                    placeholder="مثلاً نمای ساختمان موسسه"
+                >
+
+
+                <small>
+                    برای تصاویر، متن جایگزین به دسترس‌پذیری و سئو کمک می‌کند.
+                </small>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div class="media-upload-actions">
 
                 <a
-                    href="<?= View::url(
-                        '/admin/media'
+                    href="<?= View::route(
+                        'admin.media.index'
                     ) ?>"
-                    class="button button--secondary"
+                    class="
+                        media-upload-button
+                        media-upload-button--secondary
+                    "
                 >
                     انصراف
                 </a>
+
+
+                <button
+                    type="submit"
+                    class="
+                        media-upload-button
+                        media-upload-button--primary
+                    "
+                    id="media-upload-submit"
+                    disabled
+                >
+                    آپلود فایل‌ها
+                </button>
 
             </div>
 
         </form>
 
-    </div>
-
-
-    <div class="admin-panel admin-upload-info">
-
-        <div class="admin-panel__header">
-
-            <strong>
-                نکات آپلود
-            </strong>
-
-        </div>
-
-
-        <div class="admin-upload-info__body">
-
-            <p>
-                نام فایل نهایی توسط سرور ساخته می‌شود؛ بنابراین نام فایل اصلی کاربر مستقیماً به عنوان نام فایل ذخیره‌شده استفاده نمی‌شود.
-            </p>
-
-            <p>
-                نوع فایل بر اساس محتوای واقعی فایل بررسی می‌شود، نه فقط پسوند فایل.
-            </p>
-
-            <p>
-                برای تصاویر، ابعاد تصویر نیز در کتابخانه رسانه ذخیره می‌شود.
-            </p>
-
-        </div>
-
-    </div>
+    </section>
 
 </div>

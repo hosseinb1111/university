@@ -1,328 +1,670 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Core\View;
+
+
+/*
+|--------------------------------------------------------------------------
+| Normalize data
+|--------------------------------------------------------------------------
+*/
+
+$faculties =
+    is_array($faculties ?? null)
+        ? $faculties
+        : [];
+
+
+/*
+|--------------------------------------------------------------------------
+| Helpers
+|--------------------------------------------------------------------------
+*/
+
+$shorten =
+    static function (
+        mixed $value,
+        int $width
+    ): string {
+
+        if (
+            !is_string($value)
+            || trim($value) === ''
+        ) {
+            return '';
+        }
+
+
+        return mb_strimwidth(
+            trim($value),
+            0,
+            $width,
+            '...',
+            'UTF-8'
+        );
+    };
+
+
+/*
+|--------------------------------------------------------------------------
+| Faculty count
+|--------------------------------------------------------------------------
+*/
+
+$facultyCount =
+    count(
+        $faculties
+    );
+
 ?>
 
-<section class="english-hero">
 
-    <div class="english-container">
-
-        <div class="english-hero__content">
-
-            <span class="english-eyebrow">
-                Sadra Institute of Higher Education
-            </span>
-
-            <h1>
-                Education, Research and Academic Development
-            </h1>
-
-            <p>
-                Welcome to the official English website of Sadra Institute of Higher Education in Tehran.
-            </p>
-
-            <div class="english-actions">
-
-                <a
-                    href="<?= View::url(
-                        '/english/faculties'
-                    ) ?>"
-                    class="english-button english-button--primary"
-                >
-                    Explore Faculties
-                </a>
-
-                <a
-                    href="<?= View::url(
-                        '/english/about'
-                    ) ?>"
-                    class="english-button english-button--secondary"
-                >
-                    About the Institute
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
+<section
+    class="english-faculties-page"
+    lang="en"
+    dir="ltr"
+>
 
 
-<section class="english-section">
+    <!-- =====================================================
+         HERO
+    ====================================================== -->
 
-    <div class="english-container">
+    <header
+        class="
+            english-faculties-hero
+        "
+    >
 
-        <div class="english-section__heading">
+        <div
+            class="
+                english-container
+            "
+        >
 
-            <div>
+            <div
+                class="
+                    english-faculties-hero__content
+                "
+            >
+
                 <span>
-                    Latest
+                    ACADEMICS
                 </span>
 
-                <h2>
-                    Announcements
-                </h2>
+
+                <h1>
+                    Faculties
+                </h1>
+
+
+                <p>
+                    Explore the academic faculties of
+                    Sadra Institute of Higher Education.
+                    Discover their fields of study,
+                    academic structure, and related
+                    institutional information.
+                </p>
+
             </div>
 
-            <a
-                href="<?= View::url(
-                    '/english/announcements'
-                ) ?>"
+
+            <div
+                class="
+                    english-faculties-hero__meta
+                "
+                aria-label="Faculty statistics"
             >
-                View all
-            </a>
+
+                <strong>
+                    <?= number_format(
+                        $facultyCount
+                    ) ?>
+                </strong>
+
+
+                <span>
+                    Active Faculties
+                </span>
+
+            </div>
 
         </div>
 
+    </header>
 
-        <?php if (
-            empty($announcements)
-        ): ?>
 
-            <div class="english-empty">
-                No announcements are currently available.
-            </div>
+    <!-- =====================================================
+         FACULTY LIST
+    ====================================================== -->
 
-        <?php else: ?>
+    <main
+        class="
+            english-faculties-content
+        "
+    >
 
-            <div class="english-card-grid">
+        <div
+            class="
+                english-container
+            "
+        >
 
-                <?php foreach (
-                    $announcements
-                    as $announcement
-                ): ?>
 
-                    <article class="english-card">
+            <?php if (
+                $faculties === []
+            ): ?>
 
-                        <span class="english-card__meta">
-                            <?php if (
-                                !empty(
-                                    $announcement['published_at']
-                                )
-                            ): ?>
 
-                                <?= View::escape(
-                                    date(
-                                        'Y-m-d',
-                                        strtotime(
-                                            $announcement[
-                                                'published_at'
-                                            ]
-                                        )
-                                    )
-                                ) ?>
+                <!-- =============================================
+                     EMPTY STATE
+                ============================================== -->
 
-                            <?php else: ?>
+                <section
+                    class="
+                        english-faculties-empty
+                    "
+                >
 
-                                Latest
+                    <div
+                        class="
+                            english-faculties-empty__mark
+                        "
+                        aria-hidden="true"
+                    >
+                        A
+                    </div>
 
-                            <?php endif; ?>
+
+                    <span>
+                        ACADEMICS
+                    </span>
+
+
+                    <h2>
+                        No faculties are currently available.
+                    </h2>
+
+
+                    <p>
+                        Faculty information has not yet been
+                        published on the English version of
+                        the website.
+                    </p>
+
+
+                    <a
+                        href="<?= View::url(
+                            '/english'
+                        ) ?>"
+                        class="
+                            english-button
+                            english-button--primary
+                        "
+                    >
+                        Back to Home
+                    </a>
+
+                </section>
+
+
+            <?php else: ?>
+
+
+                <!-- =============================================
+                     SECTION HEADER
+                ============================================== -->
+
+                <div
+                    class="
+                        english-faculties-heading
+                    "
+                >
+
+                    <div>
+
+                        <span>
+                            ACADEMIC STRUCTURE
                         </span>
 
-                        <h3>
-                            <?= View::escape(
-                                $announcement['title']
-                            ) ?>
-                        </h3>
 
-                        <?php if (
-                            !empty(
-                                $announcement['excerpt']
-                            )
-                        ): ?>
-
-                            <p>
-                                <?= View::escape(
-                                    $announcement['excerpt']
-                                ) ?>
-                            </p>
-
-                        <?php endif; ?>
-
-                    </article>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
-
-    </div>
-
-</section>
+                        <h2>
+                            Our Faculties
+                        </h2>
 
 
-<section class="english-section english-section--muted">
+                        <p>
+                            Browse the active faculties and
+                            explore their academic information.
+                        </p>
 
-    <div class="english-container">
-
-        <div class="english-section__heading">
-
-            <div>
-                <span>
-                    Academics
-                </span>
-
-                <h2>
-                    Faculties
-                </h2>
-            </div>
-
-            <a
-                href="<?= View::url(
-                    '/english/faculties'
-                ) ?>"
-            >
-                View all
-            </a>
-
-        </div>
+                    </div>
 
 
-        <?php if (
-            empty($faculties)
-        ): ?>
-
-            <div class="english-empty">
-                Faculty information is not currently available.
-            </div>
-
-        <?php else: ?>
-
-            <div class="english-card-grid">
-
-                <?php foreach (
-                    $faculties
-                    as $faculty
-                ): ?>
-
-                    <a
-                        href="<?= View::url(
-                            '/faculties/'
-                            . rawurlencode(
-                                $faculty['slug']
-                            )
-                        ) ?>"
-                        class="english-card english-card--link"
+                    <div
+                        class="
+                            english-faculties-heading__count
+                        "
                     >
 
-                        <h3>
-                            <?= View::escape(
-                                $faculty['name']
+                        <strong>
+                            <?= number_format(
+                                $facultyCount
                             ) ?>
-                        </h3>
+                        </strong>
 
-                        <?php if (
-                            !empty(
-                                $faculty['short_name']
-                            )
-                        ): ?>
+                        <span>
+                            Faculties
+                        </span>
 
-                            <p>
-                                <?= View::escape(
+                    </div>
+
+                </div>
+
+
+                <!-- =============================================
+                     FACULTY GRID
+                ============================================== -->
+
+                <div
+                    class="
+                        english-faculties-grid
+                    "
+                >
+
+                    <?php foreach (
+                        $faculties as $index => $faculty
+                    ): ?>
+
+                        <?php
+
+                        /*
+                         * Faculty data.
+                         */
+
+                        $id =
+                            (int) (
+                                $faculty['id']
+                                ?? 0
+                            );
+
+
+                        $slug =
+                            trim(
+                                (string) (
+                                    $faculty['slug']
+                                    ?? ''
+                                )
+                            );
+
+
+                        $name =
+                            trim(
+                                (string) (
+                                    $faculty['name']
+                                    ?? ''
+                                )
+                            );
+
+
+                        $shortName =
+                            trim(
+                                (string) (
                                     $faculty['short_name']
-                                ) ?>
-                            </p>
-
-                        <?php endif; ?>
-
-                    </a>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
-
-    </div>
-
-</section>
+                                    ?? ''
+                                )
+                            );
 
 
-<section class="english-section">
+                        $description =
+                            $shorten(
+                                $faculty['description']
+                                ?? '',
+                                190
+                            );
 
-    <div class="english-container">
 
-        <div class="english-section__heading">
+                        $image =
+                            trim(
+                                (string) (
+                                    $faculty['image']
+                                    ?? ''
+                                )
+                            );
 
-            <div>
-                <span>
-                    Research
-                </span>
 
-                <h2>
-                    Research Centers
-                </h2>
-            </div>
+                        $deanFirstName =
+                            trim(
+                                (string) (
+                                    $faculty[
+                                        'dean_first_name'
+                                    ]
+                                    ?? ''
+                                )
+                            );
 
-            <a
-                href="<?= View::url(
-                    '/english/research'
-                ) ?>"
-            >
-                View all
-            </a>
+
+                        $deanLastName =
+                            trim(
+                                (string) (
+                                    $faculty[
+                                        'dean_last_name'
+                                    ]
+                                    ?? ''
+                                )
+                            );
+
+
+                        $deanName =
+                            trim(
+                                $deanFirstName
+                                . ' '
+                                . $deanLastName
+                            );
+
+
+                        /*
+                         * Skip malformed records without a name.
+                         */
+
+                        if (
+                            $name === ''
+                        ) {
+                            continue;
+                        }
+
+
+                        /*
+                         * Initial fallback.
+                         */
+
+                        $initial =
+                            mb_strtoupper(
+                                mb_substr(
+                                    $name,
+                                    0,
+                                    1,
+                                    'UTF-8'
+                                ),
+                                'UTF-8'
+                            );
+
+
+                        /*
+                         * Public detail URL.
+                         */
+
+                        $facultyUrl =
+                            $slug !== ''
+                                ? View::url(
+                                    '/english/faculties/'
+                                    . rawurlencode(
+                                        $slug
+                                    )
+                                )
+                                : '';
+
+                        ?>
+
+                        <article
+                            class="
+                                english-faculties-card
+                            "
+                        >
+
+                            <!-- =================================
+                                 Visual
+                            ================================== -->
+
+                            <div
+                                class="
+                                    english-faculties-card__visual
+                                "
+                            >
+
+                                <?php if (
+                                    $image !== ''
+                                ): ?>
+
+                                    <img
+                                        src="<?= View::escape(
+                                            $image
+                                        ) ?>"
+                                        alt="<?= View::escape(
+                                            $name
+                                        ) ?>"
+                                        loading="lazy"
+                                    >
+
+                                <?php else: ?>
+
+                                    <div
+                                        class="
+                                            english-faculties-card__placeholder
+                                        "
+                                        aria-hidden="true"
+                                    >
+                                        <?= View::escape(
+                                            $initial
+                                        ) ?>
+                                    </div>
+
+                                <?php endif; ?>
+
+
+                                <span
+                                    class="
+                                        english-faculties-card__index
+                                    "
+                                    aria-hidden="true"
+                                >
+                                    <?= str_pad(
+                                        (string) (
+                                            $index + 1
+                                        ),
+                                        2,
+                                        '0',
+                                        STR_PAD_LEFT
+                                    ) ?>
+                                </span>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 Body
+                            ================================== -->
+
+                            <div
+                                class="
+                                    english-faculties-card__body
+                                "
+                            >
+
+                                <span
+                                    class="
+                                        english-faculties-card__eyebrow
+                                    "
+                                >
+                                    FACULTY
+                                </span>
+
+
+                                <?php if (
+                                    $shortName !== ''
+                                ): ?>
+
+                                    <small
+                                        class="
+                                            english-faculties-card__short-name
+                                        "
+                                    >
+                                        <?= View::escape(
+                                            $shortName
+                                        ) ?>
+                                    </small>
+
+                                <?php endif; ?>
+
+
+                                <h3>
+                                    <?= View::escape(
+                                        $name
+                                    ) ?>
+                                </h3>
+
+
+                                <?php if (
+                                    $description !== ''
+                                ): ?>
+
+                                    <p>
+                                        <?= View::escape(
+                                            $description
+                                        ) ?>
+                                    </p>
+
+                                <?php endif; ?>
+
+
+                                <?php if (
+                                    $deanName !== ''
+                                ): ?>
+
+                                    <div
+                                        class="
+                                            english-faculties-card__dean
+                                        "
+                                    >
+
+                                        <span>
+                                            DEAN
+                                        </span>
+
+                                        <strong>
+                                            <?= View::escape(
+                                                $deanName
+                                            ) ?>
+                                        </strong>
+
+                                    </div>
+
+                                <?php endif; ?>
+
+
+                                <?php if (
+                                    $facultyUrl !== ''
+                                ): ?>
+
+                                    <a
+                                        href="<?= View::escape(
+                                            $facultyUrl
+                                        ) ?>"
+                                        class="
+                                            english-faculties-card__link
+                                        "
+                                    >
+
+                                        <span>
+                                            Explore Faculty
+                                        </span>
+
+                                        <strong
+                                            aria-hidden="true"
+                                        >
+                                            →
+                                        </strong>
+
+                                    </a>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                        </article>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+
+                <!-- =============================================
+                     BOTTOM CTA
+                ============================================== -->
+
+                <section
+                    class="
+                        english-faculties-cta
+                    "
+                >
+
+                    <div
+                        class="
+                            english-faculties-cta__content
+                        "
+                    >
+
+                        <span>
+                            SADRA INSTITUTE
+                        </span>
+
+
+                        <h2>
+                            Explore education and research at Sadra.
+                        </h2>
+
+
+                        <p>
+                            Learn more about academic programs,
+                            research centers, announcements,
+                            and the wider academic community.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="
+                            english-faculties-cta__actions
+                        "
+                    >
+
+                        <a
+                            href="<?= View::url(
+                                '/english/programs'
+                            ) ?>"
+                            class="
+                                english-button
+                                english-button--primary
+                            "
+                        >
+                            Academic Programs
+                        </a>
+
+
+                        <a
+                            href="<?= View::url(
+                                '/english/research'
+                            ) ?>"
+                            class="
+                                english-button
+                                english-button--secondary
+                            "
+                        >
+                            Research Centers
+                        </a>
+
+                    </div>
+
+                </section>
+
+            <?php endif; ?>
+
 
         </div>
 
-
-        <?php if (
-            empty($researchCenters)
-        ): ?>
-
-            <div class="english-empty">
-                Research center information is not currently available.
-            </div>
-
-        <?php else: ?>
-
-            <div class="english-card-grid">
-
-                <?php foreach (
-                    $researchCenters
-                    as $center
-                ): ?>
-
-                    <a
-                        href="<?= View::url(
-                            '/research-centers/'
-                            . rawurlencode(
-                                $center['slug']
-                            )
-                        ) ?>"
-                        class="english-card english-card--link"
-                    >
-
-                        <h3>
-                            <?= View::escape(
-                                $center['name']
-                            ) ?>
-                        </h3>
-
-                        <?php if (
-                            !empty(
-                                $center['short_name']
-                            )
-                        ): ?>
-
-                            <p>
-                                <?= View::escape(
-                                    $center['short_name']
-                                ) ?>
-                            </p>
-
-                        <?php endif; ?>
-
-                    </a>
-
-                <?php endforeach; ?>
-
-            </div>
-
-        <?php endif; ?>
-
-    </div>
+    </main>
 
 </section>

@@ -87,14 +87,18 @@ $facultyName =
                     !empty($person['image'])
                 ): ?>
 
-                    <img
-                        src="<?= View::escape(
-                            (string) $person['image']
-                        ) ?>"
-                        alt="<?= View::escape(
-                            $fullName
-                        ) ?>"
-                    >
+                  <img
+    src="<?= View::url(
+        '/'
+        . ltrim(
+            (string) $person['image'],
+            '/'
+        )
+    ) ?>"
+    alt="<?= View::escape(
+        $fullName
+    ) ?>"
+>
 
                 <?php else: ?>
 

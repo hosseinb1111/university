@@ -1,0 +1,1583 @@
+/*
+|--------------------------------------------------------------------------
+| English — Presidency page
+|--------------------------------------------------------------------------
+| Theme-aware institutional presidency page.
+|
+| Light mode:
+|   Clean editorial white / soft gray surfaces.
+|
+| Dark mode:
+|   Deep charcoal surfaces with restrained contrast.
+|
+| The intentionally dark CTA section remains dark in both themes.
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   PAGE
+========================================================================== */
+
+.english-presidency-page {
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+
+    overflow:
+        hidden;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   HERO
+========================================================================== */
+
+.english-presidency-hero {
+    position:
+        relative;
+
+    padding:
+        95px
+        0
+        90px;
+
+    overflow:
+        hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--english-surface) 0%,
+            var(--english-background-soft) 100%
+        );
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    transition:
+        background
+        var(--english-transition),
+
+        border-color
+        var(--english-transition);
+}
+
+
+.english-presidency-hero::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    right:
+        -170px;
+
+    top:
+        -250px;
+
+    width:
+        600px;
+
+    height:
+        600px;
+
+    border-radius:
+        50%;
+
+    border:
+        1px solid
+        var(--english-decoration-border);
+
+    pointer-events:
+        none;
+}
+
+
+.english-presidency-hero::after {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        25%;
+
+    bottom:
+        -320px;
+
+    width:
+        500px;
+
+    height:
+        500px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--english-decoration-primary-soft);
+
+    pointer-events:
+        none;
+}
+
+
+.english-presidency-hero .english-container {
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        50px;
+}
+
+
+.english-presidency-hero__content {
+    max-width:
+        800px;
+}
+
+
+.english-presidency-hero__content > span {
+    display:
+        inline-block;
+
+    margin-bottom:
+        10px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.11em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-presidency-hero h1 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            42px,
+            6vw,
+            66px
+        );
+
+    line-height:
+        1.05;
+
+    letter-spacing:
+        -0.05em;
+}
+
+
+.english-presidency-hero p {
+    max-width:
+        680px;
+
+    margin:
+        20px
+        0
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        15px;
+
+    line-height:
+        1.9;
+}
+
+
+/* ==========================================================================
+   HERO MARK
+========================================================================== */
+
+.english-presidency-hero__mark {
+    position:
+        relative;
+
+    width:
+        150px;
+
+    height:
+        150px;
+
+    flex:
+        0
+        0
+        150px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--english-decoration-mark);
+
+    border:
+        1px solid
+        var(--english-decoration-border);
+
+    border-radius:
+        42px;
+
+    font-size:
+        74px;
+
+    font-weight:
+        900;
+
+    line-height:
+        1;
+}
+
+
+.english-presidency-hero__mark::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        12px;
+
+    border:
+        1px solid
+        var(--english-decoration-border-soft);
+
+    border-radius:
+        32px;
+}
+
+
+/* ==========================================================================
+   MAIN PROFILE SECTION
+========================================================================== */
+
+.english-presidency-section {
+    padding:
+        90px
+        0;
+
+    background:
+        var(--english-background-soft);
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   PRESIDENT PROFILE
+========================================================================== */
+
+.english-president-profile {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            320px,
+            0.75fr
+        )
+        minmax(
+            0,
+            1.25fr
+        );
+
+    min-height:
+        560px;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        var(--english-radius-lg);
+
+    box-shadow:
+        var(--english-shadow-md);
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        box-shadow
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   PORTRAIT
+========================================================================== */
+
+.english-president-profile__visual {
+    position:
+        relative;
+
+    min-height:
+        560px;
+
+    overflow:
+        hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--english-background-soft),
+            var(--english-surface-soft)
+        );
+}
+
+
+.english-president-profile__visual img {
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        560px;
+
+    object-fit:
+        cover;
+}
+
+
+.english-president-profile__visual::after {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                15,
+                23,
+                42,
+                0
+            )
+            45%,
+
+            rgba(
+                15,
+                23,
+                42,
+                0.3
+            )
+        );
+
+    pointer-events:
+        none;
+}
+
+
+.english-president-profile__placeholder {
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        560px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--english-decoration-mark);
+
+    font-size:
+        120px;
+
+    font-weight:
+        900;
+
+    background:
+        linear-gradient(
+            145deg,
+            var(--english-background-soft),
+            var(--english-surface-soft)
+        );
+
+    transition:
+        background
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+.english-president-profile__portrait-label {
+    position:
+        absolute;
+
+    left:
+        25px;
+
+    bottom:
+        25px;
+
+    z-index:
+        2;
+
+    padding:
+        8px
+        11px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--english-surface) 88%,
+            transparent
+        );
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        7px;
+
+    backdrop-filter:
+        blur(8px);
+
+    -webkit-backdrop-filter:
+        blur(8px);
+}
+
+
+.english-president-profile__portrait-label span {
+    color:
+        var(--english-text);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+}
+
+
+/* ==========================================================================
+   PROFILE CONTENT
+========================================================================== */
+
+.english-president-profile__content {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    padding:
+        44px;
+
+    background:
+        var(--english-surface);
+
+    transition:
+        background-color
+        var(--english-transition);
+}
+
+
+.english-president-profile__eyebrow {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    padding-bottom:
+        18px;
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+}
+
+
+.english-president-profile__eyebrow span {
+    color:
+        var(--english-muted);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-president-profile__eyebrow strong {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        34px;
+
+    height:
+        34px;
+
+    background:
+        var(--english-surface-soft);
+
+    color:
+        var(--english-muted);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        9px;
+
+    font-size:
+        9px;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+.english-president-profile__position {
+    margin-top:
+        30px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.08em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-president-profile h2 {
+    margin:
+        8px
+        0
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            34px,
+            4vw,
+            52px
+        );
+
+    line-height:
+        1.08;
+
+    letter-spacing:
+        -0.05em;
+}
+
+
+.english-president-profile__biography {
+    margin-top:
+        25px;
+
+    color:
+        var(--english-text-soft);
+
+    font-size:
+        14px;
+
+    line-height:
+        2;
+}
+
+
+.english-president-profile__fallback {
+    margin:
+        25px
+        0
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        14px;
+
+    line-height:
+        1.9;
+}
+
+
+/* ==========================================================================
+   DETAILS
+========================================================================== */
+
+.english-president-profile__details {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+    margin-top:
+        auto;
+
+    padding-top:
+        30px;
+}
+
+
+.english-president-detail {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        5px;
+
+    min-width:
+        0;
+
+    padding:
+        14px
+        15px;
+
+    background:
+        var(--english-surface-soft);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        10px;
+
+    text-decoration:
+        none;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+.english-president-detail:hover {
+    background:
+        var(--english-background-soft);
+
+    border-color:
+        var(--english-border-strong);
+}
+
+
+.english-president-detail__label {
+    color:
+        var(--english-muted-light);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.07em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-president-detail strong {
+    overflow:
+        hidden;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        12px;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+/* ==========================================================================
+   INFORMATION SECTION
+========================================================================== */
+
+.english-presidency-information {
+    padding:
+        90px
+        0;
+
+    background:
+        var(--english-surface);
+
+    transition:
+        background-color
+        var(--english-transition);
+}
+
+
+.english-presidency-information__grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            0,
+            0.95fr
+        )
+        minmax(
+            0,
+            1.05fr
+        );
+
+    gap:
+        85px;
+}
+
+
+.english-presidency-information__grid > div:first-child > span {
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-presidency-information h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            30px,
+            4vw,
+            46px
+        );
+
+    line-height:
+        1.1;
+
+    letter-spacing:
+        -0.04em;
+}
+
+
+.english-presidency-information__grid > div:last-child {
+    padding-top:
+        2px;
+}
+
+
+.english-presidency-information__grid p {
+    margin:
+        0
+        0
+        17px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        14px;
+
+    line-height:
+        1.9;
+}
+
+
+/* ==========================================================================
+   PILLARS
+========================================================================== */
+
+.english-presidency-pillars {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        16px;
+
+    margin-top:
+        45px;
+}
+
+
+.english-presidency-pillars article {
+    padding:
+        25px;
+
+    background:
+        var(--english-background-soft);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-top:
+        2px solid
+        var(--english-text);
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        box-shadow
+        var(--english-transition);
+}
+
+
+.english-presidency-pillars article:hover {
+    box-shadow:
+        var(--english-shadow-xs);
+}
+
+
+.english-presidency-pillars article > span {
+    color:
+        var(--english-muted-light);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.08em;
+}
+
+
+.english-presidency-pillars h3 {
+    margin:
+        25px
+        0
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        17px;
+}
+
+
+.english-presidency-pillars p {
+    margin:
+        10px
+        0
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.8;
+}
+
+
+/* ==========================================================================
+   EMPTY STATE
+========================================================================== */
+
+.english-presidency-empty {
+    max-width:
+        800px;
+
+    margin:
+        0
+        auto;
+
+    padding:
+        75px
+        25px;
+
+    text-align:
+        center;
+}
+
+
+.english-presidency-empty__icon {
+    width:
+        62px;
+
+    height:
+        62px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin:
+        0
+        auto
+        20px;
+
+    background:
+        var(--english-surface-soft);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    color:
+        var(--english-muted);
+
+    border-radius:
+        17px;
+
+    font-size:
+        28px;
+
+    font-weight:
+        900;
+}
+
+
+.english-presidency-empty h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        20px;
+}
+
+
+.english-presidency-empty p {
+    max-width:
+        550px;
+
+    margin:
+        10px
+        auto
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.8;
+}
+
+
+.english-presidency-empty .english-button {
+    margin-top:
+        25px;
+}
+
+
+/* ==========================================================================
+   CTA
+   Intentionally dark editorial section.
+========================================================================== */
+
+.english-presidency-cta {
+    padding:
+        75px
+        0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--english-dark-surface) 0%,
+            var(--english-dark-surface-soft) 58%,
+            var(--english-dark-surface-alt) 100%
+        );
+
+    color:
+        var(--english-dark-text);
+
+    border-top:
+        1px solid
+        var(--english-dark-border);
+}
+
+
+.english-presidency-cta__inner {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        45px;
+}
+
+
+.english-presidency-cta__inner > div:first-child {
+    max-width:
+        700px;
+}
+
+
+.english-presidency-cta__inner > div:first-child > span {
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-presidency-cta h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-dark-text);
+
+    font-size:
+        clamp(
+            29px,
+            4vw,
+            45px
+        );
+
+    line-height:
+        1.08;
+
+    letter-spacing:
+        -0.04em;
+}
+
+
+.english-presidency-cta p {
+    max-width:
+        620px;
+
+    margin:
+        14px
+        0
+        0;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.85;
+}
+
+
+.english-presidency-cta__actions {
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        10px;
+}
+
+
+.english-presidency-cta__actions .english-button--primary {
+    background:
+        var(--english-dark-text);
+
+    color:
+        var(--english-dark-surface);
+
+    box-shadow:
+        0
+        8px
+        24px
+        rgba(
+            0,
+            0,
+            0,
+            0.16
+        );
+}
+
+
+.english-presidency-cta__actions .english-button--primary:hover {
+    background:
+        #ffffff;
+
+    color:
+        #0d1117;
+}
+
+
+.english-presidency-cta__actions .english-button--secondary {
+    background:
+        var(--english-dark-hover);
+
+    border-color:
+        var(--english-dark-border);
+
+    color:
+        var(--english-dark-text);
+}
+
+
+.english-presidency-cta__actions .english-button--secondary:hover {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.08
+        );
+
+    border-color:
+        var(--english-dark-line);
+
+    color:
+        #ffffff;
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 950px
+========================================================================== */
+
+@media (max-width: 950px) {
+
+    .english-president-profile {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .english-president-profile__visual {
+        min-height:
+            400px;
+    }
+
+
+    .english-president-profile__visual img,
+    .english-president-profile__placeholder {
+        min-height:
+            400px;
+
+        height:
+            400px;
+    }
+
+
+    .english-presidency-information__grid {
+        gap:
+            50px;
+    }
+
+
+    .english-presidency-pillars {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 800px
+========================================================================== */
+
+@media (max-width: 800px) {
+
+    .english-presidency-hero {
+        padding:
+            70px
+            0;
+    }
+
+
+    .english-presidency-hero .english-container {
+        align-items:
+            flex-start;
+    }
+
+
+    .english-presidency-hero__mark {
+        width:
+            100px;
+
+        height:
+            100px;
+
+        flex-basis:
+            100px;
+
+        font-size:
+            48px;
+
+        border-radius:
+            28px;
+    }
+
+
+    .english-presidency-section,
+    .english-presidency-information {
+        padding:
+            70px
+            0;
+    }
+
+
+    .english-presidency-information__grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .english-presidency-cta__inner {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 600px
+========================================================================== */
+
+@media (max-width: 600px) {
+
+    .english-presidency-hero {
+        padding:
+            60px
+            0
+            65px;
+    }
+
+
+    .english-presidency-hero .english-container {
+        flex-direction:
+            column;
+    }
+
+
+    .english-presidency-hero h1 {
+        font-size:
+            39px;
+    }
+
+
+    .english-presidency-hero p {
+        font-size:
+            14px;
+    }
+
+
+    .english-presidency-hero__mark {
+        display:
+            none;
+    }
+
+
+    .english-president-profile__content {
+        padding:
+            28px
+            24px;
+    }
+
+
+    .english-president-profile__details {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .english-president-profile h2 {
+        font-size:
+            34px;
+    }
+
+
+    .english-presidency-section,
+    .english-presidency-information {
+        padding:
+            60px
+            0;
+    }
+
+
+    .english-presidency-information h2 {
+        font-size:
+            31px;
+    }
+
+
+    .english-presidency-cta {
+        padding:
+            60px
+            0;
+    }
+
+
+    .english-presidency-cta__actions {
+        width:
+            100%;
+
+        flex-direction:
+            column;
+    }
+
+
+    .english-presidency-cta__actions .english-button {
+        width:
+            100%;
+    }
+
+}
+
+
+/* ==========================================================================
+   DARK THEME REFINEMENTS
+   Additional corrections for elements whose visual identity benefits
+   from explicit dark-mode treatment.
+========================================================================== */
+
+html[data-theme="dark"] .english-president-profile__visual::after {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                0,
+                0,
+                0,
+                0
+            )
+            45%,
+
+            rgba(
+                0,
+                0,
+                0,
+                0.42
+            )
+        );
+}
+
+
+html[data-theme="dark"]
+.english-president-profile__portrait-label {
+    background:
+        rgba(
+            13,
+            17,
+            23,
+            0.84
+        );
+}
+
+
+html[data-theme="dark"]
+.english-presidency-pillars article {
+    border-top-color:
+        var(--english-text);
+}

@@ -2,116 +2,302 @@
 
 declare(strict_types=1);
 
-$items = $announcements['items'] ?? [];
+use App\Core\Csrf;
+use App\Core\View;
 
-$total = (int) (
-    $announcements['total'] ?? 0
-);
+$items =
+    is_array(
+        $announcements['items']
+        ?? null
+    )
+        ? $announcements['items']
+        : [];
 
-$page = (int) (
-    $announcements['page'] ?? 1
-);
+$total =
+    (int) (
+        $announcements['total']
+        ?? 0
+    );
 
-$totalPages = (int) (
-    $announcements['totalPages'] ?? 1
-);
+$page =
+    max(
+        1,
+        (int) (
+            $announcements['page']
+            ?? 1
+        )
+    );
+
+$totalPages =
+    max(
+        1,
+        (int) (
+            $announcements['totalPages']
+            ?? 1
+        )
+    );
+
+$success =
+    is_string(
+        $success
+        ?? null
+    )
+        ? $success
+        : null;
+
+$formatStatus =
+    static function (
+        string $status
+    ): array {
+        return match ($status) {
+            'published' => [
+                'label' => 'منتشر شده',
+                'class' => 'announcement-admin-status--published',
+            ],
+
+            'archived' => [
+                'label' => 'بایگانی شده',
+                'class' => 'announcement-admin-status--archived',
+            ],
+
+            default => [
+                'label' => 'پیش‌نویس',
+                'class' => 'announcement-admin-status--draft',
+            ],
+        };
+    };
+
 ?>
 
-<div class="admin-page">
+<div class="admin-page admin-announcements-page">
 
-    <div class="admin-page__header">
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
 
-        <div>
+    <div class="admin-page__header admin-announcements-header">
+
+        <div class="admin-announcements-header__content">
+
+            <div class="admin-announcements-header__eyebrow">
+                مدیریت محتوا
+            </div>
 
             <h1>
                 اطلاعیه‌ها
             </h1>
 
             <p>
-                مدیریت اطلاعیه‌های موسسه
+                اطلاعیه‌های موسسه را ایجاد، ویرایش، انتشار و مدیریت کنید.
             </p>
 
         </div>
 
-        <a
-            href="<?= View::route(
-                'admin.announcements.create'
-            ) ?>"
-            class="button button--primary"
-        >
-            + ایجاد اطلاعیه
-        </a>
+
+        <div class="admin-announcements-header__actions">
+
+            <a
+                href="<?= View::route(
+                    'admin.announcements.create'
+                ) ?>"
+                class="admin-button admin-button--primary"
+            >
+                <span class="admin-button__icon" aria-hidden="true">
+                    +
+                </span>
+
+                <span>
+                    ایجاد اطلاعیه
+                </span>
+            </a>
+
+        </div>
 
     </div>
 
 
+    <!-- =========================================================
+         SUCCESS MESSAGE
+    ========================================================== -->
+
     <?php if (
         $success !== null
+        && $success !== ''
     ): ?>
 
         <div
-            style="
-                margin-bottom:20px;
-                padding:14px 16px;
-                background:#f0fdf4;
-                border:1px solid #bbf7d0;
-                border-radius:12px;
-                color:#166534;
-            "
+            class="admin-announcements-alert admin-announcements-alert--success"
+            role="status"
         >
-            <?= View::escape(
-                $success
-            ) ?>
+
+            <span
+                class="admin-announcements-alert__icon"
+                aria-hidden="true"
+            >
+                ✓
+            </span>
+
+            <span>
+                <?= View::escape(
+                    $success
+                ) ?>
+            </span>
+
         </div>
 
     <?php endif; ?>
 
 
-    <div class="admin-panel">
+    <!-- =========================================================
+         SUMMARY
+    ========================================================== -->
 
-        <div
-            style="
-                margin-bottom:20px;
-                color:#64748b;
-                font-size:13px;
-            "
-        >
-            مجموع:
-            <?= number_format(
-                $total
-            ) ?>
-            اطلاعیه
+    <div class="admin-announcements-summary">
+
+        <div class="admin-announcements-summary__main">
+
+            <div class="admin-announcements-summary__icon">
+                📢
+            </div>
+
+            <div>
+
+                <span>
+                    مجموع اطلاعیه‌ها
+                </span>
+
+                <strong>
+                    <?= number_format(
+                        $total
+                    ) ?>
+                </strong>
+
+            </div>
+
         </div>
 
 
-        <?php if ($items === []): ?>
+        <?php if (
+            $totalPages > 1
+        ): ?>
 
-            <div
-                style="
-                    padding:50px 20px;
-                    text-align:center;
-                    color:#64748b;
-                "
-            >
-                هنوز هیچ اطلاعیه‌ای ایجاد نشده است.
+            <div class="admin-announcements-summary__pagination">
+
+                <span>
+                    صفحه
+                    <?= number_format(
+                        $page
+                    ) ?>
+                    از
+                    <?= number_format(
+                        $totalPages
+                    ) ?>
+                </span>
+
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+
+    <!-- =========================================================
+         TABLE PANEL
+    ========================================================== -->
+
+    <section class="admin-panel admin-announcements-panel">
+
+        <div class="admin-panel__header admin-announcements-panel__header">
+
+            <div>
+
+                <h2>
+                    فهرست اطلاعیه‌ها
+                </h2>
+
+                <p>
+                    تمام اطلاعیه‌های ثبت‌شده در سامانه
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <?php if (
+            $items === []
+        ): ?>
+
+            <!-- =================================================
+                 EMPTY STATE
+            ================================================== -->
+
+            <div class="admin-announcements-empty">
+
+                <div
+                    class="admin-announcements-empty__icon"
+                    aria-hidden="true"
+                >
+                    📢
+                </div>
+
+                <h3>
+                    هنوز اطلاعیه‌ای ایجاد نشده است
+                </h3>
+
+                <p>
+                    اولین اطلاعیه خود را ایجاد کنید تا در سایت نمایش داده شود.
+                </p>
+
+                <a
+                    href="<?= View::route(
+                        'admin.announcements.create'
+                    ) ?>"
+                    class="admin-button admin-button--primary"
+                >
+                    ایجاد اولین اطلاعیه
+                </a>
+
             </div>
 
         <?php else: ?>
 
-            <div class="announcement-table-wrapper">
+            <!-- =================================================
+                 TABLE
+            ================================================== -->
 
-                <table class="announcement-table">
+            <div class="admin-announcements-table-wrap">
+
+                <table class="admin-announcements-table">
 
                     <thead>
 
                         <tr>
-                            <th>عنوان</th>
-                            <th>وضعیت</th>
-                            <th>انتشار</th>
-                            <th>عملیات</th>
+
+                            <th>
+                                اطلاعیه
+                            </th>
+
+                            <th>
+                                وضعیت
+                            </th>
+
+                            <th>
+                                تاریخ انتشار
+                            </th>
+
+                            <th>
+                                اولویت
+                            </th>
+
+                            <th>
+                                عملیات
+                            </th>
+
                         </tr>
 
                     </thead>
+
 
                     <tbody>
 
@@ -120,96 +306,219 @@ $totalPages = (int) (
                         as $announcement
                     ): ?>
 
+                        <?php
+
+                        $id =
+                            (int) (
+                                $announcement['id']
+                                ?? 0
+                            );
+
+                        $title =
+                            trim(
+                                (string) (
+                                    $announcement['title']
+                                    ?? ''
+                                )
+                            );
+
+                        $slug =
+                            trim(
+                                (string) (
+                                    $announcement['slug']
+                                    ?? ''
+                                )
+                            );
+
+                        $status =
+                            (string) (
+                                $announcement['status']
+                                ?? 'draft'
+                            );
+
+                        $priority =
+                            (int) (
+                                $announcement['priority']
+                                ?? 0
+                            );
+
+                        $publishedAt =
+                            $announcement['published_at']
+                            ?? null;
+
+                        $statusMeta =
+                            $formatStatus(
+                                $status
+                            );
+
+                        ?>
+
                         <tr>
+
+                            <!-- =================================================
+                                 Announcement
+                            ================================================== -->
 
                             <td>
 
-                                <strong>
-                                    <?= View::escape(
-                                        $announcement['title']
-                                    ) ?>
-                                </strong>
+                                <div class="admin-announcement-item">
 
-                                <div
-                                    style="
-                                        margin-top:4px;
-                                        color:#94a3b8;
-                                        font-size:12px;
-                                    "
-                                >
-                                    /<?= View::escape(
-                                        $announcement['slug']
-                                    ) ?>
+                                    <div
+                                        class="admin-announcement-item__icon"
+                                        aria-hidden="true"
+                                    >
+                                        📢
+                                    </div>
+
+                                    <div
+                                        class="admin-announcement-item__content"
+                                    >
+
+                                        <strong>
+                                            <?= View::escape(
+                                                $title
+                                            ) ?>
+                                        </strong>
+
+                                        <?php if (
+                                            $slug !== ''
+                                        ): ?>
+
+                                            <span>
+                                                /<?= View::escape(
+                                                    $slug
+                                                ) ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
                                 </div>
 
                             </td>
 
 
+                            <!-- =================================================
+                                 Status
+                            ================================================== -->
+
                             <td>
 
-                                <?php
-                                $status =
-                                    $announcement['status']
-                                    ?? 'draft';
-                                ?>
-
                                 <span
-                                    class="
-                                        announcement-status
-                                        announcement-status--<?= View::escape(
-                                            $status
-                                        ) ?>
-                                    "
+                                    class="admin-announcement-status <?= View::escape(
+                                        $statusMeta['class']
+                                    ) ?>"
                                 >
-                                    <?php if (
-                                        $status === 'published'
-                                    ): ?>
 
-                                        منتشر شده
+                                    <span
+                                        class="admin-announcement-status__dot"
+                                        aria-hidden="true"
+                                    ></span>
 
-                                    <?php elseif (
-                                        $status === 'archived'
-                                    ): ?>
+                                    <?= View::escape(
+                                        $statusMeta['label']
+                                    ) ?>
 
-                                        بایگانی شده
-
-                                    <?php else: ?>
-
-                                        پیش‌نویس
-
-                                    <?php endif; ?>
                                 </span>
 
                             </td>
 
 
+                            <!-- =================================================
+                                 Published date
+                            ================================================== -->
+
                             <td>
 
-                                <?= !empty(
-                                    $announcement['published_at']
-                                )
-                                    ? View::escape(
-                                        $announcement['published_at']
-                                    )
-                                    : '—'
-                                ?>
+                                <div class="admin-announcement-date">
+
+                                    <?php if (
+                                        !empty(
+                                            $publishedAt
+                                        )
+                                    ): ?>
+
+                                        <span>
+                                            <?= View::escape(
+                                                jalali_date_fa(
+                                                    $publishedAt,
+                                                    'j F Y'
+                                                )
+                                            ) ?>
+                                        </span>
+
+                                        <small>
+                                            <?= View::escape(
+                                                jalali_date_fa(
+                                                    $publishedAt,
+                                                    'H:i'
+                                                )
+                                            ) ?>
+                                        </small>
+
+                                    <?php else: ?>
+
+                                        <span
+                                            class="admin-announcement-date--empty"
+                                        >
+                                            بدون زمان
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </div>
 
                             </td>
 
 
+                            <!-- =================================================
+                                 Priority
+                            ================================================== -->
+
                             <td>
 
-                                <div
-                                    style="
-                                        display:flex;
-                                        flex-wrap:wrap;
-                                        gap:6px;
+                                <span
+                                    class="
+                                        admin-announcement-priority
+                                        <?php
+                                        if (
+                                            $priority > 0
+                                        ) {
+                                            echo ' admin-announcement-priority--positive';
+                                        } elseif (
+                                            $priority < 0
+                                        ) {
+                                            echo ' admin-announcement-priority--negative';
+                                        }
+                                        ?>
                                     "
                                 >
 
+                                    <?= $priority > 0
+                                        ? '+'
+                                        : '' ?><?= number_format(
+                                            $priority
+                                        ) ?>
+
+                                </span>
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 Actions
+                            ================================================== -->
+
+                            <td>
+
+                                <div
+                                    class="admin-announcement-actions"
+                                >
+
                                     <a
-                                        href="/admin/announcements/<?= (int) $announcement['id'] ?>/edit"
-                                        class="table-action"
+                                        href="/admin/announcements/<?= $id ?>/edit"
+                                        class="admin-announcement-action"
                                     >
                                         ویرایش
                                     </a>
@@ -221,14 +530,17 @@ $totalPages = (int) (
 
                                         <form
                                             method="POST"
-                                            action="/admin/announcements/<?= (int) $announcement['id'] ?>/publish"
+                                            action="/admin/announcements/<?= $id ?>/publish"
                                         >
 
-                                            <?= \App\Core\Csrf::field() ?>
+                                            <?= Csrf::field() ?>
 
                                             <button
                                                 type="submit"
-                                                class="table-action table-action--success"
+                                                class="
+                                                    admin-announcement-action
+                                                    admin-announcement-action--success
+                                                "
                                             >
                                                 انتشار
                                             </button>
@@ -244,14 +556,14 @@ $totalPages = (int) (
 
                                         <form
                                             method="POST"
-                                            action="/admin/announcements/<?= (int) $announcement['id'] ?>/archive"
+                                            action="/admin/announcements/<?= $id ?>/archive"
                                         >
 
-                                            <?= \App\Core\Csrf::field() ?>
+                                            <?= Csrf::field() ?>
 
                                             <button
                                                 type="submit"
-                                                class="table-action"
+                                                class="admin-announcement-action"
                                             >
                                                 بایگانی
                                             </button>
@@ -263,15 +575,18 @@ $totalPages = (int) (
 
                                     <form
                                         method="POST"
-                                        action="/admin/announcements/<?= (int) $announcement['id'] ?>/delete"
+                                        action="/admin/announcements/<?= $id ?>/delete"
                                         onsubmit="return confirm('آیا از حذف این اطلاعیه مطمئن هستید؟');"
                                     >
 
-                                        <?= \App\Core\Csrf::field() ?>
+                                        <?= Csrf::field() ?>
 
                                         <button
                                             type="submit"
-                                            class="table-action table-action--danger"
+                                            class="
+                                                admin-announcement-action
+                                                admin-announcement-action--danger
+                                            "
                                         >
                                             حذف
                                         </button>
@@ -294,38 +609,149 @@ $totalPages = (int) (
 
         <?php endif; ?>
 
-    </div>
+    </section>
 
+
+    <!-- =========================================================
+         PAGINATION
+    ========================================================== -->
 
     <?php if (
         $totalPages > 1
     ): ?>
 
-        <div
-            style="
-                display:flex;
-                justify-content:center;
-                gap:8px;
-                margin-top:20px;
-            "
+        <nav
+            class="admin-announcements-pagination"
+            aria-label="صفحه‌بندی اطلاعیه‌ها"
         >
 
-            <?php for (
-                $i = 1;
-                $i <= $totalPages;
-                $i++
+            <?php if (
+                $page > 1
             ): ?>
 
                 <a
-                    href="/admin/announcements?page=<?= $i ?>"
-                    class="table-action <?= $i === $page ? 'table-action--active' : '' ?>"
+                    href="/admin/announcements?page=<?= $page - 1 ?>"
+                    class="admin-announcements-pagination__arrow"
                 >
-                    <?= $i ?>
+                    ←
                 </a>
 
-            <?php endfor; ?>
+            <?php endif; ?>
 
-        </div>
+
+            <div class="admin-announcements-pagination__pages">
+
+                <?php
+
+                $startPage =
+                    max(
+                        1,
+                        $page - 2
+                    );
+
+                $endPage =
+                    min(
+                        $totalPages,
+                        $page + 2
+                    );
+
+                ?>
+
+
+                <?php if (
+                    $startPage > 1
+                ): ?>
+
+                    <a
+                        href="/admin/announcements?page=1"
+                        class="admin-announcements-pagination__page"
+                    >
+                        ۱
+                    </a>
+
+                    <?php if (
+                        $startPage > 2
+                    ): ?>
+
+                        <span
+                            class="admin-announcements-pagination__ellipsis"
+                        >
+                            …
+                        </span>
+
+                    <?php endif; ?>
+
+                <?php endif; ?>
+
+
+                <?php for (
+                    $i = $startPage;
+                    $i <= $endPage;
+                    $i++
+                ): ?>
+
+                    <a
+                        href="/admin/announcements?page=<?= $i ?>"
+                        class="
+                            admin-announcements-pagination__page
+                            <?= $i === $page
+                                ? 'admin-announcements-pagination__page--active'
+                                : ''
+                            ?>
+                        "
+                    >
+                        <?= number_format(
+                            $i
+                        ) ?>
+                    </a>
+
+                <?php endfor; ?>
+
+
+                <?php if (
+                    $endPage < $totalPages
+                ): ?>
+
+                    <?php if (
+                        $endPage < $totalPages - 1
+                    ): ?>
+
+                        <span
+                            class="admin-announcements-pagination__ellipsis"
+                        >
+                            …
+                        </span>
+
+                    <?php endif; ?>
+
+                    <a
+                        href="/admin/announcements?page=<?= $totalPages ?>"
+                        class="admin-announcements-pagination__page"
+                    >
+                        <?= number_format(
+                            $totalPages
+                        ) ?>
+                    </a>
+
+                <?php endif; ?>
+
+            </div>
+
+
+            <?php if (
+                $page < $totalPages
+            ): ?>
+
+                <a
+                    href="/admin/announcements?page=<?= $page + 1 ?>"
+                    class="admin-announcements-pagination__arrow"
+                >
+                    →
+                </a>
+
+            <?php endif; ?>
+
+        </nav>
 
     <?php endif; ?>
 

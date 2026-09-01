@@ -1,6 +1,116 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Core\View;
+
+$contact =
+    is_array(
+        $contact ?? null
+    )
+        ? $contact
+        : [];
+
+
+$eyebrow =
+    (string) (
+        $contact['eyebrow']
+        ?? 'ارتباط با موسسه'
+    );
+
+$title =
+    (string) (
+        $contact['title']
+        ?? 'تماس با ما'
+    );
+
+$description =
+    (string) (
+        $contact['description']
+        ?? 'اطلاعات رسمی تماس موسسه آموزش عالی صدرالمتالهین.'
+    );
+
+
+$email =
+    trim(
+        (string) (
+            $contact['email']
+            ?? ''
+        )
+    );
+
+
+$phone =
+    trim(
+        (string) (
+            $contact['phone']
+            ?? ''
+        )
+    );
+
+
+$fax =
+    trim(
+        (string) (
+            $contact['fax']
+            ?? ''
+        )
+    );
+
+
+$address =
+    trim(
+        (string) (
+            $contact['address']
+            ?? ''
+        )
+    );
+
+
+$mapEyebrow =
+    (string) (
+        $contact['map_eyebrow']
+        ?? 'موقعیت موسسه'
+    );
+
+
+$mapTitle =
+    (string) (
+        $contact['map_title']
+        ?? 'تهران، ایران'
+    );
+
+
+$mapDescription =
+    (string) (
+        $contact['map_description']
+        ?? ''
+    );
+
+
+$mapEmbed =
+    trim(
+        (string) (
+            $contact['map_embed']
+            ?? ''
+        )
+    );
+
+
+$phoneHref =
+    preg_replace(
+        '/[^0-9+]/',
+        '',
+        $phone
+    );
+
+
+if (
+    !is_string($phoneHref)
+) {
+    $phoneHref = '';
+}
+
 ?>
 
 <section class="institution-page">
@@ -10,15 +120,21 @@ declare(strict_types=1);
         <div class="institution-hero">
 
             <span>
-                ارتباط با موسسه
+                <?= View::escape(
+                    $eyebrow
+                ) ?>
             </span>
 
             <h1>
-                تماس با ما
+                <?= View::escape(
+                    $title
+                ) ?>
             </h1>
 
             <p>
-                اطلاعات رسمی تماس موسسه آموزش عالی صدرالمتالهین.
+                <?= View::escape(
+                    $description
+                ) ?>
             </p>
 
         </div>
@@ -37,15 +153,21 @@ declare(strict_types=1);
                     پست الکترونیکی
                 </h2>
 
-                <a
-                    href="mailto:<?= View::escape(
-                        $contact['email']
-                    ) ?>"
-                >
-                    <?= View::escape(
-                        $contact['email']
-                    ) ?>
-                </a>
+                <?php if (
+                    $email !== ''
+                ): ?>
+
+                    <a
+                        href="mailto:<?= View::escape(
+                            $email
+                        ) ?>"
+                    >
+                        <?= View::escape(
+                            $email
+                        ) ?>
+                    </a>
+
+                <?php endif; ?>
 
             </article>
 
@@ -60,19 +182,21 @@ declare(strict_types=1);
                     تلفن
                 </h2>
 
-                <a
-                    href="tel:<?= View::escape(
-                        preg_replace(
-                            '/[^0-9+]/',
-                            '',
-                            $contact['phone']
-                        )
-                    ) ?>"
-                >
-                    <?= View::escape(
-                        $contact['phone']
-                    ) ?>
-                </a>
+                <?php if (
+                    $phone !== ''
+                ): ?>
+
+                    <a
+                        href="tel:<?= View::escape(
+                            $phoneHref
+                        ) ?>"
+                    >
+                        <?= View::escape(
+                            $phone
+                        ) ?>
+                    </a>
+
+                <?php endif; ?>
 
             </article>
 
@@ -89,7 +213,7 @@ declare(strict_types=1);
 
                 <p>
                     <?= View::escape(
-                        $contact['fax']
+                        $fax
                     ) ?>
                 </p>
 
@@ -108,7 +232,7 @@ declare(strict_types=1);
 
                 <p>
                     <?= View::escape(
-                        $contact['address']
+                        $address
                     ) ?>
                 </p>
 
@@ -117,25 +241,56 @@ declare(strict_types=1);
         </div>
 
 
-        <div
-            class="contact-map"
-        >
+        <div class="contact-map">
 
-            <div>
+            <div class="contact-map__content">
 
                 <span>
-                    موقعیت موسسه
+                    <?= View::escape(
+                        $mapEyebrow
+                    ) ?>
                 </span>
 
                 <h2>
-                    تهران، ایران
+                    <?= View::escape(
+                        $mapTitle
+                    ) ?>
                 </h2>
 
-                <p>
-                    برای نسخه نهایی سایت می‌توانیم مختصات و نقشه رسمی موسسه را نیز وارد کنیم.
-                </p>
+                <?php if (
+                    $mapDescription !== ''
+                ): ?>
+
+                    <p>
+                        <?= View::escape(
+                            $mapDescription
+                        ) ?>
+                    </p>
+
+                <?php endif; ?>
 
             </div>
+
+
+            <?php if (
+                $mapEmbed !== ''
+            ): ?>
+
+                <div class="contact-map__frame">
+
+                    <iframe
+                        src="<?= View::escape(
+                            $mapEmbed
+                        ) ?>"
+                        title="موقعیت موسسه آموزش عالی صدرالمتالهین"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="strict-origin-when-cross-origin"
+                    ></iframe>
+
+                </div>
+
+            <?php endif; ?>
 
         </div>
 

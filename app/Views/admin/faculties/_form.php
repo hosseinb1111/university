@@ -2,20 +2,28 @@
 
 declare(strict_types=1);
 
-$faculty =
-    $faculty ?? [];
+use App\Core\Csrf;
+use App\Core\View;
 
-$people =
-    $people ?? [];
+$faculty =
+    is_array($faculty ?? null)
+        ? $faculty
+        : [];
 
 $errors =
-    $errors ?? [];
+    is_array($errors ?? null)
+        ? $errors
+        : [];
 
 $action =
-    $action ?? '';
+    is_string($action ?? null)
+        ? $action
+        : '';
 
 $submitLabel =
-    $submitLabel ?? 'ذخیره';
+    is_string($submitLabel ?? null)
+        ? $submitLabel
+        : 'ذخیره';
 ?>
 
 <form
@@ -23,76 +31,98 @@ $submitLabel =
     action="<?= View::escape(
         $action
     ) ?>"
-    class="admin-form"
+    class="faculty-admin-form"
 >
 
-    <?= \App\Core\Csrf::field() ?>
+    <?= Csrf::field() ?>
 
 
     <?php if (
         $errors !== []
     ): ?>
 
-        <div class="form-errors">
+        <div class="faculty-admin-form__errors">
 
-            <strong>
-                لطفاً موارد زیر را اصلاح کنید:
-            </strong>
+            <div
+                class="faculty-admin-form__errors-icon"
+                aria-hidden="true"
+            >
+                !
+            </div>
 
-            <ul>
+            <div>
 
-                <?php foreach (
-                    $errors
-                    as $error
-                ): ?>
+                <strong>
+                    لطفاً موارد زیر را اصلاح کنید.
+                </strong>
 
-                    <li>
-                        <?= View::escape(
-                            $error
-                        ) ?>
-                    </li>
+                <ul>
 
-                <?php endforeach; ?>
+                    <?php foreach (
+                        $errors
+                        as $field => $message
+                    ): ?>
 
-            </ul>
+                        <li>
+                            <?= View::escape(
+                                (string) $message
+                            ) ?>
+                        </li>
+
+                    <?php endforeach; ?>
+
+                </ul>
+
+            </div>
 
         </div>
 
     <?php endif; ?>
 
 
-    <div class="form-grid">
+    <div class="faculty-admin-form__grid">
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="name"
-                class="form-field__label"
-            >
+            <label for="name">
                 نام دانشکده
+                <span>*</span>
             </label>
 
             <input
                 id="name"
                 name="name"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
                     $faculty['name']
                     ?? ''
                 ) ?>"
+                maxlength="255"
                 required
+                autocomplete="organization"
+                placeholder="مثلاً دانشکده مهندسی کامپیوتر"
             >
+
+            <?php if (
+                isset(
+                    $errors['name']
+                )
+            ): ?>
+
+                <small class="faculty-admin-form__error">
+                    <?= View::escape(
+                        $errors['name']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="short_name"
-                class="form-field__label"
-            >
+            <label for="short_name">
                 نام کوتاه
             </label>
 
@@ -100,113 +130,84 @@ $submitLabel =
                 id="short_name"
                 name="short_name"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
                     $faculty['short_name']
                     ?? ''
                 ) ?>"
+                maxlength="100"
+                placeholder="مثلاً فنی"
             >
+
+            <small>
+                نام کوتاه برای استفاده در بخش‌های فشرده سایت.
+            </small>
 
         </div>
 
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="slug"
-                class="form-field__label"
-            >
-                آدرس
+            <label for="slug">
+                شناسه URL
             </label>
 
-            <input
-                id="slug"
-                name="slug"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $faculty['slug']
-                    ?? ''
-                ) ?>"
-                placeholder="computer-engineering"
-                required
-            >
+            <div class="faculty-admin-form__input-prefix">
 
-        </div>
+                <span dir="ltr">
+                    /faculties/
+                </span>
 
+                <input
+                    id="slug"
+                    name="slug"
+                    type="text"
+                    value="<?= View::escape(
+                        $faculty['slug']
+                        ?? ''
+                    ) ?>"
+                    maxlength="255"
+                    dir="ltr"
+                    placeholder="computer-engineering"
+                >
 
-        <div class="form-field">
+            </div>
 
-            <label
-                for="dean_person_id"
-                class="form-field__label"
-            >
-                رئیس دانشکده
-            </label>
+            <?php if (
+                isset(
+                    $errors['slug']
+                )
+            ): ?>
 
-            <select
-                id="dean_person_id"
-                name="dean_person_id"
-                class="form-field__input"
-            >
+                <small class="faculty-admin-form__error">
+                    <?= View::escape(
+                        $errors['slug']
+                    ) ?>
+                </small>
 
-                <option value="">
-                    انتخاب نشده
-                </option>
+            <?php else: ?>
 
-                <?php foreach (
-                    $people
-                    as $person
-                ): ?>
+                <small>
+                    در صورت خالی بودن، شناسه از روی نام دانشکده ساخته می‌شود.
+                </small>
 
-                    <option
-                        value="<?= (int) $person['id'] ?>"
-                        <?= (
-                            (string) (
-                                $faculty[
-                                    'dean_person_id'
-                                ] ?? ''
-                            )
-                            === (string) (
-                                $person['id']
-                            )
-                        )
-                            ? 'selected'
-                            : ''
-                        ?>
-                    >
-                        <?= View::escape(
-                            trim(
-                                $person['first_name']
-                                . ' '
-                                . $person['last_name']
-                            )
-                        ) ?>
-                    </option>
-
-                <?php endforeach; ?>
-
-            </select>
+            <?php endif; ?>
 
         </div>
 
 
         <div
-            class="form-field form-field--full"
+            class="faculty-admin-form__field faculty-admin-form__field--full"
         >
 
-            <label
-                for="description"
-                class="form-field__label"
-            >
+            <label for="description">
                 معرفی دانشکده
             </label>
 
             <textarea
                 id="description"
                 name="description"
-                class="form-field__textarea"
                 rows="7"
+                placeholder="توضیح مختصری درباره دانشکده، گروه‌های آموزشی و زمینه فعالیت آن بنویسید."
             ><?= View::escape(
                 $faculty['description']
                 ?? ''
@@ -215,12 +216,9 @@ $submitLabel =
         </div>
 
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="email"
-                class="form-field__label"
-            >
+            <label for="email">
                 ایمیل
             </label>
 
@@ -228,22 +226,34 @@ $submitLabel =
                 id="email"
                 name="email"
                 type="email"
-                class="form-field__input"
                 value="<?= View::escape(
                     $faculty['email']
                     ?? ''
                 ) ?>"
+                autocomplete="email"
+                placeholder="faculty@example.com"
             >
+
+            <?php if (
+                isset(
+                    $errors['email']
+                )
+            ): ?>
+
+                <small class="faculty-admin-form__error">
+                    <?= View::escape(
+                        $errors['email']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="phone"
-                class="form-field__label"
-            >
+            <label for="phone">
                 تلفن
             </label>
 
@@ -251,22 +261,19 @@ $submitLabel =
                 id="phone"
                 name="phone"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
                     $faculty['phone']
                     ?? ''
                 ) ?>"
+                placeholder="۰۲۱-..."
             >
 
         </div>
 
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="fax"
-                class="form-field__label"
-            >
+            <label for="fax">
                 فکس
             </label>
 
@@ -274,55 +281,53 @@ $submitLabel =
                 id="fax"
                 name="fax"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
                     $faculty['fax']
                     ?? ''
                 ) ?>"
+                placeholder="۰۲۱-..."
             >
 
         </div>
 
 
-        <div class="form-field">
+        <div class="faculty-admin-form__field">
 
-            <label
-                for="sort_order"
-                class="form-field__label"
-            >
-                ترتیب
+            <label for="sort_order">
+                ترتیب نمایش
             </label>
 
             <input
                 id="sort_order"
                 name="sort_order"
                 type="number"
-                class="form-field__input"
+                min="0"
                 value="<?= View::escape(
                     $faculty['sort_order']
                     ?? 0
                 ) ?>"
             >
 
+            <small>
+                عدد کمتر، جایگاه بالاتری در ترتیب نمایش خواهد داشت.
+            </small>
+
         </div>
 
 
         <div
-            class="form-field form-field--full"
+            class="faculty-admin-form__field faculty-admin-form__field--full"
         >
 
-            <label
-                for="address"
-                class="form-field__label"
-            >
+            <label for="address">
                 آدرس
             </label>
 
             <textarea
                 id="address"
                 name="address"
-                class="form-field__textarea"
                 rows="3"
+                placeholder="آدرس کامل دانشکده"
             ><?= View::escape(
                 $faculty['address']
                 ?? ''
@@ -332,41 +337,67 @@ $submitLabel =
 
 
         <div
-            class="form-field form-field--full"
+            class="faculty-admin-form__field faculty-admin-form__field--full"
         >
 
-            <label
-                for="image"
-                class="form-field__label"
-            >
-                تصویر
+            <label for="image">
+                تصویر دانشکده
             </label>
 
             <input
                 id="image"
                 name="image"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
                     $faculty['image']
                     ?? ''
                 ) ?>"
-                placeholder="/media/..."
+                maxlength="500"
+                dir="ltr"
+                placeholder="/media/faculties/example.jpg"
             >
+
+            <small>
+                مسیر داخلی فایل یا آدرس کامل تصویر را وارد کنید.
+            </small>
+
+            <?php if (
+                isset(
+                    $errors['image']
+                )
+            ): ?>
+
+                <small class="faculty-admin-form__error">
+                    <?= View::escape(
+                        $errors['image']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
+    </div>
 
-        <div class="form-field">
 
-            <label
-                style="
-                    display:flex;
-                    align-items:center;
-                    gap:8px;
-                    min-height:46px;
-                "
-            >
+    <div class="faculty-admin-form__settings">
+
+        <div class="faculty-admin-form__setting">
+
+            <div>
+
+                <strong>
+                    وضعیت دانشکده
+                </strong>
+
+                <span>
+                    دانشکده‌های فعال در سایت عمومی نمایش داده می‌شوند.
+                </span>
+
+            </div>
+
+
+            <label class="faculty-admin-form__switch">
 
                 <input
                     type="checkbox"
@@ -383,7 +414,16 @@ $submitLabel =
                     ?>
                 >
 
-                دانشکده فعال باشد
+                <span
+                    class="faculty-admin-form__switch-track"
+                    aria-hidden="true"
+                >
+                    <span></span>
+                </span>
+
+                <strong>
+                    فعال
+                </strong>
 
             </label>
 
@@ -392,25 +432,26 @@ $submitLabel =
     </div>
 
 
-    <div class="admin-form__actions">
-
-        <button
-            type="submit"
-            class="button button--primary"
-        >
-            <?= View::escape(
-                $submitLabel
-            ) ?>
-        </button>
+    <div class="faculty-admin-form__actions">
 
         <a
             href="<?= View::route(
                 'admin.faculties.index'
             ) ?>"
-            class="button button--secondary"
+            class="faculty-admin-form__button faculty-admin-form__button--secondary"
         >
             انصراف
         </a>
+
+
+        <button
+            type="submit"
+            class="faculty-admin-form__button faculty-admin-form__button--primary"
+        >
+            <?= View::escape(
+                $submitLabel
+            ) ?>
+        </button>
 
     </div>
 

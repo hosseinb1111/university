@@ -1,0 +1,796 @@
+/*
+|--------------------------------------------------------------------------
+| English — Base
+|--------------------------------------------------------------------------
+| CSS custom properties, theme system, box-sizing reset, html/body base,
+| form control resets, links, images, selection color and accessibility.
+|
+| This file is the single source of truth for the English visual theme.
+|
+| Theme:
+|
+|   html[data-theme="light"]
+|   html[data-theme="dark"]
+|
+| No component-specific rules belong in this file.
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   ENGLISH DESIGN TOKENS — LIGHT THEME
+========================================================================== */
+
+:root {
+
+    /*
+     * Page backgrounds
+     */
+
+    --english-background:
+        #f4f6f9;
+
+    --english-background-soft:
+        #f8fafc;
+
+
+    /*
+     * Surfaces
+     */
+
+    --english-surface:
+        #ffffff;
+
+    --english-surface-soft:
+        #f8fafc;
+
+
+    /*
+     * Borders
+     */
+
+    --english-border:
+        #e2e6ec;
+
+    --english-border-strong:
+        #d6dbe3;
+
+
+    /*
+     * Text
+     */
+
+    --english-text:
+        #111827;
+
+    --english-text-soft:
+        #263247;
+
+
+    /*
+     * Muted text
+     */
+
+    --english-muted:
+        #667085;
+
+    --english-muted-light:
+        #98a2b3;
+
+
+    /*
+     * Primary actions
+     */
+
+    --english-primary:
+        #172033;
+
+    --english-primary-hover:
+        #27324a;
+
+
+    /*
+     * Accent
+     */
+
+    --english-accent:
+        #2563eb;
+
+    --english-accent-hover:
+        #1d4ed8;
+
+
+    /*
+     * Decorative / atmospheric elements
+     */
+
+    --english-decoration-border:
+        rgba(
+            23,
+            32,
+            51,
+            0.055
+        );
+
+    --english-decoration-border-soft:
+        rgba(
+            23,
+            32,
+            51,
+            0.035
+        );
+
+    --english-decoration-primary:
+        rgba(
+            37,
+            99,
+            235,
+            0.055
+        );
+
+    --english-decoration-primary-soft:
+        rgba(
+            37,
+            99,
+            235,
+            0.018
+        );
+
+    --english-decoration-surface:
+        rgba(
+            23,
+            32,
+            51,
+            0.015
+        );
+
+    --english-decoration-mark:
+        rgba(
+            23,
+            32,
+            51,
+            0.045
+        );
+
+    --english-decoration-line:
+        #94a3b8;
+
+
+    /*
+     * Dark editorial surfaces
+     *
+     * These remain intentionally dark even while the surrounding
+     * page is in light mode.
+     */
+
+    --english-dark-surface:
+        #111827;
+
+    --english-dark-surface-soft:
+        #172033;
+
+    --english-dark-surface-alt:
+        #1e293b;
+
+    --english-dark-border:
+        #334155;
+
+    --english-dark-text:
+        #ffffff;
+
+    --english-dark-muted:
+        #cbd5e1;
+
+    --english-dark-line:
+        #64748b;
+
+    --english-dark-link:
+        #e2e8f0;
+
+    --english-dark-hover:
+        rgba(
+            255,
+            255,
+            255,
+            0.025
+        );
+
+    --english-dark-decoration:
+        rgba(
+            255,
+            255,
+            255,
+            0.055
+        );
+
+    --english-dark-decoration-soft:
+        rgba(
+            255,
+            255,
+            255,
+            0.04
+        );
+
+
+    /*
+     * Accessibility
+     */
+
+    --english-focus:
+        rgba(
+            37,
+            99,
+            235,
+            0.35
+        );
+
+
+    /*
+     * Layout
+     */
+
+    --english-container:
+        1240px;
+
+
+    /*
+     * Radius
+     */
+
+    --english-radius-xs:
+        6px;
+
+    --english-radius-sm:
+        9px;
+
+    --english-radius-md:
+        12px;
+
+    --english-radius-lg:
+        18px;
+
+    --english-radius-xl:
+        24px;
+
+
+    /*
+     * Shadows
+     */
+
+    --english-shadow-xs:
+        0
+        2px
+        8px
+        rgba(
+            15,
+            23,
+            42,
+            0.04
+        );
+
+    --english-shadow-sm:
+        0
+        6px
+        20px
+        rgba(
+            15,
+            23,
+            42,
+            0.06
+        );
+
+    --english-shadow-md:
+        0
+        18px
+        50px
+        rgba(
+            15,
+            23,
+            42,
+            0.09
+        );
+
+    --english-shadow-lg:
+        0
+        28px
+        80px
+        rgba(
+            15,
+            23,
+            42,
+            0.13
+        );
+
+
+    /*
+     * Motion
+     */
+
+    --english-transition:
+        180ms ease;
+
+
+    /*
+     * Browser rendering
+     */
+
+    color-scheme:
+        light;
+}
+
+
+/* ==========================================================================
+   ENGLISH DESIGN TOKENS — DARK THEME
+========================================================================== */
+
+html[data-theme="dark"] {
+
+    /*
+     * Page backgrounds
+     */
+
+    --english-background:
+        #101317;
+
+    --english-background-soft:
+        #151a20;
+
+
+    /*
+     * Surfaces
+     */
+
+    --english-surface:
+        #171c22;
+
+    --english-surface-soft:
+        #1d242c;
+
+
+    /*
+     * Borders
+     */
+
+    --english-border:
+        #2a333d;
+
+    --english-border-strong:
+        #394652;
+
+
+    /*
+     * Text
+     */
+
+    --english-text:
+        #edf2f7;
+
+    --english-text-soft:
+        #d2dae3;
+
+
+    /*
+     * Muted text
+     */
+
+    --english-muted:
+        #aeb8c4;
+
+    --english-muted-light:
+        #84919f;
+
+
+    /*
+     * Primary actions
+     */
+
+    --english-primary:
+        #dfe7ef;
+
+    --english-primary-hover:
+        #ffffff;
+
+
+    /*
+     * Accent
+     */
+
+    --english-accent:
+        #7fb0e8;
+
+    --english-accent-hover:
+        #9ac4ef;
+
+
+    /*
+     * Decorative / atmospheric elements
+     */
+
+    --english-decoration-border:
+        rgba(
+            255,
+            255,
+            255,
+            0.075
+        );
+
+    --english-decoration-border-soft:
+        rgba(
+            255,
+            255,
+            255,
+            0.045
+        );
+
+    --english-decoration-primary:
+        rgba(
+            127,
+            176,
+            232,
+            0.10
+        );
+
+    --english-decoration-primary-soft:
+        rgba(
+            127,
+            176,
+            232,
+            0.035
+        );
+
+    --english-decoration-surface:
+        rgba(
+            255,
+            255,
+            255,
+            0.018
+        );
+
+    --english-decoration-mark:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+
+    --english-decoration-line:
+        #64748b;
+
+
+    /*
+     * Dark editorial surfaces
+     */
+
+    --english-dark-surface:
+        #0d1117;
+
+    --english-dark-surface-soft:
+        #151b24;
+
+    --english-dark-surface-alt:
+        #1c2633;
+
+    --english-dark-border:
+        #303b48;
+
+    --english-dark-text:
+        #f8fafc;
+
+    --english-dark-muted:
+        #c3ccd7;
+
+    --english-dark-line:
+        #68788a;
+
+    --english-dark-link:
+        #dce5ee;
+
+    --english-dark-hover:
+        rgba(
+            255,
+            255,
+            255,
+            0.035
+        );
+
+    --english-dark-decoration:
+        rgba(
+            255,
+            255,
+            255,
+            0.065
+        );
+
+    --english-dark-decoration-soft:
+        rgba(
+            255,
+            255,
+            255,
+            0.045
+        );
+
+
+    /*
+     * Accessibility
+     */
+
+    --english-focus:
+        rgba(
+            127,
+            176,
+            232,
+            0.38
+        );
+
+
+    /*
+     * Browser rendering
+     */
+
+    color-scheme:
+        dark;
+}
+
+
+/* ==========================================================================
+   BOX SIZING
+========================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing:
+        border-box;
+}
+
+
+/* ==========================================================================
+   DOCUMENT BASE
+========================================================================== */
+
+html {
+    scroll-behavior:
+        smooth;
+
+    min-height:
+        100%;
+
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+
+    transition:
+        background-color
+        var(--english-transition),
+        color
+        var(--english-transition);
+}
+
+
+body {
+    margin:
+        0;
+
+    min-height:
+        100vh;
+
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+
+    line-height:
+        1.7;
+
+    -webkit-font-smoothing:
+        antialiased;
+
+    -moz-osx-font-smoothing:
+        grayscale;
+
+    text-rendering:
+        optimizeLegibility;
+
+    transition:
+        background-color
+        var(--english-transition),
+        color
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   FORM CONTROLS
+========================================================================== */
+
+button,
+input,
+textarea,
+select {
+    font:
+        inherit;
+
+    color:
+        inherit;
+}
+
+
+input,
+textarea,
+select {
+    background:
+        var(--english-surface);
+
+    border-color:
+        var(--english-border);
+}
+
+
+input::placeholder,
+textarea::placeholder {
+    color:
+        var(--english-muted-light);
+
+    opacity:
+        1;
+}
+
+
+input:disabled,
+textarea:disabled,
+select:disabled,
+button:disabled {
+    opacity:
+        0.6;
+
+    cursor:
+        not-allowed;
+}
+
+
+/* ==========================================================================
+   LINKS
+========================================================================== */
+
+a {
+    color:
+        inherit;
+}
+
+
+/* ==========================================================================
+   IMAGES
+========================================================================== */
+
+img {
+    display:
+        block;
+
+    max-width:
+        100%;
+
+    height:
+        auto;
+}
+
+
+/* ==========================================================================
+   SELECTION
+========================================================================== */
+
+::selection {
+    background:
+        rgba(
+            37,
+            99,
+            235,
+            0.18
+        );
+
+    color:
+        inherit;
+}
+
+
+html[data-theme="dark"] ::selection {
+    background:
+        rgba(
+            127,
+            176,
+            232,
+            0.24
+        );
+
+    color:
+        #ffffff;
+}
+
+
+/* ==========================================================================
+   FOCUS ACCESSIBILITY
+========================================================================== */
+
+.english-nav__link:focus-visible,
+.english-nav__language:focus-visible,
+.english-menu-toggle:focus-visible,
+.english-button:focus-visible,
+.english-home-section__link:focus-visible,
+.english-home-section-heading__link:focus-visible,
+.english-card a:focus-visible,
+.english-list__item a:focus-visible,
+.english-footer a:focus-visible {
+    outline:
+        3px
+        solid
+        var(--english-focus);
+
+    outline-offset:
+        3px;
+}
+
+
+/* ==========================================================================
+   THEME TRANSITION SUPPORT
+========================================================================== */
+
+.english-faculties-page,
+.english-faculty-page,
+.english-about-page,
+.english-contact-page,
+.english-announcements-page,
+.english-announcement-page,
+.english-announcement-hero,
+.english-announcements-hero,
+.english-faculties-hero,
+.english-faculty-hero,
+.english-contact-hero,
+.english-about-hero,
+.english-announcements-section,
+.english-contact-section,
+.english-faculties-section,
+.english-faculty-content,
+.english-about-intro,
+.english-about-section,
+.english-about-values,
+.english-contact-help,
+.english-announcement-content {
+    transition:
+        background-color
+        var(--english-transition),
+        color
+        var(--english-transition),
+        border-color
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   REDUCED MOTION
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior:
+            auto;
+    }
+
+
+    *,
+    *::before,
+    *::after {
+        transition-duration:
+            0.01ms !important;
+
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+    }
+
+}

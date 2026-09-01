@@ -2,77 +2,308 @@
 
 declare(strict_types=1);
 
+use App\Core\Csrf;
+use App\Core\View;
+
 $items =
-    $people['items'] ?? [];
+    is_array($people['items'] ?? null)
+        ? $people['items']
+        : [];
 
 $total =
     (int) (
-        $people['total'] ?? 0
+        $people['total']
+        ?? 0
     );
+
+$page =
+    max(
+        1,
+        (int) (
+            $people['page']
+            ?? 1
+        )
+    );
+
+$totalPages =
+    max(
+        1,
+        (int) (
+            $people['totalPages']
+            ?? 1
+        )
+    );
+
+$success =
+    is_string($success ?? null)
+        ? $success
+        : null;
+
+$error =
+    is_string($error ?? null)
+        ? $error
+        : null;
 ?>
 
-<div class="admin-page">
+<div class="people-admin">
 
-    <div class="admin-page__header">
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
 
-        <div>
+    <header class="people-admin__header">
 
-            <h1>
-                اعضای هیئت علمی و کارکنان
-            </h1>
+        <div class="people-admin__header-main">
 
-            <p>
-                مدیریت اطلاعات اساتید، مدیران و کارکنان موسسه
-            </p>
+            <span class="people-admin__eyebrow">
+                اعضای موسسه
+            </span>
+
+            <div class="people-admin__title-row">
+
+                <div
+                    class="people-admin__title-icon"
+                    aria-hidden="true"
+                >
+                    👥
+                </div>
+
+                <div>
+
+                    <h1 class="people-admin__title">
+                        اعضای هیئت علمی و کارکنان
+                    </h1>
+
+                    <p class="people-admin__description">
+                        اطلاعات اساتید، مدیران و کارکنان موسسه را مدیریت کنید.
+                    </p>
+
+                </div>
+
+            </div>
 
         </div>
 
-        <a
-            href="<?= View::route(
-                'admin.people.create'
-            ) ?>"
-            class="button button--primary"
-        >
-            + افزودن شخص
-        </a>
 
-    </div>
+        <div class="people-admin__header-actions">
 
+            <a
+                href="<?= View::route(
+                    'admin.people.create'
+                ) ?>"
+                class="people-admin__button people-admin__button--primary"
+            >
+
+                <span aria-hidden="true">
+                    +
+                </span>
+
+                افزودن شخص
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         ALERTS
+    ========================================================== -->
 
     <?php if (
         $success !== null
+        && $success !== ''
     ): ?>
 
         <div
-            style="
-                margin-bottom:20px;
-                padding:14px 16px;
-                background:#f0fdf4;
-                border:1px solid #bbf7d0;
-                border-radius:12px;
-                color:#166534;
-            "
+            class="people-admin__alert people-admin__alert--success"
+            role="status"
         >
-            <?= View::escape(
-                $success
-            ) ?>
+
+            <div
+                class="people-admin__alert-icon"
+                aria-hidden="true"
+            >
+                ✓
+            </div>
+
+            <div>
+
+                <strong>
+                    انجام شد
+                </strong>
+
+                <p>
+                    <?= View::escape(
+                        $success
+                    ) ?>
+                </p>
+
+            </div>
+
         </div>
 
     <?php endif; ?>
 
 
-    <div class="admin-panel">
+    <?php if (
+        $error !== null
+        && $error !== ''
+    ): ?>
 
         <div
-            style="
-                margin-bottom:20px;
-                color:#64748b;
-                font-size:13px;
-            "
+            class="people-admin__alert people-admin__alert--error"
+            role="alert"
         >
-            مجموع:
-            <?= number_format($total) ?>
-            نفر
+
+            <div
+                class="people-admin__alert-icon"
+                aria-hidden="true"
+            >
+                !
+            </div>
+
+            <div>
+
+                <strong>
+                    خطا
+                </strong>
+
+                <p>
+                    <?= View::escape(
+                        $error
+                    ) ?>
+                </p>
+
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <!-- =========================================================
+         STATS
+    ========================================================== -->
+
+    <section class="people-admin__stats">
+
+        <div class="people-admin__stat">
+
+            <div
+                class="people-admin__stat-icon"
+                aria-hidden="true"
+            >
+                👥
+            </div>
+
+            <div>
+
+                <span>
+                    مجموع اعضا
+                </span>
+
+                <strong>
+                    <?= number_format(
+                        $total
+                    ) ?>
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="people-admin__stat">
+
+            <div
+                class="people-admin__stat-icon"
+                aria-hidden="true"
+            >
+                🎓
+            </div>
+
+            <div>
+
+                <span>
+                    بخش آموزشی
+                </span>
+
+                <strong>
+                    هیئت علمی
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="people-admin__stat">
+
+            <div
+                class="people-admin__stat-icon"
+                aria-hidden="true"
+            >
+                🌐
+            </div>
+
+            <div>
+
+                <span>
+                    وضعیت
+                </span>
+
+                <strong>
+                    مدیریت آنلاین
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         MAIN PANEL
+    ========================================================== -->
+
+    <section class="people-admin__panel">
+
+        <div class="people-admin__panel-header">
+
+            <div>
+
+                <span class="people-admin__panel-eyebrow">
+                    فهرست اعضا
+                </span>
+
+                <h2>
+                    اساتید و کارکنان
+                </h2>
+
+                <p>
+                    اطلاعات اعضای موسسه را مشاهده و مدیریت کنید.
+                </p>
+
+            </div>
+
+
+            <div class="people-admin__panel-count">
+
+                <strong>
+                    <?= number_format(
+                        $total
+                    ) ?>
+                </strong>
+
+                <span>
+                    نفر
+                </span>
+
+            </div>
+
         </div>
 
 
@@ -80,147 +311,437 @@ $total =
             $items === []
         ): ?>
 
-            <div
-                style="
-                    padding:50px 20px;
-                    text-align:center;
-                    color:#64748b;
-                "
-            >
-                هنوز شخصی ثبت نشده است.
+            <div class="people-admin__empty">
+
+                <div
+                    class="people-admin__empty-icon"
+                    aria-hidden="true"
+                >
+                    👥
+                </div>
+
+                <h3>
+                    هنوز شخصی ثبت نشده است
+                </h3>
+
+                <p>
+                    اولین عضو هیئت علمی یا کارمند را اضافه کنید.
+                </p>
+
+                <a
+                    href="<?= View::route(
+                        'admin.people.create'
+                    ) ?>"
+                    class="people-admin__button people-admin__button--primary"
+                >
+                    افزودن اولین شخص
+                </a>
+
             </div>
 
         <?php else: ?>
 
-            <div class="announcement-table-wrapper">
+            <div class="people-admin__table-wrap">
 
-                <table class="announcement-table">
+                <table class="people-admin__table">
 
                     <thead>
 
-                    <tr>
-                        <th>نام</th>
-                        <th>سمت</th>
-                        <th>دانشکده</th>
-                        <th>ایمیل</th>
-                        <th>وضعیت</th>
-                        <th>عملیات</th>
-                    </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    <?php foreach (
-                        $items
-                        as $person
-                    ): ?>
-
                         <tr>
 
-                            <td>
+                            <th>
+                                شخص
+                            </th>
 
-                                <strong>
-                                    <?= View::escape(
-                                        trim(
-                                            $person['first_name']
-                                            . ' '
-                                            . $person['last_name']
-                                        )
-                                    ) ?>
-                                </strong>
+                            <th>
+                                سمت
+                            </th>
 
-                            </td>
+                            <th>
+                                دانشکده
+                            </th>
 
-                            <td>
-                                <?= View::escape(
-                                    $person['position']
-                                    ?? '—'
-                                ) ?>
-                            </td>
+                            <th>
+                                ارتباط
+                            </th>
 
-                            <td>
-                                <?= View::escape(
-                                    $person['faculty_name']
-                                    ?? '—'
-                                ) ?>
-                            </td>
+                            <th>
+                                وضعیت
+                            </th>
 
-                            <td>
-                                <?= View::escape(
-                                    $person['email']
-                                    ?? '—'
-                                ) ?>
-                            </td>
-
-                            <td>
-
-                                <?php if (
-                                    (int) (
-                                        $person['is_active']
-                                        ?? 0
-                                    ) === 1
-                                ): ?>
-
-                                    <span
-                                        class="announcement-status announcement-status--published"
-                                    >
-                                        فعال
-                                    </span>
-
-                                <?php else: ?>
-
-                                    <span
-                                        class="announcement-status announcement-status--draft"
-                                    >
-                                        غیرفعال
-                                    </span>
-
-                                <?php endif; ?>
-
-                            </td>
-
-                            <td>
-
-                                <a
-                                    href="/admin/people/<?= (int) $person['id'] ?>/edit"
-                                    class="table-action"
-                                >
-                                    ویرایش
-                                </a>
-
-                                <a
-                                    href="/people/<?= (int) $person['id'] ?>"
-                                    class="table-action"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    مشاهده
-                                </a>
-
-                                <form
-                                    method="POST"
-                                    action="/admin/people/<?= (int) $person['id'] ?>/delete"
-                                    style="display:inline"
-                                    onsubmit="return confirm('آیا از حذف این شخص مطمئن هستید؟');"
-                                >
-
-                                    <?= \App\Core\Csrf::field() ?>
-
-                                    <button
-                                        type="submit"
-                                        class="table-action table-action--danger"
-                                    >
-                                        حذف
-                                    </button>
-
-                                </form>
-
-                            </td>
+                            <th>
+                                عملیات
+                            </th>
 
                         </tr>
 
-                    <?php endforeach; ?>
+                    </thead>
+
+
+                    <tbody>
+
+                        <?php foreach (
+                            $items
+                            as $person
+                        ): ?>
+
+                            <?php
+
+                            $personId =
+                                (int) (
+                                    $person['id']
+                                    ?? 0
+                                );
+
+                            $firstName =
+                                trim(
+                                    (string) (
+                                        $person['first_name']
+                                        ?? ''
+                                    )
+                                );
+
+                            $lastName =
+                                trim(
+                                    (string) (
+                                        $person['last_name']
+                                        ?? ''
+                                    )
+                                );
+
+                            $fullName =
+                                trim(
+                                    $firstName
+                                    . ' '
+                                    . $lastName
+                                );
+
+                            if (
+                                $fullName === ''
+                            ) {
+                                $fullName =
+                                    'بدون نام';
+                            }
+
+                            $position =
+                                trim(
+                                    (string) (
+                                        $person['position']
+                                        ?? ''
+                                    )
+                                );
+
+                            $facultyName =
+                                trim(
+                                    (string) (
+                                        $person['faculty_name']
+                                        ?? ''
+                                    )
+                                );
+
+                            $email =
+                                trim(
+                                    (string) (
+                                        $person['email']
+                                        ?? ''
+                                    )
+                                );
+
+                            $phone =
+                                trim(
+                                    (string) (
+                                        $person['phone']
+                                        ?? ''
+                                    )
+                                );
+
+                            $isActive =
+                                (int) (
+                                    $person['is_active']
+                                    ?? 0
+                                ) === 1;
+
+                            ?>
+
+                            <tr>
+
+                                <!-- PERSON -->
+
+                                <td>
+
+                                    <div class="people-admin__person-cell">
+
+                                        <div
+                                            class="people-admin__avatar"
+                                            aria-hidden="true"
+                                        >
+                                            <?= View::escape(
+                                                mb_strtoupper(
+                                                    mb_substr(
+                                                        $fullName,
+                                                        0,
+                                                        1,
+                                                        'UTF-8'
+                                                    ),
+                                                    'UTF-8'
+                                                )
+                                            ) ?>
+                                        </div>
+
+
+                                        <div class="people-admin__person-info">
+
+                                            <strong>
+                                                <?= View::escape(
+                                                    $fullName
+                                                ) ?>
+                                            </strong>
+
+                                            <?php if (
+                                                $email !== ''
+                                            ): ?>
+
+                                                <span dir="ltr">
+                                                    <?= View::escape(
+                                                        $email
+                                                    ) ?>
+                                                </span>
+
+                                            <?php endif; ?>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- POSITION -->
+
+                                <td>
+
+                                    <?php if (
+                                        $position !== ''
+                                    ): ?>
+
+                                        <span class="people-admin__position">
+                                            <?= View::escape(
+                                                $position
+                                            ) ?>
+                                        </span>
+
+                                    <?php else: ?>
+
+                                        <span class="people-admin__muted">
+                                            تعیین نشده
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+
+                                <!-- FACULTY -->
+
+                                <td>
+
+                                    <?php if (
+                                        $facultyName !== ''
+                                    ): ?>
+
+                                        <span class="people-admin__faculty">
+                                            <?= View::escape(
+                                                $facultyName
+                                            ) ?>
+                                        </span>
+
+                                    <?php else: ?>
+
+                                        <span class="people-admin__muted">
+                                            بدون دانشکده
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+
+                                <!-- CONTACT -->
+
+                                <td>
+
+                                    <div class="people-admin__contact">
+
+                                        <?php if (
+                                            $email !== ''
+                                        ): ?>
+
+                                            <a
+                                                href="mailto:<?= View::escape(
+                                                    $email
+                                                ) ?>"
+                                                title="ارسال ایمیل"
+                                            >
+                                                ✉
+                                            </a>
+
+                                        <?php endif; ?>
+
+
+                                        <?php if (
+                                            $phone !== ''
+                                        ): ?>
+
+                                            <a
+                                                href="tel:<?= View::escape(
+                                                    preg_replace(
+                                                        '/[^0-9+]/',
+                                                        '',
+                                                        $phone
+                                                    ) ?? ''
+                                                ) ?>"
+                                                title="تماس"
+                                            >
+                                                ☎
+                                            </a>
+
+                                        <?php endif; ?>
+
+
+                                        <?php if (
+                                            $email === ''
+                                            && $phone === ''
+                                        ): ?>
+
+                                            <span class="people-admin__muted">
+                                                —
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <?php if (
+                                        $isActive
+                                    ): ?>
+
+                                        <span
+                                            class="
+                                                people-admin__status
+                                                people-admin__status--active
+                                            "
+                                        >
+
+                                            <span
+                                                class="people-admin__status-dot"
+                                                aria-hidden="true"
+                                            ></span>
+
+                                            فعال
+
+                                        </span>
+
+                                    <?php else: ?>
+
+                                        <span
+                                            class="
+                                                people-admin__status
+                                                people-admin__status--inactive
+                                            "
+                                        >
+
+                                            <span
+                                                class="people-admin__status-dot"
+                                                aria-hidden="true"
+                                            ></span>
+
+                                            غیرفعال
+
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div class="people-admin__actions">
+
+                                        <a
+                                            href="<?= View::url(
+                                                '/admin/people/'
+                                                . $personId
+                                                . '/edit'
+                                            ) ?>"
+                                            class="
+                                                people-admin__action
+                                                people-admin__action--edit
+                                            "
+                                        >
+                                            ویرایش
+                                        </a>
+
+
+                                        <a
+                                            href="<?= View::url(
+                                                '/people/'
+                                                . $personId
+                                            ) ?>"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="
+                                                people-admin__action
+                                                people-admin__action--view
+                                            "
+                                        >
+                                            مشاهده
+                                            <span aria-hidden="true">
+                                                ↗
+                                            </span>
+                                        </a>
+
+
+                                        <form
+                                            method="POST"
+                                            action="<?= View::url(
+                                                '/admin/people/'
+                                                . $personId
+                                                . '/delete'
+                                            ) ?>"
+                                            onsubmit="return confirm('آیا از حذف این شخص مطمئن هستید؟');"
+                                        >
+
+                                            <?= Csrf::field() ?>
+
+                                            <button
+                                                type="submit"
+                                                class="
+                                                    people-admin__action
+                                                    people-admin__action--danger
+                                                "
+                                            >
+                                                حذف
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
 
                     </tbody>
 
@@ -230,6 +751,105 @@ $total =
 
         <?php endif; ?>
 
-    </div>
+    </section>
+
+
+    <!-- =========================================================
+         PAGINATION
+    ========================================================== -->
+
+    <?php if (
+        $totalPages > 1
+    ): ?>
+
+        <nav
+            class="people-admin__pagination"
+            aria-label="صفحه‌بندی"
+        >
+
+            <?php if (
+                $page > 1
+            ): ?>
+
+                <a
+                    href="<?= View::url(
+                        '/admin/people?page='
+                        . (
+                            $page - 1
+                        )
+                    ) ?>"
+                    class="people-admin__page"
+                >
+                    قبلی
+                </a>
+
+            <?php endif; ?>
+
+
+            <?php
+
+            $startPage =
+                max(
+                    1,
+                    $page - 2
+                );
+
+            $endPage =
+                min(
+                    $totalPages,
+                    $page + 2
+                );
+
+            ?>
+
+
+            <?php for (
+                $i = $startPage;
+                $i <= $endPage;
+                $i++
+            ): ?>
+
+                <a
+                    href="<?= View::url(
+                        '/admin/people?page='
+                        . $i
+                    ) ?>"
+                    class="
+                        people-admin__page
+                        <?= $i === $page
+                            ? 'people-admin__page--active'
+                            : ''
+                        ?>
+                    "
+                >
+                    <?= number_format(
+                        $i
+                    ) ?>
+                </a>
+
+            <?php endfor; ?>
+
+
+            <?php if (
+                $page < $totalPages
+            ): ?>
+
+                <a
+                    href="<?= View::url(
+                        '/admin/people?page='
+                        . (
+                            $page + 1
+                        )
+                    ) ?>"
+                    class="people-admin__page"
+                >
+                    بعدی
+                </a>
+
+            <?php endif; ?>
+
+        </nav>
+
+    <?php endif; ?>
 
 </div>

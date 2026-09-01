@@ -2,9 +2,24 @@
 
 declare(strict_types=1);
 
+use App\Core\Csrf;
+use App\Core\View;
+
+
+/*
+|--------------------------------------------------------------------------
+| Data
+|--------------------------------------------------------------------------
+*/
+
 $items =
-    $documents['items']
-    ?? [];
+    is_array(
+        $documents['items']
+        ?? null
+    )
+        ? $documents['items']
+        : [];
+
 
 $total =
     (int) (
@@ -12,81 +27,355 @@ $total =
         ?? 0
     );
 
+
 $page =
-    (int) (
-        $documents['page']
-        ?? 1
+    max(
+        1,
+        (int) (
+            $documents['page']
+            ?? 1
+        )
     );
+
 
 $totalPages =
-    (int) (
-        $documents['totalPages']
-        ?? 1
+    max(
+        1,
+        (int) (
+            $documents['totalPages']
+            ?? 1
+        )
     );
+
+
+$success =
+    is_string(
+        $success
+        ?? null
+    )
+        ? $success
+        : null;
+
+
+$error =
+    is_string(
+        $error
+        ?? null
+    )
+        ? $error
+        : null;
+
+
+/*
+|--------------------------------------------------------------------------
+| File type helper
+|--------------------------------------------------------------------------
+*/
+
+$getFileType =
+    static function (
+        string $mime,
+        string $filename
+    ): string {
+
+        $mime =
+            strtolower(
+                trim(
+                    $mime
+                )
+            );
+
+
+        $extension =
+            strtolower(
+                (string) pathinfo(
+                    $filename,
+                    PATHINFO_EXTENSION
+                )
+            );
+
+
+        if (
+            str_contains(
+                $mime,
+                'pdf'
+            )
+            || $extension === 'pdf'
+        ) {
+            return 'PDF';
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'word'
+            )
+            || str_contains(
+                $mime,
+                'document'
+            )
+            || in_array(
+                $extension,
+                [
+                    'doc',
+                    'docx',
+                ],
+                true
+            )
+        ) {
+            return 'DOC';
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'excel'
+            )
+            || str_contains(
+                $mime,
+                'spreadsheet'
+            )
+            || in_array(
+                $extension,
+                [
+                    'xls',
+                    'xlsx',
+                    'csv',
+                ],
+                true
+            )
+        ) {
+            return 'XLS';
+        }
+
+
+        if (
+            str_contains(
+                $mime,
+                'powerpoint'
+            )
+            || str_contains(
+                $mime,
+                'presentation'
+            )
+            || in_array(
+                $extension,
+                [
+                    'ppt',
+                    'pptx',
+                ],
+                true
+            )
+        ) {
+            return 'PPT';
+        }
+
+
+        if (
+            $extension !== ''
+        ) {
+            return strtoupper(
+                substr(
+                    $extension,
+                    0,
+                    4
+                )
+            );
+        }
+
+
+        return 'FILE';
+    };
+
 ?>
 
-<div class="admin-page">
+<div class="admin-documents">
 
-    <div class="admin-page__header">
+    <header class="admin-documents__header">
 
-        <div>
-            <h1>
+        <div class="admin-documents__header-main">
+
+            <div class="admin-documents__eyebrow">
+                <span
+                    class="admin-documents__eyebrow-icon"
+                    aria-hidden="true"
+                >
+                    📄
+                </span>
+
                 اسناد و فرم‌ها
+            </div>
+
+
+            <h1>
+                کتابخانه اسناد
             </h1>
 
+
             <p>
-                مدیریت فرم‌ها، آیین‌نامه‌ها و فایل‌های موسسه
+                فرم‌ها، آیین‌نامه‌ها، فایل‌های رسمی و سایر اسناد
+                موسسه را از یک بخش منظم مدیریت کنید.
             </p>
+
         </div>
 
-        <a
-            href="<?= View::route(
-                'admin.documents.create'
-            ) ?>"
-            class="button button--primary"
-        >
-            + افزودن سند
-        </a>
 
-    </div>
+        <div class="admin-documents__header-actions">
+
+            <a
+                href="<?= View::route(
+                    'admin.documents.create'
+                ) ?>"
+                class="admin-documents__add"
+            >
+
+                <span
+                    class="admin-documents__add-icon"
+                    aria-hidden="true"
+                >
+                    +
+                </span>
+
+                <span>
+                    افزودن سند
+                </span>
+
+            </a>
+
+        </div>
+
+    </header>
 
 
     <?php if (
         $success !== null
+        && $success !== ''
     ): ?>
 
         <div
-            style="
-                margin-bottom:20px;
-                padding:14px 16px;
-                background:#f0fdf4;
-                border:1px solid #bbf7d0;
-                border-radius:12px;
-                color:#166534;
+            class="
+                admin-documents__alert
+                admin-documents__alert--success
             "
+            role="status"
         >
-            <?= View::escape(
-                $success
-            ) ?>
+
+            <span
+                class="admin-documents__alert-icon"
+                aria-hidden="true"
+            >
+                ✓
+            </span>
+
+
+            <div>
+
+                <strong>
+                    عملیات موفق
+                </strong>
+
+                <span>
+                    <?= View::escape(
+                        $success
+                    ) ?>
+                </span>
+
+            </div>
+
         </div>
 
     <?php endif; ?>
 
 
-    <div class="admin-panel">
+    <?php if (
+        $error !== null
+        && $error !== ''
+    ): ?>
 
         <div
-            style="
-                margin-bottom:20px;
-                color:#64748b;
-                font-size:13px;
+            class="
+                admin-documents__alert
+                admin-documents__alert--error
             "
+            role="alert"
         >
-            مجموع:
-            <?= number_format(
-                $total
-            ) ?>
-            سند
+
+            <span
+                class="admin-documents__alert-icon"
+                aria-hidden="true"
+            >
+                !
+            </span>
+
+
+            <div>
+
+                <strong>
+                    خطا
+                </strong>
+
+                <span>
+                    <?= View::escape(
+                        $error
+                    ) ?>
+                </span>
+
+            </div>
+
+        </div>
+
+    <?php endif; ?>
+
+
+    <section class="admin-documents__panel">
+
+        <div class="admin-documents__panel-header">
+
+            <div class="admin-documents__panel-heading">
+
+                <div
+                    class="admin-documents__panel-icon"
+                    aria-hidden="true"
+                >
+                    📚
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Document Library
+                    </span>
+
+                    <h2>
+                        اسناد ثبت‌شده
+                    </h2>
+
+                    <p>
+                        فهرست تمام اسناد ذخیره‌شده در سامانه
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="admin-documents__panel-count">
+
+                <strong>
+                    <?= number_format(
+                        $total
+                    ) ?>
+                </strong>
+
+                <span>
+                    سند
+                </span>
+
+            </div>
+
         </div>
 
 
@@ -94,194 +383,576 @@ $totalPages =
             $items === []
         ): ?>
 
-            <div
-                style="
-                    padding:50px 20px;
-                    text-align:center;
-                    color:#64748b;
-                "
-            >
-                هنوز سندی ثبت نشده است.
+            <div class="admin-documents__empty">
+
+                <div
+                    class="admin-documents__empty-icon"
+                    aria-hidden="true"
+                >
+                    📄
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        هنوز سندی ثبت نشده است.
+                    </h2>
+
+                    <p>
+                        اولین فرم، آیین‌نامه یا فایل رسمی موسسه را
+                        اضافه کنید تا در این بخش مدیریت شود.
+                    </p>
+
+                    <a
+                        href="<?= View::route(
+                            'admin.documents.create'
+                        ) ?>"
+                        class="admin-documents__empty-button"
+                    >
+                        + افزودن اولین سند
+                    </a>
+
+                </div>
+
             </div>
 
         <?php else: ?>
 
-            <div class="announcement-table-wrapper">
+            <div class="admin-documents__table-shell">
 
-                <table class="announcement-table">
+                <div class="admin-documents__table-wrapper">
 
-                    <thead>
+                    <table class="admin-documents__table">
 
-                    <tr>
-                        <th>عنوان</th>
-                        <th>دسته</th>
-                        <th>فایل</th>
-                        <th>وضعیت</th>
-                        <th>دانلود</th>
-                        <th>عملیات</th>
-                    </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                    <?php foreach (
-                        $items
-                        as $document
-                    ): ?>
+                        <thead>
 
                         <tr>
 
-                            <td>
-                                <strong>
-                                    <?= View::escape(
-                                        $document['title']
-                                    ) ?>
-                                </strong>
+                            <th>
+                                سند
+                            </th>
 
-                                <?php if (
-                                    !empty(
-                                        $document['description']
-                                    )
-                                ): ?>
+                            <th>
+                                دسته‌بندی
+                            </th>
 
-                                    <div
-                                        style="
-                                            margin-top:4px;
-                                            color:#94a3b8;
-                                            font-size:12px;
-                                        "
-                                    >
-                                        <?= View::escape(
-                                            mb_strimwidth(
-                                                $document['description'],
-                                                0,
-                                                100,
-                                                '...',
-                                                'UTF-8'
-                                            )
-                                        ) ?>
-                                    </div>
+                            <th>
+                                فایل
+                            </th>
 
-                                <?php endif; ?>
-                            </td>
+                            <th>
+                                وضعیت
+                            </th>
 
+                            <th>
+                                دانلود
+                            </th>
 
-                            <td>
-                                <?= View::escape(
-                                    $document['category_name']
-                                    ?? ''
-                                ) ?>
-                            </td>
-
-
-                            <td>
-                                <?= View::escape(
-                                    $document['file_name']
-                                    ?? ''
-                                ) ?>
-                            </td>
-
-
-                            <td>
-
-                                <?php if (
-                                    (int) (
-                                        $document['is_active']
-                                        ?? 0
-                                    ) === 1
-                                ): ?>
-
-                                    <span
-                                        class="announcement-status announcement-status--published"
-                                    >
-                                        فعال
-                                    </span>
-
-                                <?php else: ?>
-
-                                    <span
-                                        class="announcement-status announcement-status--draft"
-                                    >
-                                        غیرفعال
-                                    </span>
-
-                                <?php endif; ?>
-
-                            </td>
-
-
-                            <td>
-                                <?= number_format(
-                                    (int) (
-                                        $document['download_count']
-                                        ?? 0
-                                    )
-                                ) ?>
-                            </td>
-
-
-                            <td>
-
-                                <div
-                                    style="
-                                        display:flex;
-                                        gap:6px;
-                                        flex-wrap:wrap;
-                                    "
-                                >
-
-                                    <a
-                                        href="/admin/documents/<?= (int) $document['id'] ?>/edit"
-                                        class="table-action"
-                                    >
-                                        ویرایش
-                                    </a>
-
-                                    <a
-                                        href="/documents/<?= rawurlencode(
-                                            $document['category_slug']
-                                        ) ?>/<?= (int) $document['id'] ?>"
-                                        class="table-action"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        دانلود
-                                    </a>
-
-                                    <form
-                                        method="POST"
-                                        action="/admin/documents/<?= (int) $document['id'] ?>/delete"
-                                        onsubmit="return confirm('آیا از حذف این سند مطمئن هستید؟');"
-                                    >
-
-                                        <?= \App\Core\Csrf::field() ?>
-
-                                        <button
-                                            type="submit"
-                                            class="table-action table-action--danger"
-                                        >
-                                            حذف
-                                        </button>
-
-                                    </form>
-
-                                </div>
-
-                            </td>
+                            <th>
+                                عملیات
+                            </th>
 
                         </tr>
 
-                    <?php endforeach; ?>
+                        </thead>
 
-                    </tbody>
 
-                </table>
+                        <tbody>
+
+                        <?php foreach (
+                            $items
+                            as $document
+                        ): ?>
+
+                            <?php
+
+                            $id =
+                                (int) (
+                                    $document['id']
+                                    ?? 0
+                                );
+
+
+                            $title =
+                                trim(
+                                    (string) (
+                                        $document['title']
+                                        ?? 'سند'
+                                    )
+                                );
+
+
+                            $description =
+                                trim(
+                                    (string) (
+                                        $document['description']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            $fileName =
+                                trim(
+                                    (string) (
+                                        $document['file_name']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            $mime =
+                                trim(
+                                    (string) (
+                                        $document['mime_type']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            $categoryName =
+                                trim(
+                                    (string) (
+                                        $document['category_name']
+                                        ?? 'بدون دسته'
+                                    )
+                                );
+
+
+                            $categorySlug =
+                                trim(
+                                    (string) (
+                                        $document['category_slug']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            $downloadCount =
+                                (int) (
+                                    $document['download_count']
+                                    ?? 0
+                                );
+
+
+                            $isActive =
+                                (int) (
+                                    $document['is_active']
+                                    ?? 0
+                                ) === 1;
+
+
+                            $fileType =
+                                $getFileType(
+                                    $mime,
+                                    $fileName
+                                );
+
+
+                            $shortDescription =
+                                $description !== ''
+                                    ? mb_strimwidth(
+                                        $description,
+                                        0,
+                                        90,
+                                        '...',
+                                        'UTF-8'
+                                    )
+                                    : '';
+
+                            ?>
+
+
+                            <tr>
+
+                                <!-- DOCUMENT -->
+
+                                <td>
+
+                                    <div
+                                        class="
+                                            admin-documents__document-cell
+                                        "
+                                    >
+
+                                        <div
+                                            class="
+                                                admin-documents__document-icon
+                                                admin-documents__document-icon--<?= View::escape(
+                                                    strtolower(
+                                                        $fileType
+                                                    )
+                                                ) ?>
+                                            "
+                                            aria-hidden="true"
+                                        >
+                                            <?= View::escape(
+                                                $fileType
+                                            ) ?>
+                                        </div>
+
+
+                                        <div
+                                            class="
+                                                admin-documents__document-info
+                                            "
+                                        >
+
+                                            <strong
+                                                class="
+                                                    admin-documents__title
+                                                "
+                                            >
+                                                <?= View::escape(
+                                                    $title
+                                                ) ?>
+                                            </strong>
+
+
+                                            <?php if (
+                                                $shortDescription !== ''
+                                            ): ?>
+
+                                                <span
+                                                    class="
+                                                        admin-documents__description
+                                                    "
+                                                >
+                                                    <?= View::escape(
+                                                        $shortDescription
+                                                    ) ?>
+                                                </span>
+
+                                            <?php endif; ?>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- CATEGORY -->
+
+                                <td>
+
+                                    <span
+                                        class="
+                                            admin-documents__category
+                                        "
+                                    >
+                                        <span
+                                            class="
+                                                admin-documents__category-dot
+                                            "
+                                            aria-hidden="true"
+                                        ></span>
+
+                                        <?= View::escape(
+                                            $categoryName
+                                        ) ?>
+                                    </span>
+
+                                </td>
+
+
+                                <!-- FILE -->
+
+                                <td>
+
+                                    <div
+                                        class="
+                                            admin-documents__file-cell
+                                        "
+                                    >
+
+                                        <span
+                                            class="
+                                                admin-documents__file-name
+                                            "
+                                            title="<?= View::escape(
+                                                $fileName
+                                            ) ?>"
+                                        >
+                                            <?= View::escape(
+                                                $fileName !== ''
+                                                    ? $fileName
+                                                    : 'فایل نامشخص'
+                                            ) ?>
+                                        </span>
+
+
+                                        <?php if (
+                                            $mime !== ''
+                                        ): ?>
+
+                                            <span
+                                                class="
+                                                    admin-documents__file-meta
+                                                "
+                                            >
+                                                <?= View::escape(
+                                                    $mime
+                                                ) ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    <?php if (
+                                        $isActive
+                                    ): ?>
+
+                                        <span
+                                            class="
+                                                admin-documents__status
+                                                admin-documents__status--active
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    admin-documents__status-dot
+                                                "
+                                                aria-hidden="true"
+                                            ></span>
+
+                                            فعال
+
+                                        </span>
+
+                                    <?php else: ?>
+
+                                        <span
+                                            class="
+                                                admin-documents__status
+                                                admin-documents__status--inactive
+                                            "
+                                        >
+
+                                            <span
+                                                class="
+                                                    admin-documents__status-dot
+                                                "
+                                                aria-hidden="true"
+                                            ></span>
+
+                                            غیرفعال
+
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+
+                                <!-- DOWNLOADS -->
+
+                                <td>
+
+                                    <div
+                                        class="
+                                            admin-documents__download-count
+                                        "
+                                    >
+
+                                        <span
+                                            class="
+                                                admin-documents__download-icon
+                                            "
+                                            aria-hidden="true"
+                                        >
+                                            ↓
+                                        </span>
+
+
+                                        <strong>
+                                            <?= number_format(
+                                                $downloadCount
+                                            ) ?>
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+
+                                <!-- ACTIONS -->
+
+                                <td>
+
+                                    <div
+                                        class="
+                                            admin-documents__actions
+                                        "
+                                    >
+
+                                        <a
+                                            href="<?= View::url(
+                                                '/admin/documents/'
+                                                . $id
+                                                . '/edit'
+                                            ) ?>"
+                                            class="
+                                                admin-documents__action
+                                                admin-documents__action--edit
+                                            "
+                                        >
+                                            ویرایش
+                                        </a>
+
+
+                                        <?php if (
+                                            $categorySlug !== ''
+                                        ): ?>
+
+                                            <a
+                                                href="<?= View::url(
+                                                    '/documents/'
+                                                    . rawurlencode(
+                                                        $categorySlug
+                                                    )
+                                                    . '/'
+                                                    . $id
+                                                ) ?>"
+                                                class="
+                                                    admin-documents__action
+                                                    admin-documents__action--download
+                                                "
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                            >
+                                                دانلود
+                                            </a>
+
+                                        <?php endif; ?>
+
+
+                                        <form
+                                            method="POST"
+                                            action="<?= View::url(
+                                                '/admin/documents/'
+                                                . $id
+                                                . '/delete'
+                                            ) ?>"
+                                            onsubmit="return confirm('آیا از حذف این سند مطمئن هستید؟');"
+                                        >
+
+                                            <?= Csrf::field() ?>
+
+
+                                            <button
+                                                type="submit"
+                                                class="
+                                                    admin-documents__action
+                                                    admin-documents__action--delete
+                                                "
+                                            >
+                                                حذف
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
 
+
+            <?php if (
+                $totalPages > 1
+            ): ?>
+
+                <nav
+                    class="admin-documents__pagination"
+                    aria-label="صفحه‌بندی اسناد"
+                >
+
+                    <?php if (
+                        $page > 1
+                    ): ?>
+
+                        <a
+                            href="/admin/documents?page=<?= $page - 1 ?>"
+                            class="
+                                admin-documents__pagination-button
+                                admin-documents__pagination-button--arrow
+                            "
+                        >
+                            ←
+                            <span>
+                                قبلی
+                            </span>
+                        </a>
+
+                    <?php endif; ?>
+
+
+                    <div
+                        class="
+                            admin-documents__pagination-current
+                        "
+                    >
+
+                        <strong>
+                            <?= $page ?>
+                        </strong>
+
+                        <span>
+                            از
+                            <?= $totalPages ?>
+                        </span>
+
+                    </div>
+
+
+                    <?php if (
+                        $page < $totalPages
+                    ): ?>
+
+                        <a
+                            href="/admin/documents?page=<?= $page + 1 ?>"
+                            class="
+                                admin-documents__pagination-button
+                                admin-documents__pagination-button--arrow
+                            "
+                        >
+
+                            <span>
+                                بعدی
+                            </span>
+
+                            →
+
+                        </a>
+
+                    <?php endif; ?>
+
+                </nav>
+
+            <?php endif; ?>
+
         <?php endif; ?>
 
-    </div>
+    </section>
 
 </div>

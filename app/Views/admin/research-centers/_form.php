@@ -2,216 +2,146 @@
 
 declare(strict_types=1);
 
-$center =
-    $center ?? [];
+use App\Core\Csrf;
+use App\Core\View;
 
-$people =
-    $people ?? [];
+$center =
+    is_array($center ?? null)
+        ? $center
+        : [];
 
 $errors =
-    $errors ?? [];
+    is_array($errors ?? null)
+        ? $errors
+        : [];
 
 $action =
-    $action ?? '';
+    is_string($action ?? null)
+        ? $action
+        : '';
 
 $submitLabel =
-    $submitLabel ?? 'ذخیره';
+    is_string($submitLabel ?? null)
+        ? $submitLabel
+        : 'ذخیره';
 ?>
 
 <form
     method="POST"
-    action="<?= View::escape($action) ?>"
-    class="admin-form"
+    action="<?= View::escape(
+        $action
+    ) ?>"
+    class="research-admin-form"
 >
 
-    <?= \App\Core\Csrf::field() ?>
+    <?= Csrf::field() ?>
 
 
     <?php if (
         $errors !== []
     ): ?>
 
-        <div class="form-errors">
+        <div class="research-admin-form__errors">
 
-            <strong>
-                لطفاً موارد زیر را اصلاح کنید:
-            </strong>
+            <div
+                class="research-admin-form__errors-icon"
+                aria-hidden="true"
+            >
+                !
+            </div>
 
-            <ul>
+            <div>
 
-                <?php foreach (
-                    $errors as $error
-                ): ?>
+                <strong>
+                    لطفاً موارد زیر را اصلاح کنید.
+                </strong>
 
-                    <li>
-                        <?= View::escape($error) ?>
-                    </li>
+                <ul>
 
-                <?php endforeach; ?>
+                    <?php foreach (
+                        $errors
+                        as $message
+                    ): ?>
 
-            </ul>
+                        <li>
+                            <?= View::escape(
+                                (string) $message
+                            ) ?>
+                        </li>
+
+                    <?php endforeach; ?>
+
+                </ul>
+
+            </div>
 
         </div>
 
     <?php endif; ?>
 
 
-    <div class="form-grid">
+    <div class="research-admin-form__grid">
 
-        <div class="form-field">
+        <!-- Name -->
 
-            <label
-                for="name"
-                class="form-field__label"
-            >
+        <div class="research-admin-form__field">
+
+            <label for="name">
                 نام پژوهشکده
+                <span>*</span>
             </label>
 
             <input
                 id="name"
                 name="name"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $center['name'] ?? ''
+                    $center['name']
+                    ?? ''
                 ) ?>"
                 maxlength="255"
                 required
+                placeholder="مثلاً پژوهشکده فناوری اطلاعات"
             >
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Slug -->
 
-            <label
-                for="short_name"
-                class="form-field__label"
-            >
-                نام کوتاه
-            </label>
+        <div class="research-admin-form__field">
 
-            <input
-                id="short_name"
-                name="short_name"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $center['short_name'] ?? ''
-                ) ?>"
-            >
-
-        </div>
-
-
-        <div class="form-field">
-
-            <label
-                for="slug"
-                class="form-field__label"
-            >
+            <label for="slug">
                 آدرس
+                <span>*</span>
             </label>
 
             <input
                 id="slug"
                 name="slug"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $center['slug'] ?? ''
+                    $center['slug']
+                    ?? ''
                 ) ?>"
-                placeholder="research-center-name"
+                maxlength="255"
                 required
+                dir="ltr"
+                placeholder="information-technology-research-center"
             >
+
+            <small>
+                برای ساخت آدرس عمومی پژوهشکده استفاده می‌شود.
+            </small>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Email -->
 
-            <label
-                for="director_person_id"
-                class="form-field__label"
-            >
-                مدیر پژوهشکده
-            </label>
+        <div class="research-admin-form__field">
 
-            <select
-                id="director_person_id"
-                name="director_person_id"
-                class="form-field__input"
-            >
-
-                <option value="">
-                    انتخاب نشده
-                </option>
-
-                <?php foreach (
-                    $people
-                    as $person
-                ): ?>
-
-                    <option
-                        value="<?= (int) $person['id'] ?>"
-                        <?= (
-                            (string) (
-                                $center['director_person_id']
-                                ?? ''
-                            )
-                            === (string) (
-                                $person['id']
-                            )
-                        )
-                            ? 'selected'
-                            : ''
-                        ?>
-                    >
-                        <?= View::escape(
-                            trim(
-                                $person['first_name']
-                                . ' '
-                                . $person['last_name']
-                            )
-                        ) ?>
-                    </option>
-
-                <?php endforeach; ?>
-
-            </select>
-
-        </div>
-
-
-        <div
-            class="form-field form-field--full"
-        >
-
-            <label
-                for="description"
-                class="form-field__label"
-            >
-                معرفی پژوهشکده
-            </label>
-
-            <textarea
-                id="description"
-                name="description"
-                class="form-field__textarea"
-                rows="8"
-            ><?= View::escape(
-                $center['description'] ?? ''
-            ) ?></textarea>
-
-        </div>
-
-
-        <div class="form-field">
-
-            <label
-                for="email"
-                class="form-field__label"
-            >
+            <label for="email">
                 ایمیل
             </label>
 
@@ -219,21 +149,22 @@ $submitLabel =
                 id="email"
                 name="email"
                 type="email"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $center['email'] ?? ''
+                    $center['email']
+                    ?? ''
                 ) ?>"
+                dir="ltr"
+                placeholder="research@sadra.ac.ir"
             >
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Phone -->
 
-            <label
-                for="phone"
-                class="form-field__label"
-            >
+        <div class="research-admin-form__field">
+
+            <label for="phone">
                 تلفن
             </label>
 
@@ -241,118 +172,104 @@ $submitLabel =
                 id="phone"
                 name="phone"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $center['phone'] ?? ''
+                    $center['phone']
+                    ?? ''
                 ) ?>"
+                dir="ltr"
+                placeholder="021..."
             >
 
         </div>
 
 
-        <div class="form-field">
-
-            <label
-                for="website"
-                class="form-field__label"
-            >
-                وب‌سایت
-            </label>
-
-            <input
-                id="website"
-                name="website"
-                type="url"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $center['website'] ?? ''
-                ) ?>"
-                placeholder="https://example.com"
-            >
-
-        </div>
-
-
-        <div class="form-field">
-
-            <label
-                for="sort_order"
-                class="form-field__label"
-            >
-                ترتیب
-            </label>
-
-            <input
-                id="sort_order"
-                name="sort_order"
-                type="number"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $center['sort_order'] ?? 0
-                ) ?>"
-            >
-
-        </div>
-
+        <!-- Description -->
 
         <div
-            class="form-field form-field--full"
+            class="
+                research-admin-form__field
+                research-admin-form__field--full
+            "
         >
 
-            <label
-                for="address"
-                class="form-field__label"
-            >
+            <label for="description">
+                معرفی پژوهشکده
+            </label>
+
+            <textarea
+                id="description"
+                name="description"
+                rows="9"
+                placeholder="معرفی پژوهشکده، زمینه‌های فعالیت، اهداف و حوزه‌های پژوهشی..."
+            ><?= View::escape(
+                $center['description']
+                ?? ''
+            ) ?></textarea>
+
+        </div>
+
+
+        <!-- Address -->
+
+        <div
+            class="
+                research-admin-form__field
+                research-admin-form__field--full
+            "
+        >
+
+            <label for="address">
                 آدرس
             </label>
 
             <textarea
                 id="address"
                 name="address"
-                class="form-field__textarea"
                 rows="4"
+                placeholder="آدرس محل پژوهشکده..."
             ><?= View::escape(
-                $center['address'] ?? ''
+                $center['address']
+                ?? ''
             ) ?></textarea>
 
         </div>
 
 
-        <div
-            class="form-field form-field--full"
-        >
+        <!-- Sort order -->
 
-            <label
-                for="image"
-                class="form-field__label"
-            >
-                تصویر
+        <div class="research-admin-form__field">
+
+            <label for="sort_order">
+                ترتیب نمایش
             </label>
 
             <input
-                id="image"
-                name="image"
-                type="text"
-                class="form-field__input"
+                id="sort_order"
+                name="sort_order"
+                type="number"
+                min="0"
                 value="<?= View::escape(
-                    $center['image'] ?? ''
+                    $center['sort_order']
+                    ?? 0
                 ) ?>"
-                placeholder="/media/..."
             >
+
+            <small>
+                عدد کمتر، نمایش بالاتر.
+            </small>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Status -->
 
-            <label
-                style="
-                    display:flex;
-                    align-items:center;
-                    gap:8px;
-                    min-height:46px;
-                "
-            >
+        <div class="research-admin-form__field">
+
+            <label>
+                وضعیت
+            </label>
+
+            <label class="research-admin-form__switch">
 
                 <input
                     type="checkbox"
@@ -369,7 +286,24 @@ $submitLabel =
                     ?>
                 >
 
-                پژوهشکده فعال باشد
+                <span
+                    class="research-admin-form__switch-track"
+                    aria-hidden="true"
+                >
+                    <span></span>
+                </span>
+
+                <span class="research-admin-form__switch-copy">
+
+                    <strong>
+                        پژوهشکده فعال باشد
+                    </strong>
+
+                    <small>
+                        پژوهشکده‌های فعال در سایت عمومی نمایش داده می‌شوند.
+                    </small>
+
+                </span>
 
             </label>
 
@@ -378,25 +312,32 @@ $submitLabel =
     </div>
 
 
-    <div class="admin-form__actions">
-
-        <button
-            type="submit"
-            class="button button--primary"
-        >
-            <?= View::escape(
-                $submitLabel
-            ) ?>
-        </button>
+    <div class="research-admin-form__actions">
 
         <a
             href="<?= View::route(
                 'admin.research-centers.index'
             ) ?>"
-            class="button button--secondary"
+            class="
+                research-admin-form__button
+                research-admin-form__button--secondary
+            "
         >
             انصراف
         </a>
+
+
+        <button
+            type="submit"
+            class="
+                research-admin-form__button
+                research-admin-form__button--primary
+            "
+        >
+            <?= View::escape(
+                $submitLabel
+            ) ?>
+        </button>
 
     </div>
 

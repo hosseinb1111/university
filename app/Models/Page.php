@@ -24,18 +24,20 @@ final class Page
         int $page = 1,
         int $perPage = 20
     ): array {
-        $page = max(
-            1,
-            $page
-        );
+        $page =
+            max(
+                1,
+                $page
+            );
 
-        $perPage = max(
-            1,
-            min(
-                $perPage,
-                100
-            )
-        );
+        $perPage =
+            max(
+                1,
+                min(
+                    $perPage,
+                    100
+                )
+            );
 
         $offset =
             ($page - 1)
@@ -581,13 +583,15 @@ final class Page
         if (
             $slug === ''
         ) {
-            $slug = 'page';
+            $slug =
+                'page';
         }
 
         $baseSlug =
             $slug;
 
-        $counter = 2;
+        $counter =
+            2;
 
         while (
             self::slugExists(

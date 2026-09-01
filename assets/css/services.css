@@ -1,0 +1,831 @@
+/* ==========================================================================
+   Sadra University - Services / Institution Cards
+   RTL / Persian
+   ========================================================================== */
+
+
+/* ==========================================================================
+   Services grid
+   ========================================================================== */
+
+.services-grid,
+.institution-grid {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        18px;
+
+    align-items:
+        stretch;
+}
+
+
+/* ==========================================================================
+   Service card
+   ========================================================================== */
+
+.institution-card {
+    position:
+        relative;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    min-width:
+        0;
+
+    min-height:
+        100%;
+
+    padding:
+        22px;
+
+    overflow:
+        hidden;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius:
+        var(--admin-radius-lg);
+
+    box-shadow:
+        var(--admin-shadow-xs);
+
+    transition:
+        transform 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        background-color 0.22s ease;
+}
+
+
+.institution-card::before {
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        0;
+
+    right:
+        0;
+
+    left:
+        0;
+
+    height:
+        3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--admin-primary),
+            #60a5fa
+        );
+
+    opacity:
+        0.85;
+}
+
+
+.institution-card:hover {
+    transform:
+        translateY(
+            -4px
+        );
+
+    border-color:
+        #cfe0fb;
+
+    box-shadow:
+        var(--admin-shadow-md);
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #fbfdff
+        );
+}
+
+
+/* ==========================================================================
+   Service icon
+   ========================================================================== */
+
+.institution-card__icon {
+    width:
+        50px;
+
+    height:
+        50px;
+
+    flex:
+        0
+        0
+        50px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        17px;
+
+    background:
+        var(--admin-primary-soft);
+
+    border:
+        1px solid
+        #dbeafe;
+
+    border-radius:
+        15px;
+
+    color:
+        var(--admin-primary);
+
+    font-size:
+        21px;
+
+    box-shadow:
+        0
+        5px
+        14px
+        rgba(
+            37,
+            99,
+            235,
+            0.07
+        );
+}
+
+
+/* ==========================================================================
+   Service title
+   ========================================================================== */
+
+.institution-card__title {
+    margin:
+        0;
+
+    color:
+        var(--admin-text);
+
+    font-size:
+        16px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.5;
+
+    letter-spacing:
+        -0.015em;
+
+    overflow-wrap:
+        anywhere;
+}
+
+
+.institution-card__title a {
+    color:
+        inherit;
+
+    text-decoration:
+        none;
+}
+
+
+.institution-card__title a:hover {
+    color:
+        var(--admin-primary);
+}
+
+
+/* ==========================================================================
+   Service description
+   ========================================================================== */
+
+.institution-card__description {
+    margin:
+        8px
+        0
+        0;
+
+    color:
+        var(--admin-muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.95;
+
+    overflow-wrap:
+        anywhere;
+}
+
+
+.institution-card__description:last-child {
+    margin-bottom:
+        0;
+}
+
+
+/* ==========================================================================
+   Service metadata
+   ========================================================================== */
+
+.institution-card__meta {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        7px;
+
+    margin-top:
+        17px;
+}
+
+
+.institution-card__meta-item {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    min-height:
+        27px;
+
+    padding:
+        5px
+        9px;
+
+    background:
+        var(--admin-surface-soft);
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius:
+        999px;
+
+    color:
+        var(--admin-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        600;
+
+    line-height:
+        1.3;
+}
+
+
+/* ==========================================================================
+   Service footer
+   ========================================================================== */
+
+.institution-card__footer {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    margin-top:
+        auto;
+
+    padding-top:
+        20px;
+}
+
+
+.institution-card__link {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        6px;
+
+    min-height:
+        36px;
+
+    padding:
+        7px
+        12px;
+
+    background:
+        var(--admin-primary-soft);
+
+    border:
+        1px solid
+        #dbeafe;
+
+    border-radius:
+        10px;
+
+    color:
+        var(--admin-primary);
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+
+.institution-card__link:hover {
+    background:
+        #dbeafe;
+
+    border-color:
+        #bfdbfe;
+
+    color:
+        var(--admin-primary-hover);
+
+    transform:
+        translateY(
+            -1px
+        );
+
+    box-shadow:
+        0
+        5px
+        12px
+        rgba(
+            37,
+            99,
+            235,
+            0.08
+        );
+}
+
+
+.institution-card__arrow {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        13px;
+
+    line-height:
+        1;
+
+    transition:
+        transform 0.18s ease;
+}
+
+
+.institution-card__link:hover
+.institution-card__arrow {
+    transform:
+        translateX(
+            -2px
+        );
+}
+
+
+/* ==========================================================================
+   Featured service
+   ========================================================================== */
+
+.institution-card--featured {
+    background:
+        linear-gradient(
+            145deg,
+            #f8fbff,
+            #ffffff
+        );
+
+    border-color:
+        #cfe0fb;
+}
+
+
+.institution-card--featured
+.institution-card__icon {
+    background:
+        linear-gradient(
+            145deg,
+            #eff6ff,
+            #dbeafe
+        );
+
+    border-color:
+        #bfdbfe;
+}
+
+
+/* ==========================================================================
+   Disabled service
+   ========================================================================== */
+
+.institution-card--disabled {
+    opacity:
+        0.68;
+
+    box-shadow:
+        none;
+}
+
+
+.institution-card--disabled:hover {
+    transform:
+        none;
+
+    border-color:
+        var(--admin-border);
+
+    box-shadow:
+        none;
+}
+
+
+.institution-card--disabled
+.institution-card__link {
+    background:
+        #f1f5f9;
+
+    border-color:
+        var(--admin-border);
+
+    color:
+        var(--admin-muted);
+}
+
+
+/* ==========================================================================
+   Service list
+   ========================================================================== */
+
+.services-list {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        10px;
+}
+
+
+.services-list__item {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    padding:
+        14px
+        16px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius:
+        var(--admin-radius-md);
+
+    transition:
+        border-color 0.18s ease,
+        background 0.18s ease,
+        transform 0.18s ease;
+}
+
+
+.services-list__item:hover {
+    background:
+        #fbfdff;
+
+    border-color:
+        #cfe0fb;
+
+    transform:
+        translateX(
+            -2px
+        );
+}
+
+
+.services-list__item-title {
+    min-width:
+        0;
+
+    color:
+        var(--admin-text);
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+.services-list__item-description {
+    min-width:
+        0;
+
+    margin-top:
+        2px;
+
+    color:
+        var(--admin-muted);
+
+    font-size:
+        10px;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+/* ==========================================================================
+   Empty services state
+   ========================================================================== */
+
+.services-empty {
+    padding:
+        55px
+        24px;
+
+    text-align:
+        center;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius:
+        var(--admin-radius-lg);
+}
+
+
+.services-empty__icon {
+    width:
+        56px;
+
+    height:
+        56px;
+
+    margin:
+        0
+        auto
+        13px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        var(--admin-surface-soft);
+
+    border:
+        1px solid
+        var(--admin-border);
+
+    border-radius:
+        16px;
+
+    color:
+        var(--admin-muted);
+
+    font-size:
+        24px;
+}
+
+
+.services-empty h2 {
+    margin:
+        0;
+
+    color:
+        var(--admin-text);
+
+    font-size:
+        17px;
+
+    font-weight:
+        800;
+}
+
+
+.services-empty p {
+    margin:
+        7px
+        0
+        0;
+
+    color:
+        var(--admin-muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.8;
+}
+
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 1050px) {
+
+    .services-grid,
+    .institution-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .services-grid,
+    .institution-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .institution-card {
+        padding:
+            19px;
+    }
+
+
+    .institution-card__footer {
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+    }
+
+
+    .institution-card__link {
+        width:
+            100%;
+    }
+
+
+    .services-list__item {
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+    }
+
+}
+
+
+@media (max-width: 430px) {
+
+    .institution-card {
+        padding:
+            17px;
+    }
+
+
+    .institution-card__icon {
+        width:
+            46px;
+
+        height:
+            46px;
+
+        flex-basis:
+            46px;
+
+        border-radius:
+            13px;
+
+        font-size:
+            19px;
+    }
+
+
+    .institution-card__title {
+        font-size:
+            15px;
+    }
+
+
+    .institution-card__description {
+        font-size:
+            11px;
+    }
+
+}

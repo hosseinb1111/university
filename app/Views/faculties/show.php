@@ -281,15 +281,18 @@ $facultySlug =
                                 ): ?>
 
                                     <img
-                                        src="<?= View::escape(
-                                            (string) $person['image']
-                                        ) ?>"
-                                        alt="<?= View::escape(
-                                            $name
-                                        ) ?>"
-                                        loading="lazy"
-                                    >
-
+    src="<?= View::url(
+        '/'
+        . ltrim(
+            (string) $person['image'],
+            '/'
+        )
+    ) ?>"
+    alt="<?= View::escape(
+        $name
+    ) ?>"
+    loading="lazy"
+>
                                 <?php else: ?>
 
                                     <span>

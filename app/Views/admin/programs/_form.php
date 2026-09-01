@@ -2,66 +2,103 @@
 
 declare(strict_types=1);
 
-$program = $program ?? [];
+use App\Core\Csrf;
+use App\Core\View;
 
-$faculties = $faculties ?? [];
+$program =
+    is_array($program ?? null)
+        ? $program
+        : [];
 
-$errors = $errors ?? [];
+$faculties =
+    is_array($faculties ?? null)
+        ? $faculties
+        : [];
 
-$action = $action ?? '';
+$errors =
+    is_array($errors ?? null)
+        ? $errors
+        : [];
 
-$submitLabel = $submitLabel ?? 'ذخیره';
+$action =
+    is_string($action ?? null)
+        ? $action
+        : '';
+
+$submitLabel =
+    is_string($submitLabel ?? null)
+        ? $submitLabel
+        : 'ذخیره';
 ?>
 
 <form
     method="POST"
-    action="<?= View::escape($action) ?>"
-    class="admin-form"
+    action="<?= View::escape(
+        $action
+    ) ?>"
+    class="program-admin-form"
 >
 
-    <?= \App\Core\Csrf::field() ?>
+    <?= Csrf::field() ?>
 
 
-    <?php if ($errors !== []): ?>
+    <?php if (
+        $errors !== []
+    ): ?>
 
-        <div class="form-errors">
+        <div class="program-admin-form__errors">
 
-            <strong>
-                لطفاً موارد زیر را اصلاح کنید:
-            </strong>
+            <div
+                class="program-admin-form__errors-icon"
+                aria-hidden="true"
+            >
+                !
+            </div>
 
-            <ul>
+            <div>
 
-                <?php foreach ($errors as $error): ?>
+                <strong>
+                    لطفاً موارد زیر را اصلاح کنید.
+                </strong>
 
-                    <li>
-                        <?= View::escape($error) ?>
-                    </li>
+                <ul>
 
-                <?php endforeach; ?>
+                    <?php foreach (
+                        $errors as $message
+                    ): ?>
 
-            </ul>
+                        <li>
+                            <?= View::escape(
+                                (string) $message
+                            ) ?>
+                        </li>
+
+                    <?php endforeach; ?>
+
+                </ul>
+
+            </div>
 
         </div>
 
     <?php endif; ?>
 
 
-    <div class="form-grid">
+    <div class="program-admin-form__grid">
 
-        <div class="form-field">
 
-            <label
-                for="faculty_id"
-                class="form-field__label"
-            >
+        <!-- Faculty -->
+
+        <div class="program-admin-form__field">
+
+            <label for="faculty_id">
                 دانشکده
+                <span>*</span>
             </label>
 
             <select
                 id="faculty_id"
                 name="faculty_id"
-                class="form-field__input"
                 required
             >
 
@@ -74,23 +111,34 @@ $submitLabel = $submitLabel ?? 'ذخیره';
                     as $faculty
                 ): ?>
 
+                    <?php
+
+                    $facultyId =
+                        (string) (
+                            $faculty['id']
+                            ?? ''
+                        );
+
+                    $selectedFaculty =
+                        (string) (
+                            $program['faculty_id']
+                            ?? ''
+                        );
+
+                    ?>
+
                     <option
-                        value="<?= (int) $faculty['id'] ?>"
-                        <?= (
-                            (string) (
-                                $program['faculty_id']
-                                ?? ''
-                            )
-                            === (string) (
-                                $faculty['id']
-                            )
-                        )
+                        value="<?= View::escape(
+                            $facultyId
+                        ) ?>"
+                        <?= $facultyId === $selectedFaculty
                             ? 'selected'
                             : ''
                         ?>
                     >
                         <?= View::escape(
                             $faculty['name']
+                            ?? 'دانشکده'
                         ) ?>
                     </option>
 
@@ -98,86 +146,156 @@ $submitLabel = $submitLabel ?? 'ذخیره';
 
             </select>
 
+            <?php if (
+                isset(
+                    $errors['faculty_id']
+                )
+            ): ?>
+
+                <small class="program-admin-form__error">
+                    <?= View::escape(
+                        $errors['faculty_id']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
+
         </div>
 
 
-        <div class="form-field">
+        <!-- Program name -->
 
-            <label
-                for="name"
-                class="form-field__label"
-            >
+        <div class="program-admin-form__field">
+
+            <label for="name">
                 نام برنامه
+                <span>*</span>
             </label>
 
             <input
                 id="name"
                 name="name"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $program['name'] ?? ''
+                    $program['name']
+                    ?? ''
                 ) ?>"
                 maxlength="255"
                 required
+                placeholder="مثلاً مهندسی کامپیوتر"
             >
+
+            <?php if (
+                isset(
+                    $errors['name']
+                )
+            ): ?>
+
+                <small class="program-admin-form__error">
+                    <?= View::escape(
+                        $errors['name']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Slug -->
 
-            <label
-                for="slug"
-                class="form-field__label"
-            >
-                آدرس
+        <div class="program-admin-form__field">
+
+            <label for="slug">
+                شناسه URL
             </label>
 
-            <input
-                id="slug"
-                name="slug"
-                type="text"
-                class="form-field__input"
-                value="<?= View::escape(
-                    $program['slug'] ?? ''
-                ) ?>"
-                placeholder="computer-engineering-bsc"
-                required
-            >
+            <div class="program-admin-form__input-prefix">
+
+                <span dir="ltr">
+                    /programs/
+                </span>
+
+                <input
+                    id="slug"
+                    name="slug"
+                    type="text"
+                    value="<?= View::escape(
+                        $program['slug']
+                        ?? ''
+                    ) ?>"
+                    maxlength="255"
+                    dir="ltr"
+                    placeholder="computer-engineering-bsc"
+                >
+
+            </div>
+
+            <?php if (
+                isset(
+                    $errors['slug']
+                )
+            ): ?>
+
+                <small class="program-admin-form__error">
+                    <?= View::escape(
+                        $errors['slug']
+                    ) ?>
+                </small>
+
+            <?php else: ?>
+
+                <small>
+                    در صورت خالی بودن، شناسه به‌صورت خودکار ساخته می‌شود.
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Degree -->
 
-            <label
-                for="degree"
-                class="form-field__label"
-            >
-                مقطع
+        <div class="program-admin-form__field">
+
+            <label for="degree">
+                مقطع تحصیلی
             </label>
 
             <input
                 id="degree"
                 name="degree"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $program['degree'] ?? ''
+                    $program['degree']
+                    ?? ''
                 ) ?>"
-                placeholder="کارشناسی"
+                maxlength="100"
+                placeholder="مثلاً کارشناسی"
             >
+
+            <?php if (
+                isset(
+                    $errors['degree']
+                )
+            ): ?>
+
+                <small class="program-admin-form__error">
+                    <?= View::escape(
+                        $errors['degree']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Field -->
 
-            <label
-                for="field"
-                class="form-field__label"
-            >
+        <div class="program-admin-form__field">
+
+            <label for="field">
                 گرایش
             </label>
 
@@ -185,21 +303,36 @@ $submitLabel = $submitLabel ?? 'ذخیره';
                 id="field"
                 name="field"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $program['field'] ?? ''
+                    $program['field']
+                    ?? ''
                 ) ?>"
+                maxlength="255"
+                placeholder="مثلاً نرم‌افزار"
             >
+
+            <?php if (
+                isset(
+                    $errors['field']
+                )
+            ): ?>
+
+                <small class="program-admin-form__error">
+                    <?= View::escape(
+                        $errors['field']
+                    ) ?>
+                </small>
+
+            <?php endif; ?>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Duration -->
 
-            <label
-                for="duration"
-                class="form-field__label"
-            >
+        <div class="program-admin-form__field">
+
+            <label for="duration">
                 مدت تحصیل
             </label>
 
@@ -207,117 +340,129 @@ $submitLabel = $submitLabel ?? 'ذخیره';
                 id="duration"
                 name="duration"
                 type="text"
-                class="form-field__input"
                 value="<?= View::escape(
-                    $program['duration'] ?? ''
+                    $program['duration']
+                    ?? ''
                 ) ?>"
-                placeholder="۴ سال"
+                placeholder="مثلاً ۴ سال"
             >
 
         </div>
 
 
+        <!-- Description -->
+
         <div
-            class="form-field form-field--full"
+            class="
+                program-admin-form__field
+                program-admin-form__field--full
+            "
         >
 
-            <label
-                for="description"
-                class="form-field__label"
-            >
+            <label for="description">
                 معرفی برنامه
             </label>
 
             <textarea
                 id="description"
                 name="description"
-                class="form-field__textarea"
-                rows="6"
+                rows="7"
+                placeholder="توضیحی درباره برنامه، اهداف آموزشی و محتوای آن بنویسید."
             ><?= View::escape(
-                $program['description'] ?? ''
+                $program['description']
+                ?? ''
             ) ?></textarea>
 
         </div>
 
 
+        <!-- Admission -->
+
         <div
-            class="form-field form-field--full"
+            class="
+                program-admin-form__field
+                program-admin-form__field--full
+            "
         >
 
-            <label
-                for="admission_info"
-                class="form-field__label"
-            >
+            <label for="admission_info">
                 اطلاعات پذیرش
             </label>
 
             <textarea
                 id="admission_info"
                 name="admission_info"
-                class="form-field__textarea"
-                rows="6"
+                rows="7"
+                placeholder="شرایط و توضیحات مربوط به پذیرش دانشجو."
             ><?= View::escape(
-                $program['admission_info'] ?? ''
+                $program['admission_info']
+                ?? ''
             ) ?></textarea>
 
         </div>
 
 
+        <!-- Curriculum -->
+
         <div
-            class="form-field form-field--full"
+            class="
+                program-admin-form__field
+                program-admin-form__field--full
+            "
         >
 
-            <label
-                for="curriculum"
-                class="form-field__label"
-            >
+            <label for="curriculum">
                 برنامه درسی
             </label>
 
             <textarea
                 id="curriculum"
                 name="curriculum"
-                class="form-field__textarea"
-                rows="8"
+                rows="9"
+                placeholder="واحدها، دروس یا توضیحات برنامه درسی را وارد کنید."
             ><?= View::escape(
-                $program['curriculum'] ?? ''
+                $program['curriculum']
+                ?? ''
             ) ?></textarea>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Sort order -->
 
-            <label
-                for="sort_order"
-                class="form-field__label"
-            >
-                ترتیب
+        <div class="program-admin-form__field">
+
+            <label for="sort_order">
+                ترتیب نمایش
             </label>
 
             <input
                 id="sort_order"
                 name="sort_order"
                 type="number"
-                class="form-field__input"
+                min="0"
                 value="<?= View::escape(
-                    $program['sort_order'] ?? 0
+                    $program['sort_order']
+                    ?? 0
                 ) ?>"
             >
+
+            <small>
+                عدد کمتر، جایگاه بالاتری خواهد داشت.
+            </small>
 
         </div>
 
 
-        <div class="form-field">
+        <!-- Active -->
 
-            <label
-                style="
-                    display:flex;
-                    align-items:center;
-                    gap:8px;
-                    min-height:46px;
-                "
-            >
+        <div class="program-admin-form__field">
+
+            <label>
+                وضعیت برنامه
+            </label>
+
+            <label class="program-admin-form__switch">
 
                 <input
                     type="checkbox"
@@ -334,7 +479,24 @@ $submitLabel = $submitLabel ?? 'ذخیره';
                     ?>
                 >
 
-                برنامه فعال باشد
+                <span
+                    class="program-admin-form__switch-track"
+                    aria-hidden="true"
+                >
+                    <span></span>
+                </span>
+
+                <span class="program-admin-form__switch-text">
+
+                    <strong>
+                        برنامه فعال باشد
+                    </strong>
+
+                    <small>
+                        برنامه‌های فعال در سایت عمومی نمایش داده می‌شوند.
+                    </small>
+
+                </span>
 
             </label>
 
@@ -343,25 +505,26 @@ $submitLabel = $submitLabel ?? 'ذخیره';
     </div>
 
 
-    <div class="admin-form__actions">
-
-        <button
-            type="submit"
-            class="button button--primary"
-        >
-            <?= View::escape(
-                $submitLabel
-            ) ?>
-        </button>
+    <div class="program-admin-form__actions">
 
         <a
             href="<?= View::route(
                 'admin.programs.index'
             ) ?>"
-            class="button button--secondary"
+            class="program-admin-form__button program-admin-form__button--secondary"
         >
             انصراف
         </a>
+
+
+        <button
+            type="submit"
+            class="program-admin-form__button program-admin-form__button--primary"
+        >
+            <?= View::escape(
+                $submitLabel
+            ) ?>
+        </button>
 
     </div>
 

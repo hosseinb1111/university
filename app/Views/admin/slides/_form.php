@@ -33,13 +33,6 @@ $submitLabel =
         ? $submitLabel
         : 'ذخیره';
 
-$mediaItems =
-    is_array(
-        $mediaItems ?? null
-    )
-        ? $mediaItems
-        : [];
-
 
 /*
 |--------------------------------------------------------------------------
@@ -106,57 +99,6 @@ $isActive =
     ) === 1;
 
 
-/*
-|--------------------------------------------------------------------------
-| Datetime formatter
-|--------------------------------------------------------------------------
-*/
-
-$formatDateTime =
-    static function (
-        mixed $value
-    ): string {
-        if (
-            !is_string(
-                $value
-            )
-            || trim(
-                $value
-            ) === ''
-        ) {
-            return '';
-        }
-
-        $timestamp =
-            strtotime(
-                $value
-            );
-
-        if (
-            $timestamp === false
-        ) {
-            return '';
-        }
-
-        return date(
-            'Y-m-d\TH:i',
-            $timestamp
-        );
-    };
-
-
-$startsAt =
-    $formatDateTime(
-        $slide['starts_at']
-        ?? ''
-    );
-
-$endsAt =
-    $formatDateTime(
-        $slide['ends_at']
-        ?? ''
-    );
-
 ?>
 
 <form
@@ -165,6 +107,7 @@ $endsAt =
         $action
     ) ?>"
     class="admin-form"
+    enctype="multipart/form-data"
 >
 
     <?= Csrf::field() ?>
@@ -226,7 +169,7 @@ $endsAt =
             <label
                 for="title"
             >
-                عنوان *
+                عنوان (اختیاری)
             </label>
 
             <input
@@ -237,7 +180,6 @@ $endsAt =
                     $title
                 ) ?>"
                 maxlength="255"
-                required
                 autofocus
             >
 
@@ -382,7 +324,7 @@ $endsAt =
 
 
         <!-- =================================================
-             Desktop image
+             Desktop image (direct upload)
         ================================================== -->
 
         <div
@@ -398,87 +340,43 @@ $endsAt =
                 تصویر اصلی
             </label>
 
-
-            <select
-                id="image"
-                name="image"
+            <div
+                class="admin-dropzone"
+                id="image-dropzone"
+                tabindex="0"
+                role="button"
+                aria-describedby="image-dropzone-hint"
             >
 
-                <option value="">
-                    بدون تصویر
-                </option>
+                <input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                    class="admin-dropzone__input"
+                >
 
+                <div class="admin-dropzone__body">
 
-                <?php foreach (
-                    $mediaItems
-                    as $media
-                ): ?>
+                    <span class="admin-dropzone__icon" aria-hidden="true">
+                        📁
+                    </span>
 
-                    <?php
-                    $mediaPath =
-                        trim(
-                            (string) (
-                                $media['public_url']
-                                ?? $media['url']
-                                ?? ''
-                            )
-                        );
+                    <span class="admin-dropzone__text">
+                        تصویر را اینجا رها کنید، یا برای انتخاب فایل کلیک کنید
+                    </span>
 
-                    $mediaName =
-                        (string) (
-                            $media['original_name']
-                            ?? $media['file_name']
-                            ?? 'تصویر'
-                        );
+                    <span
+                        class="admin-dropzone__filename"
+                        id="image-filename"
+                    ></span>
 
-                    $mediaMime =
-                        strtolower(
-                            (string) (
-                                $media['mime_type']
-                                ?? ''
-                            )
-                        );
-                    ?>
+                </div>
 
-                    <?php if (
-                        $mediaPath !== ''
-                        && str_starts_with(
-                            $mediaMime,
-                            'image/'
-                        )
-                    ): ?>
-
-                        <option
-                            value="<?= View::escape(
-                                $mediaPath
-                            ) ?>"
-                            <?= $image === $mediaPath
-                                ? 'selected'
-                                : ''
-                            ?>
-                        >
-                            <?= View::escape(
-                                $mediaName
-                            ) ?>
-                        </option>
-
-                    <?php endif; ?>
-
-                <?php endforeach; ?>
-
-            </select>
-
-
-            <small>
-                تصاویر را ابتدا از کتابخانه رسانه آپلود کنید.
-            </small>
-
-
-            <?php if (
-                $image !== ''
-            ): ?>
-
-                <div class="admin-image-preview">
+                <div
+                    class="admin-image-preview<?= $image === '' ? ' admin-image-preview--empty' : '' ?>"
+                    id="image-preview-wrap"
+                >
 
                     <img
                         src="<?= View::escape(
@@ -486,17 +384,27 @@ $endsAt =
                         ) ?>"
                         alt=""
                         loading="lazy"
+                        id="image-preview"
                     >
 
                 </div>
 
-            <?php endif; ?>
+            </div>
+
+            <small id="image-dropzone-hint">
+                فرمت مجاز: jpg، png، webp — حداکثر ۵ مگابایت.
+                <?php if (
+                    $image !== ''
+                ): ?>
+                    برای حفظ تصویر فعلی، این فیلد را خالی بگذارید.
+                <?php endif; ?>
+            </small>
 
         </div>
 
 
         <!-- =================================================
-             Mobile image
+             Mobile image (direct upload)
         ================================================== -->
 
         <div
@@ -512,87 +420,43 @@ $endsAt =
                 تصویر موبایل
             </label>
 
-
-            <select
-                id="mobile_image"
-                name="mobile_image"
+            <div
+                class="admin-dropzone"
+                id="mobile_image-dropzone"
+                tabindex="0"
+                role="button"
+                aria-describedby="mobile_image-dropzone-hint"
             >
 
-                <option value="">
-                    استفاده از تصویر اصلی
-                </option>
+                <input
+                    type="file"
+                    id="mobile_image"
+                    name="mobile_image"
+                    accept="image/*"
+                    class="admin-dropzone__input"
+                >
 
+                <div class="admin-dropzone__body">
 
-                <?php foreach (
-                    $mediaItems
-                    as $media
-                ): ?>
+                    <span class="admin-dropzone__icon" aria-hidden="true">
+                        📁
+                    </span>
 
-                    <?php
-                    $mediaPath =
-                        trim(
-                            (string) (
-                                $media['public_url']
-                                ?? $media['url']
-                                ?? ''
-                            )
-                        );
+                    <span class="admin-dropzone__text">
+                        تصویر را اینجا رها کنید، یا برای انتخاب فایل کلیک کنید
+                    </span>
 
-                    $mediaName =
-                        (string) (
-                            $media['original_name']
-                            ?? $media['file_name']
-                            ?? 'تصویر'
-                        );
+                    <span
+                        class="admin-dropzone__filename"
+                        id="mobile_image-filename"
+                    ></span>
 
-                    $mediaMime =
-                        strtolower(
-                            (string) (
-                                $media['mime_type']
-                                ?? ''
-                            )
-                        );
-                    ?>
+                </div>
 
-                    <?php if (
-                        $mediaPath !== ''
-                        && str_starts_with(
-                            $mediaMime,
-                            'image/'
-                        )
-                    ): ?>
-
-                        <option
-                            value="<?= View::escape(
-                                $mediaPath
-                            ) ?>"
-                            <?= $mobileImage === $mediaPath
-                                ? 'selected'
-                                : ''
-                            ?>
-                        >
-                            <?= View::escape(
-                                $mediaName
-                            ) ?>
-                        </option>
-
-                    <?php endif; ?>
-
-                <?php endforeach; ?>
-
-            </select>
-
-
-            <small>
-                اختیاری؛ برای موبایل می‌توانید تصویر متفاوتی انتخاب کنید.
-            </small>
-
-
-            <?php if (
-                $mobileImage !== ''
-            ): ?>
-
-                <div class="admin-image-preview">
+                <div
+                    class="admin-image-preview<?= $mobileImage === '' ? ' admin-image-preview--empty' : '' ?>"
+                    id="mobile_image-preview-wrap"
+                >
 
                     <img
                         src="<?= View::escape(
@@ -600,66 +464,20 @@ $endsAt =
                         ) ?>"
                         alt=""
                         loading="lazy"
+                        id="mobile_image-preview"
                     >
 
                 </div>
 
-            <?php endif; ?>
+            </div>
 
-        </div>
-
-
-        <!-- =================================================
-             Start date
-        ================================================== -->
-
-        <div class="admin-form__field">
-
-            <label
-                for="starts_at"
-            >
-                شروع نمایش
-            </label>
-
-            <input
-                id="starts_at"
-                name="starts_at"
-                type="datetime-local"
-                value="<?= View::escape(
-                    $startsAt
-                ) ?>"
-            >
-
-            <small>
-                خالی = نمایش بدون شروع زمان‌بندی‌شده.
-            </small>
-
-        </div>
-
-
-        <!-- =================================================
-             End date
-        ================================================== -->
-
-        <div class="admin-form__field">
-
-            <label
-                for="ends_at"
-            >
-                پایان نمایش
-            </label>
-
-            <input
-                id="ends_at"
-                name="ends_at"
-                type="datetime-local"
-                value="<?= View::escape(
-                    $endsAt
-                ) ?>"
-            >
-
-            <small>
-                خالی = بدون پایان زمان‌بندی‌شده.
+            <small id="mobile_image-dropzone-hint">
+                اختیاری؛ در صورت خالی بودن، تصویر اصلی استفاده می‌شود.
+                <?php if (
+                    $mobileImage !== ''
+                ): ?>
+                    برای حفظ تصویر فعلی، این فیلد را خالی بگذارید.
+                <?php endif; ?>
             </small>
 
         </div>
@@ -723,3 +541,186 @@ $endsAt =
     </div>
 
 </form>
+
+
+<style>
+.admin-dropzone {
+    position: relative;
+    display: block;
+    border: 2px dashed var(--admin-border-color, #d0d5dd);
+    border-radius: 8px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+}
+
+.admin-dropzone:hover,
+.admin-dropzone:focus-visible {
+    border-color: var(--admin-primary-color, #2563eb);
+    outline: none;
+}
+
+.admin-dropzone.is-dragover {
+    border-color: var(--admin-primary-color, #2563eb);
+    background-color: rgba(37, 99, 235, .05);
+}
+
+.admin-dropzone__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.admin-dropzone__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+}
+
+.admin-dropzone__icon {
+    font-size: 24px;
+}
+
+.admin-dropzone__filename {
+    font-size: 13px;
+    color: var(--admin-primary-color, #2563eb);
+    word-break: break-all;
+}
+
+.admin-image-preview {
+    margin-top: 12px;
+    pointer-events: none;
+}
+
+.admin-image-preview--empty {
+    display: none;
+}
+
+.admin-image-preview img {
+    max-width: 220px;
+    max-height: 140px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+</style>
+
+
+<script>
+(function () {
+    function bindDropzone(inputId, zoneId, wrapId, imgId, filenameId) {
+        var input = document.getElementById(inputId);
+        var zone = document.getElementById(zoneId);
+
+        if (!input || !zone) {
+            return;
+        }
+
+        function showFile(file) {
+            if (!file) {
+                return;
+            }
+
+            var img = document.getElementById(imgId);
+            var wrap = document.getElementById(wrapId);
+
+            if (!img) {
+                wrap = document.createElement('div');
+                wrap.className = 'admin-image-preview';
+                wrap.id = wrapId;
+
+                img = document.createElement('img');
+                img.id = imgId;
+                img.alt = '';
+                img.loading = 'lazy';
+
+                wrap.appendChild(img);
+                zone.appendChild(wrap);
+            }
+
+            wrap.classList.remove('admin-image-preview--empty');
+            img.src = URL.createObjectURL(file);
+
+            var filenameEl = document.getElementById(filenameId);
+
+            if (filenameEl) {
+                filenameEl.textContent = file.name;
+            }
+        }
+
+        /*
+         * Click-to-browse / manual selection.
+         */
+        input.addEventListener('change', function (event) {
+            showFile(event.target.files[0]);
+        });
+
+        /*
+         * Keyboard access (Enter / Space) since the input itself
+         * is transparent and stretched over the whole dropzone.
+         */
+        zone.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                input.click();
+            }
+        });
+
+        /*
+         * Drag and drop.
+         */
+        ['dragenter', 'dragover'].forEach(function (eventName) {
+            zone.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                zone.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'dragend'].forEach(function (eventName) {
+            zone.addEventListener(eventName, function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                zone.classList.remove('is-dragover');
+            });
+        });
+
+        zone.addEventListener('drop', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            zone.classList.remove('is-dragover');
+
+            var files = event.dataTransfer ? event.dataTransfer.files : null;
+
+            if (!files || !files.length) {
+                return;
+            }
+
+            var file = files[0];
+
+            if (file.type.indexOf('image/') !== 0) {
+                return;
+            }
+
+            /*
+             * Assign the dropped file to the real <input type="file">
+             * so it submits with the form exactly like a manually
+             * chosen file would.
+             */
+            var dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            input.files = dataTransfer.files;
+
+            showFile(file);
+        });
+    }
+
+    bindDropzone('image', 'image-dropzone', 'image-preview-wrap', 'image-preview', 'image-filename');
+    bindDropzone('mobile_image', 'mobile_image-dropzone', 'mobile_image-preview-wrap', 'mobile_image-preview', 'mobile_image-filename');
+})();
+</script>

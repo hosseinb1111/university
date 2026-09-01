@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Core\Database;
 use PDO;
-use RuntimeException;
 
 final class People
 {
@@ -17,29 +16,31 @@ final class People
      */
     public static function active(): array
     {
-        $statement = Database::query(
-            '
-            SELECT
-                people.*,
+        $statement =
+            Database::query(
+                '
+                SELECT
+                    people.*,
 
-                faculties.name AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                faculties.slug AS faculty_slug
+                    faculties.slug AS faculty_slug
 
-            FROM people
+                FROM people
 
-            LEFT JOIN faculties
-                ON faculties.id = people.faculty_id
+                LEFT JOIN faculties
+                    ON faculties.id =
+                       people.faculty_id
 
-            WHERE people.is_active = 1
+                WHERE people.is_active = 1
 
-            ORDER BY
-                people.sort_order ASC,
-                people.last_name ASC,
-                people.first_name ASC,
-                people.id ASC
-            '
-        );
+                ORDER BY
+                    people.sort_order ASC,
+                    people.last_name ASC,
+                    people.first_name ASC,
+                    people.id ASC
+                '
+            );
 
         return $statement->fetchAll(
             PDO::FETCH_ASSOC
@@ -54,35 +55,37 @@ final class People
     public static function byFaculty(
         int $facultyId
     ): array {
-        $statement = Database::query(
-            '
-            SELECT
-                people.*,
+        $statement =
+            Database::query(
+                '
+                SELECT
+                    people.*,
 
-                faculties.name AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                faculties.slug AS faculty_slug
+                    faculties.slug AS faculty_slug
 
-            FROM people
+                FROM people
 
-            LEFT JOIN faculties
-                ON faculties.id = people.faculty_id
+                LEFT JOIN faculties
+                    ON faculties.id =
+                       people.faculty_id
 
-            WHERE people.faculty_id = :faculty_id
+                WHERE people.faculty_id = :faculty_id
 
-            AND people.is_active = 1
+                AND people.is_active = 1
 
-            ORDER BY
-                people.sort_order ASC,
-                people.last_name ASC,
-                people.first_name ASC,
-                people.id ASC
-            ',
-            [
-                ':faculty_id' =>
-                    $facultyId,
-            ]
-        );
+                ORDER BY
+                    people.sort_order ASC,
+                    people.last_name ASC,
+                    people.first_name ASC,
+                    people.id ASC
+                ',
+                [
+                    ':faculty_id' =>
+                        $facultyId,
+                ]
+            );
 
         return $statement->fetchAll(
             PDO::FETCH_ASSOC
@@ -97,33 +100,36 @@ final class People
     public static function find(
         int $id
     ): ?array {
-        $statement = Database::query(
-            '
-            SELECT
-                people.*,
+        $statement =
+            Database::query(
+                '
+                SELECT
+                    people.*,
 
-                faculties.name AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                faculties.slug AS faculty_slug
+                    faculties.slug AS faculty_slug
 
-            FROM people
+                FROM people
 
-            LEFT JOIN faculties
-                ON faculties.id = people.faculty_id
+                LEFT JOIN faculties
+                    ON faculties.id =
+                       people.faculty_id
 
-            WHERE people.id = :id
+                WHERE people.id = :id
 
-            LIMIT 1
-            ',
-            [
-                ':id' =>
-                    $id,
-            ]
-        );
+                LIMIT 1
+                ',
+                [
+                    ':id' =>
+                        $id,
+                ]
+            );
 
-        $person = $statement->fetch(
-            PDO::FETCH_ASSOC
-        );
+        $person =
+            $statement->fetch(
+                PDO::FETCH_ASSOC
+            );
 
         return $person === false
             ? null
@@ -138,35 +144,37 @@ final class People
     public static function findActive(
         int $id
     ): ?array {
-        $statement = Database::query(
-            '
-            SELECT
-                people.*,
+        $statement =
+            Database::query(
+                '
+                SELECT
+                    people.*,
 
-                faculties.name AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                faculties.slug AS faculty_slug
+                    faculties.slug AS faculty_slug
 
-            FROM people
+                FROM people
 
-            LEFT JOIN faculties
-                ON faculties.id = people.faculty_id
+                LEFT JOIN faculties
+                    ON faculties.id = people.faculty_id
 
-            WHERE people.id = :id
+                WHERE people.id = :id
 
-            AND people.is_active = 1
+                AND people.is_active = 1
 
-            LIMIT 1
-            ',
-            [
-                ':id' =>
-                    $id,
-            ]
-        );
+                LIMIT 1
+                ',
+                [
+                    ':id' =>
+                        $id,
+                ]
+            );
 
-        $person = $statement->fetch(
-            PDO::FETCH_ASSOC
-        );
+        $person =
+            $statement->fetch(
+                PDO::FETCH_ASSOC
+            );
 
         return $person === false
             ? null
@@ -188,18 +196,20 @@ final class People
         int $page = 1,
         int $perPage = 20
     ): array {
-        $page = max(
-            1,
-            $page
-        );
+        $page =
+            max(
+                1,
+                $page
+            );
 
-        $perPage = max(
-            1,
-            min(
-                $perPage,
-                100
-            )
-        );
+        $perPage =
+            max(
+                1,
+                min(
+                    $perPage,
+                    100
+                )
+            );
 
         $offset =
             ($page - 1)
@@ -225,11 +235,9 @@ final class People
                 SELECT
                     people.*,
 
-                    faculties.name
-                        AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                    faculties.slug
-                        AS faculty_slug
+                    faculties.slug AS faculty_slug
 
                 FROM people
 
@@ -296,11 +304,6 @@ final class People
         array $data,
         ?int $userId = null
     ): int {
-        /*
-         * The current people table has no created_by or
-         * updated_by columns, so $userId is intentionally
-         * not stored here.
-         */
         Database::query(
             '
             INSERT INTO people (
@@ -318,6 +321,7 @@ final class People
                 sort_order,
                 is_active
             )
+
             VALUES (
                 :user_id,
                 :faculty_id,
@@ -337,17 +341,19 @@ final class People
             [
                 ':user_id' =>
                     $data['user_id']
-                    ?? null,
+                    ?? $userId,
 
                 ':faculty_id' =>
                     $data['faculty_id']
                     ?? null,
 
                 ':first_name' =>
-                    $data['first_name'],
+                    $data['first_name']
+                    ?? '',
 
                 ':last_name' =>
-                    $data['last_name'],
+                    $data['last_name']
+                    ?? '',
 
                 ':position' =>
                     $data['position']
@@ -442,18 +448,24 @@ final class People
                     $id,
 
                 ':user_id' =>
-                    $data['user_id']
-                    ?? null,
+                    array_key_exists(
+                        'user_id',
+                        $data
+                    )
+                        ? $data['user_id']
+                        : $userId,
 
                 ':faculty_id' =>
                     $data['faculty_id']
                     ?? null,
 
                 ':first_name' =>
-                    $data['first_name'],
+                    $data['first_name']
+                    ?? '',
 
                 ':last_name' =>
-                    $data['last_name'],
+                    $data['last_name']
+                    ?? '',
 
                 ':position' =>
                     $data['position']
@@ -507,6 +519,7 @@ final class People
         return Database::execute(
             '
             DELETE FROM people
+
             WHERE id = :id
             ',
             [
@@ -525,6 +538,7 @@ final class People
             Database::query(
                 '
                 SELECT COUNT(*)
+
                 FROM people
 
                 WHERE is_active = 1
@@ -548,11 +562,9 @@ final class People
                 SELECT
                     people.*,
 
-                    faculties.name
-                        AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                    faculties.slug
-                        AS faculty_slug
+                    faculties.slug AS faculty_slug
 
                 FROM people
 
@@ -560,8 +572,7 @@ final class People
                     ON faculties.id =
                        people.faculty_id
 
-                WHERE people.user_id =
-                      :user_id
+                WHERE people.user_id = :user_id
 
                 ORDER BY
                     people.sort_order ASC,
@@ -579,7 +590,9 @@ final class People
     }
 
     /**
-     * Find a person linked to a user account.
+     * Find one person linked to a user account.
+     *
+     * This is the primary lookup used by the teacher panel.
      *
      * @return array<string, mixed>|null
      */
@@ -592,11 +605,9 @@ final class People
                 SELECT
                     people.*,
 
-                    faculties.name
-                        AS faculty_name,
+                    faculties.name AS faculty_name,
 
-                    faculties.slug
-                        AS faculty_slug
+                    faculties.slug AS faculty_slug
 
                 FROM people
 
@@ -604,8 +615,10 @@ final class People
                     ON faculties.id =
                        people.faculty_id
 
-                WHERE people.user_id =
-                      :user_id
+                WHERE people.user_id = :user_id
+
+                ORDER BY
+                    people.id ASC
 
                 LIMIT 1
                 ',
@@ -635,10 +648,10 @@ final class People
             Database::query(
                 '
                 SELECT COUNT(*)
+
                 FROM people
 
-                WHERE faculty_id =
-                      :faculty_id
+                WHERE faculty_id = :faculty_id
 
                 AND is_active = 1
                 ',
@@ -661,7 +674,9 @@ final class People
         int $limit = 50
     ): array {
         $query =
-            trim($query);
+            trim(
+                $query
+            );
 
         if (
             $query === ''
@@ -688,11 +703,9 @@ final class People
                     SELECT
                         people.*,
 
-                        faculties.name
-                            AS faculty_name,
+                        faculties.name AS faculty_name,
 
-                        faculties.slug
-                            AS faculty_slug
+                        faculties.slug AS faculty_slug
 
                     FROM people
 

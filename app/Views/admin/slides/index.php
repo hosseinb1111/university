@@ -271,29 +271,40 @@ $totalPages =
 
                             <td>
 
-                                <strong>
-                                    <?= View::escape(
-                                        $title
-                                    ) ?>
-                                </strong>
+    <?php if (
+        $title !== ''
+    ): ?>
+
+        <strong>
+            <?= View::escape(
+                $title
+            ) ?>
+        </strong>
+
+    <?php else: ?>
+
+        <span class="admin-table__muted">
+            بدون عنوان
+        </span>
+
+    <?php endif; ?>
 
 
-                                <?php if (
-                                    !empty(
-                                        $slide['subtitle']
-                                    )
-                                ): ?>
+    <?php if (
+        !empty(
+            $slide['subtitle']
+        )
+    ): ?>
 
-                                    <span class="admin-table__muted">
-                                        <?= View::escape(
-                                            $slide['subtitle']
-                                        ) ?>
-                                    </span>
+        <span class="admin-table__muted">
+            <?= View::escape(
+                $slide['subtitle']
+            ) ?>
+        </span>
 
-                                <?php endif; ?>
+    <?php endif; ?>
 
-                            </td>
-
+</td>
 
                             <td>
                                 <?= number_format(

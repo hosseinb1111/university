@@ -1,45 +1,80 @@
 <?php
 
 declare(strict_types=1);
+
+use App\Core\View;
+
+$currentPath =
+    parse_url(
+        $_SERVER['REQUEST_URI'] ?? '/',
+        PHP_URL_PATH
+    );
+
+if (
+    !is_string($currentPath)
+    || $currentPath === ''
+) {
+    $currentPath = '/';
+}
+
+$message =
+    is_string($message ?? null)
+        && $message !== ''
+        ? $message
+        : 'صفحه مورد نظر پیدا نشد.';
 ?>
 
 <section class="error-page">
+
     <div class="container">
 
-        <div class="error-page__content">
+        <div class="error-card">
 
-            <span class="error-page__code">
+            <div class="error-card__code">
                 404
+            </div>
+
+            <span class="error-card__eyebrow">
+                صفحه پیدا نشد
             </span>
 
-            <h1>
-                صفحه پیدا نشد
+            <h1 class="error-card__title">
+                صفحه مورد نظر وجود ندارد
             </h1>
 
-            <p>
-                صفحه‌ای که به دنبال آن هستید وجود ندارد
-                یا ممکن است منتقل شده باشد.
+            <p class="error-card__description">
+                <?= View::escape(
+                    $message
+                ) ?>
             </p>
 
-            <div class="error-page__actions">
+            <div class="error-card__path">
+                <?= View::escape(
+                    $currentPath
+                ) ?>
+            </div>
+
+            <div class="error-card__actions">
 
                 <a
-                    href="/"
+                    href="<?= View::url('/') ?>"
                     class="button button--primary"
                 >
-                    صفحه اصلی
+                    بازگشت به صفحه اصلی
                 </a>
 
-                <a
-                    href="/announcements"
+                <button
+                    type="button"
                     class="button button--secondary"
+                    onclick="history.back()"
                 >
-                    اطلاعیه‌ها
-                </a>
+                    بازگشت به صفحه قبل
+                </button>
 
             </div>
 
         </div>
 
     </div>
+
 </section>

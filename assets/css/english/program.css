@@ -1,0 +1,1355 @@
+/*
+|--------------------------------------------------------------------------
+| English — Single program page
+|--------------------------------------------------------------------------
+| Theme-aware institutional program detail page.
+|
+| Covers:
+|   - Hero
+|   - Program content
+|   - Main article
+|   - Sections
+|   - Explore links
+|   - Sidebar
+|   - Statistics
+|   - Navigation
+|   - CTA
+|   - Responsive behavior
+|
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   PAGE
+========================================================================== */
+
+.english-program-detail-page {
+    background:
+        var(--english-background);
+
+    color:
+        var(--english-text);
+
+    overflow:
+        hidden;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   HERO
+========================================================================== */
+
+.english-program-detail-hero {
+    padding:
+        52px
+        0
+        85px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--english-surface) 0%,
+            var(--english-background-soft) 100%
+        );
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    transition:
+        background
+        var(--english-transition),
+
+        border-color
+        var(--english-transition);
+}
+
+
+.english-program-detail-back {
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    text-decoration:
+        none;
+
+    transition:
+        color
+        var(--english-transition),
+
+        transform
+        var(--english-transition);
+}
+
+
+.english-program-detail-back:hover {
+    color:
+        var(--english-text);
+
+    transform:
+        translateX(
+            -2px
+        );
+}
+
+
+.english-program-detail-back span {
+    font-size:
+        16px;
+}
+
+
+.english-program-detail-hero__content {
+    max-width:
+        900px;
+
+    margin-top:
+        38px;
+}
+
+
+.english-program-detail-hero__content > span {
+    display:
+        block;
+
+    margin-bottom:
+        9px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.11em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-program-detail-hero__degree {
+    display:
+        inline-flex;
+
+    margin-bottom:
+        11px;
+
+    padding:
+        6px
+        9px;
+
+    background:
+        var(--english-surface-soft);
+
+    color:
+        var(--english-text);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        7px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+.english-program-detail-hero h1 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        clamp(
+            43px,
+            6vw,
+            68px
+        );
+
+    line-height:
+        1.04;
+
+    letter-spacing:
+        -0.055em;
+
+    overflow-wrap:
+        anywhere;
+}
+
+
+.english-program-detail-hero p {
+    max-width:
+        720px;
+
+    margin:
+        17px
+        0
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        15px;
+
+    line-height:
+        1.8;
+
+    overflow-wrap:
+        anywhere;
+}
+
+
+/* ==========================================================================
+   MAIN CONTENT
+========================================================================== */
+
+.english-program-detail-content {
+    padding:
+        85px
+        0;
+
+    background:
+        var(--english-background-soft);
+
+    transition:
+        background-color
+        var(--english-transition);
+}
+
+
+.english-program-detail-layout {
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            0,
+            1fr
+        )
+        300px;
+
+    gap:
+        25px;
+
+    align-items:
+        start;
+
+    min-width:
+        0;
+}
+
+
+/* ==========================================================================
+   MAIN ARTICLE
+========================================================================== */
+
+.english-program-detail-main {
+    overflow:
+        hidden;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        var(--english-radius-lg);
+
+    box-shadow:
+        var(--english-shadow-sm);
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        box-shadow
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   PROGRAM SECTIONS
+========================================================================== */
+
+.english-program-detail-section {
+    padding:
+        34px;
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    transition:
+        border-color
+        var(--english-transition);
+}
+
+
+.english-program-detail-section:last-child {
+    border-bottom:
+        0;
+}
+
+
+.english-program-detail-section__heading > span {
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-program-detail-section__heading h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        27px;
+
+    line-height:
+        1.25;
+
+    letter-spacing:
+        -0.025em;
+}
+
+
+.english-program-detail-text {
+    margin-top:
+        20px;
+
+    color:
+        var(--english-text-soft);
+
+    font-size:
+        14px;
+
+    line-height:
+        2;
+
+    overflow-wrap:
+        anywhere;
+
+    word-break:
+        break-word;
+}
+
+
+.english-program-detail-text--secondary {
+    color:
+        var(--english-muted);
+}
+
+
+/* ==========================================================================
+   EMPTY CONTENT
+========================================================================== */
+
+.english-program-detail-empty {
+    padding:
+        45px
+        25px;
+
+    text-align:
+        center;
+}
+
+
+.english-program-detail-empty__icon {
+    width:
+        60px;
+
+    height:
+        60px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin:
+        0
+        auto
+        18px;
+
+    background:
+        var(--english-surface-soft);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    color:
+        var(--english-muted);
+
+    border-radius:
+        16px;
+
+    font-size:
+        25px;
+
+    font-weight:
+        900;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+.english-program-detail-empty h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        20px;
+}
+
+
+.english-program-detail-empty p {
+    max-width:
+        540px;
+
+    margin:
+        9px
+        auto
+        0;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.8;
+}
+
+
+/* ==========================================================================
+   EXPLORE
+========================================================================== */
+
+.english-program-detail-explore {
+    padding:
+        34px;
+}
+
+
+.english-program-detail-explore > div:first-child > span {
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-program-detail-explore h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        22px;
+}
+
+
+.english-program-detail-explore__links {
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+    margin-top:
+        20px;
+}
+
+
+.english-program-detail-explore__links a {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    padding:
+        14px;
+
+    background:
+        var(--english-surface-soft);
+
+    color:
+        var(--english-text);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        10px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    text-decoration:
+        none;
+
+    transition:
+        transform
+        180ms
+        ease,
+
+        background-color
+        180ms
+        ease,
+
+        border-color
+        180ms
+        ease,
+
+        box-shadow
+        180ms
+        ease;
+}
+
+
+.english-program-detail-explore__links a:hover {
+    background:
+        var(--english-background);
+
+    border-color:
+        var(--english-border-strong);
+
+    transform:
+        translateY(
+            -2px
+        );
+
+    box-shadow:
+        var(--english-shadow-xs);
+}
+
+
+.english-program-detail-explore__links strong {
+    color:
+        var(--english-text);
+
+    font-size:
+        17px;
+
+    line-height:
+        1;
+}
+
+
+/* ==========================================================================
+   SIDEBAR
+========================================================================== */
+
+.english-program-detail-sidebar {
+    position:
+        sticky;
+
+    top:
+        100px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        12px;
+
+    min-width:
+        0;
+}
+
+
+/* ==========================================================================
+   SIDEBAR CARD
+========================================================================== */
+
+.english-program-detail-card {
+    padding:
+        22px;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        var(--english-radius-lg);
+
+    box-shadow:
+        var(--english-shadow-xs);
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        box-shadow
+        var(--english-transition);
+}
+
+
+.english-program-detail-card--identity {
+    padding-top:
+        25px;
+}
+
+
+.english-program-detail-card__mark {
+    width:
+        58px;
+
+    height:
+        58px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        20px;
+
+    background:
+        var(--english-surface-soft);
+
+    color:
+        var(--english-decoration-mark);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        15px;
+
+    font-size:
+        26px;
+
+    font-weight:
+        900;
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+.english-program-detail-card--identity > span {
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-program-detail-card--identity > strong {
+    display:
+        block;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        17px;
+
+    line-height:
+        1.45;
+
+    overflow-wrap:
+        anywhere;
+
+    word-break:
+        break-word;
+}
+
+
+.english-program-detail-card__title {
+    display:
+        block;
+
+    margin-bottom:
+        5px;
+
+    color:
+        var(--english-muted);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+/* ==========================================================================
+   SIDEBAR STAT
+========================================================================== */
+
+.english-program-detail-stat {
+    padding:
+        14px
+        0;
+
+    border-top:
+        1px solid
+        var(--english-border);
+}
+
+
+.english-program-detail-stat small {
+    display:
+        block;
+
+    margin-bottom:
+        4px;
+
+    color:
+        var(--english-muted-light);
+
+    font-size:
+        9px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.05em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-program-detail-stat strong {
+    display:
+        block;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.55;
+
+    overflow-wrap:
+        anywhere;
+}
+
+
+/* ==========================================================================
+   NAVIGATION
+========================================================================== */
+
+.english-program-detail-navigation {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        9px;
+}
+
+
+.english-program-detail-navigation .english-button {
+    width:
+        100%;
+}
+
+
+/* ==========================================================================
+   CTA
+   Intentionally dark editorial section.
+========================================================================== */
+
+.english-program-detail-cta {
+    padding:
+        75px
+        0;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--english-dark-surface) 0%,
+            var(--english-dark-surface-soft) 58%,
+            var(--english-dark-surface-alt) 100%
+        );
+
+    color:
+        var(--english-dark-text);
+
+    border-top:
+        1px solid
+        var(--english-dark-border);
+}
+
+
+.english-program-detail-cta__inner > div:first-child {
+    max-width:
+        700px;
+}
+
+
+.english-program-detail-cta__inner > div:first-child > span {
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.1em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.english-program-detail-cta h2 {
+    margin:
+        0;
+
+    color:
+        var(--english-dark-text);
+
+    font-size:
+        clamp(
+            30px,
+            4vw,
+            45px
+        );
+
+    line-height:
+        1.08;
+
+    letter-spacing:
+        -0.04em;
+}
+
+
+.english-program-detail-cta p {
+    max-width:
+        620px;
+
+    margin:
+        14px
+        0
+        0;
+
+    color:
+        var(--english-dark-muted);
+
+    font-size:
+        13px;
+
+    line-height:
+        1.85;
+}
+
+
+.english-program-detail-cta__actions .english-button--primary {
+    background:
+        var(--english-dark-text);
+
+    color:
+        var(--english-dark-surface);
+
+    box-shadow:
+        0
+        8px
+        24px
+        rgba(
+            0,
+            0,
+            0,
+            0.16
+        );
+}
+
+
+.english-program-detail-cta__actions .english-button--primary:hover {
+    background:
+        #ffffff;
+
+    color:
+        #0d1117;
+}
+
+
+.english-program-detail-cta__actions .english-button--secondary {
+    background:
+        var(--english-dark-hover);
+
+    border-color:
+        var(--english-dark-border);
+
+    color:
+        var(--english-dark-text);
+}
+
+
+.english-program-detail-cta__actions .english-button--secondary:hover {
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.08
+        );
+
+    border-color:
+        var(--english-dark-line);
+
+    color:
+        #ffffff;
+}
+
+
+/* ==========================================================================
+   DARK THEME REFINEMENTS
+========================================================================== */
+
+html[data-theme="dark"]
+.english-program-detail-page {
+    background:
+        var(--english-background);
+}
+
+
+html[data-theme="dark"]
+.english-program-detail-hero {
+    box-shadow:
+        inset
+        0
+        -1px
+        0
+        rgba(
+            255,
+            255,
+            255,
+            0.015
+        );
+}
+
+
+html[data-theme="dark"]
+.english-program-detail-main,
+html[data-theme="dark"]
+.english-program-detail-card {
+    box-shadow:
+        var(--english-shadow-xs);
+}
+
+
+html[data-theme="dark"]
+.english-program-detail-explore__links a:hover {
+    background:
+        var(--english-surface);
+}
+
+
+html[data-theme="dark"]
+.english-program-detail-card__mark {
+    color:
+        var(--english-muted-light);
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 900px
+========================================================================== */
+
+@media (max-width: 900px) {
+
+    .english-program-detail-layout {
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .english-program-detail-sidebar {
+        position:
+            static;
+
+        display:
+            grid;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+        align-items:
+            start;
+    }
+
+
+    .english-program-detail-navigation {
+        grid-column:
+            1 / -1;
+
+        flex-direction:
+            row;
+    }
+
+
+    .english-program-detail-navigation .english-button {
+        width:
+            auto;
+
+        flex:
+            1;
+    }
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 700px
+========================================================================== */
+
+@media (max-width: 700px) {
+
+    .english-program-detail-content {
+        padding:
+            60px
+            0;
+    }
+
+
+    .english-program-detail-explore__links {
+        grid-template-columns:
+            1fr;
+    }
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — 600px
+========================================================================== */
+
+@media (max-width: 600px) {
+
+    .english-program-detail-hero {
+        padding:
+            45px
+            0
+            65px;
+    }
+
+
+    .english-program-detail-hero h1 {
+        font-size:
+            39px;
+    }
+
+
+    .english-program-detail-layout {
+        gap:
+            16px;
+    }
+
+
+    .english-program-detail-section,
+    .english-program-detail-explore {
+        padding:
+            26px
+            22px;
+    }
+
+
+    .english-program-detail-section__heading h2 {
+        font-size:
+            24px;
+    }
+
+
+    .english-program-detail-text {
+        font-size:
+            13px;
+    }
+
+
+    .english-program-detail-sidebar {
+        display:
+            flex;
+    }
+
+
+    .english-program-detail-navigation {
+        flex-direction:
+            column;
+    }
+
+
+    .english-program-detail-navigation .english-button {
+        width:
+            100%;
+    }
+
+
+    .english-program-detail-cta {
+        padding:
+            60px
+            0;
+    }
+}
+
+
+/* ==========================================================================
+   RESPONSIVE — VERY SMALL PHONES
+========================================================================== */
+
+@media (max-width: 400px) {
+
+    .english-program-detail-hero {
+        padding:
+            38px
+            0
+            55px;
+    }
+
+
+    .english-program-detail-hero h1 {
+        font-size:
+            34px;
+    }
+
+
+    .english-program-detail-section,
+    .english-program-detail-explore {
+        padding:
+            23px
+            18px;
+    }
+
+
+    .english-program-detail-card {
+        padding:
+            19px;
+    }
+
+
+    .english-program-detail-card__mark {
+        width:
+            52px;
+
+        height:
+            52px;
+
+        font-size:
+            23px;
+    }
+
+
+    .english-program-detail-cta {
+        padding:
+            50px
+            0;
+    }
+
+
+    .english-program-detail-cta h2 {
+        font-size:
+            29px;
+    }
+}
+
+
+/* ==========================================================================
+   REDUCED MOTION
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .english-program-detail-page *,
+    .english-program-detail-page *::before,
+    .english-program-detail-page *::after {
+        transition-duration:
+            0.01ms !important;
+
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+    }
+}

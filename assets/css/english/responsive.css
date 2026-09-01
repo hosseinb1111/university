@@ -1,0 +1,16 @@
+/*
+|--------------------------------------------------------------------------
+| English — Global responsive
+|--------------------------------------------------------------------------
+| Every breakpoint in the old english.css was actually scoped to one
+| component or one page (header, footer, buttons, slider, home, about,
+| presidency, faculties, faculty, programs, program, research,
+| announcements, contact) — none of it was truly cross-cutting. Per the
+| reorg brief, those rules were kept beside the component they belong
+| to instead of being merged in here, so nothing has been duplicated
+| into this file.
+|
+| This file stays imported (empty) as the designated place for future
+| rules that genuinely apply across the whole English site regardless
+| of page/component — add them here, not to a random component file.
+*/

@@ -41,6 +41,9 @@ final class PageController
 
                 'success' =>
                     $this->successMessage(),
+
+                'error' =>
+                    null,
             ]
         );
     }
@@ -58,7 +61,8 @@ final class PageController
                     'ایجاد صفحه | صدرا',
 
                 'page' => [
-                    'parent_id' => '',
+                    'id' => null,
+                    'parent_id' => null,
                     'slug' => '',
                     'title' => '',
                     'excerpt' => '',
@@ -68,13 +72,22 @@ final class PageController
                     'seo_title' => '',
                     'seo_description' => '',
                     'seo_keywords' => '',
-                    'published_at' => '',
+                    'published_at' => null,
+                    'created_by' => null,
+                    'updated_by' => null,
                 ],
 
                 'parents' =>
                     Page::parentOptions(),
 
-                'errors' => [],
+                'errors' =>
+                    [],
+
+                'success' =>
+                    null,
+
+                'error' =>
+                    null,
             ]
         );
     }
@@ -86,11 +99,13 @@ final class PageController
     {
         Csrf::requireValid();
 
-        $data = $this->collectInput();
+        $data =
+            $this->collectInput();
 
-        $errors = $this->validate(
-            $data
-        );
+        $errors =
+            $this->validate(
+                $data
+            );
 
         if ($errors !== []) {
             Session::flash(
@@ -108,7 +123,8 @@ final class PageController
             );
         }
 
-        $userId = Session::userId();
+        $userId =
+            Session::userId();
 
         if ($userId === null) {
             Response::redirectRoute(
@@ -132,9 +148,10 @@ final class PageController
     public function edit(
         string $id
     ): string {
-        $page = Page::find(
-            (int) $id
-        );
+        $page =
+            Page::find(
+                (int) $id
+            );
 
         if ($page === null) {
             Response::notFound(
@@ -157,7 +174,14 @@ final class PageController
                         (int) $id
                     ),
 
-                'errors' => [],
+                'errors' =>
+                    [],
+
+                'success' =>
+                    null,
+
+                'error' =>
+                    null,
             ]
         );
     }
@@ -170,7 +194,8 @@ final class PageController
     ): never {
         Csrf::requireValid();
 
-        $pageId = (int) $id;
+        $pageId =
+            (int) $id;
 
         if (
             Page::find($pageId) === null
@@ -180,7 +205,8 @@ final class PageController
             );
         }
 
-        $data = $this->collectInput();
+        $data =
+            $this->collectInput();
 
         /*
          * Prevent a page from becoming its own parent.
@@ -193,10 +219,11 @@ final class PageController
             $data['parent_id'] = null;
         }
 
-        $errors = $this->validate(
-            $data,
-            $pageId
-        );
+        $errors =
+            $this->validate(
+                $data,
+                $pageId
+            );
 
         if ($errors !== []) {
             Session::flash(
@@ -216,7 +243,8 @@ final class PageController
             );
         }
 
-        $userId = Session::userId();
+        $userId =
+            Session::userId();
 
         if ($userId === null) {
             Response::redirectRoute(
@@ -243,7 +271,8 @@ final class PageController
     ): never {
         Csrf::requireValid();
 
-        $pageId = (int) $id;
+        $pageId =
+            (int) $id;
 
         if (
             Page::find($pageId) === null
@@ -268,9 +297,10 @@ final class PageController
     public function show(
         string $slug
     ): string {
-        $page = Page::findPublishedBySlug(
-            $slug
-        );
+        $page =
+            Page::findPublishedBySlug(
+                $slug
+            );
 
         if ($page === null) {
             return View::renderIntoLayout(
@@ -306,23 +336,35 @@ final class PageController
     /**
      * Collect form data.
      *
+     * The database stores published_at as Gregorian
+     * MySQL DATETIME, while the admin enters a Jalali
+     * date such as:
+     *
+     * ۱۴۰۵/۰۶/۰۵ ۱۱:۱۴
+     *
+     * jalali_parse_datetime() converts it to:
+     *
+     * 2026-08-27 11:14:00
+     *
      * @return array<string, mixed>
      */
     private function collectInput(): array
     {
-        $title = trim(
-            (string) (
-                $_POST['title']
-                ?? ''
-            )
-        );
+        $title =
+            trim(
+                (string) (
+                    $_POST['title']
+                    ?? ''
+                )
+            );
 
-        $slug = trim(
-            (string) (
-                $_POST['slug']
-                ?? ''
-            )
-        );
+        $slug =
+            trim(
+                (string) (
+                    $_POST['slug']
+                    ?? ''
+                )
+            );
 
         if ($slug === '') {
             $slug =
@@ -336,10 +378,11 @@ final class PageController
                 );
         }
 
-        $status = (string) (
-            $_POST['status']
-            ?? 'draft'
-        );
+        $status =
+            (string) (
+                $_POST['status']
+                ?? 'draft'
+            );
 
         if (
             !in_array(
@@ -355,7 +398,8 @@ final class PageController
             $status = 'draft';
         }
 
-        $parentId = null;
+        $parentId =
+            null;
 
         if (
             isset($_POST['parent_id'])
@@ -368,6 +412,27 @@ final class PageController
                 $parentId = null;
             }
         }
+
+        /*
+         * The admin enters a Jalali date.
+         *
+         * Example:
+         * ۱۴۰۵/۰۶/۰۵ ۱۱:۱۴
+         *
+         * The helper converts it to:
+         * 2026-08-27 11:14:00
+         */
+        $publishedAtInput =
+            isset($_POST['published_at'])
+                ? trim(
+                    (string) $_POST['published_at']
+                )
+                : '';
+
+        $publishedAt =
+            jalali_parse_datetime(
+                $publishedAtInput
+            );
 
         return [
             'parent_id' =>
@@ -419,10 +484,7 @@ final class PageController
                 ),
 
             'published_at' =>
-                $this->normalizeDateTime(
-                    $_POST['published_at']
-                    ?? null
-                ),
+                $publishedAt,
         ];
     }
 
@@ -437,19 +499,21 @@ final class PageController
     ): array {
         $errors = [];
 
-        $title = trim(
-            (string) (
-                $data['title']
-                ?? ''
-            )
-        );
+        $title =
+            trim(
+                (string) (
+                    $data['title']
+                    ?? ''
+                )
+            );
 
-        $slug = trim(
-            (string) (
-                $data['slug']
-                ?? ''
-            )
-        );
+        $slug =
+            trim(
+                (string) (
+                    $data['slug']
+                    ?? ''
+                )
+            );
 
         if ($title === '') {
             $errors['title'] =
@@ -485,9 +549,11 @@ final class PageController
                 'این آدرس قبلاً استفاده شده است.';
         }
 
-        $status = (string) (
-            $data['status'] ?? ''
-        );
+        $status =
+            (string) (
+                $data['status']
+                ?? ''
+            );
 
         if (
             !in_array(
@@ -504,6 +570,29 @@ final class PageController
                 'وضعیت انتخاب شده معتبر نیست.';
         }
 
+        /*
+         * published_at is already normalized by collectInput().
+         *
+         * If the user entered something, but it could not
+         * be parsed as a Jalali date, reject it.
+         */
+        $publishedAtInput =
+            isset($_POST['published_at'])
+                ? trim(
+                    (string) $_POST['published_at']
+                )
+                : '';
+
+        if (
+            $publishedAtInput !== ''
+            && !jalali_is_valid_datetime_input(
+                $publishedAtInput
+            )
+        ) {
+            $errors['published_at'] =
+                'تاریخ انتشار وارد شده معتبر نیست. نمونه صحیح: ۱۴۰۵/۰۶/۰۵ ۱۱:۱۴';
+        }
+
         return $errors;
     }
 
@@ -517,41 +606,14 @@ final class PageController
             return null;
         }
 
-        $value = trim(
-            $value
-        );
+        $value =
+            trim(
+                $value
+            );
 
         return $value === ''
             ? null
             : $value;
-    }
-
-    /**
-     * Normalize datetime.
-     */
-    private function normalizeDateTime(
-        mixed $value
-    ): ?string {
-        if (
-            !is_string($value)
-            || trim($value) === ''
-        ) {
-            return null;
-        }
-
-        $timestamp =
-            strtotime($value);
-
-        if (
-            $timestamp === false
-        ) {
-            return null;
-        }
-
-        return date(
-            'Y-m-d H:i:s',
-            $timestamp
-        );
     }
 
     /**
@@ -570,10 +632,11 @@ final class PageController
                 'صفحه با موفقیت حذف شد.',
         ];
 
-        $key = (string) (
-            $_GET['success']
-            ?? ''
-        );
+        $key =
+            (string) (
+                $_GET['success']
+                ?? ''
+            );
 
         return $messages[$key]
             ?? null;

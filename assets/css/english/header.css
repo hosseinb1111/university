@@ -1,0 +1,1107 @@
+/*
+|--------------------------------------------------------------------------
+| English Header
+|--------------------------------------------------------------------------
+|
+| Desktop:
+|
+|     [Brand]                         [Theme] [Navigation]
+|
+| Mobile:
+|
+|     [Brand]                              [Theme] [Menu]
+|
+| The theme toggle is ONE button only.
+| It lives in .english-header__actions and moves beside the
+| hamburger on smaller screens.
+|
+|--------------------------------------------------------------------------
+*/
+
+
+/* ==========================================================================
+   Header
+========================================================================== */
+
+.english-header {
+
+    position:
+        sticky;
+
+    top:
+        0;
+
+    z-index:
+        100;
+
+    width:
+        100%;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--english-surface) 96%,
+            transparent
+        );
+
+    border-bottom:
+        1px solid
+        var(--english-border);
+
+    backdrop-filter:
+        blur(
+            14px
+        );
+
+    -webkit-backdrop-filter:
+        blur(
+            14px
+        );
+
+    transition:
+        background-color
+        var(--english-transition),
+
+        border-color
+        var(--english-transition),
+
+        color
+        var(--english-transition);
+}
+
+
+/* ==========================================================================
+   Header inner
+========================================================================== */
+
+.english-header__inner {
+
+    min-height:
+        76px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        24px;
+}
+
+
+/* ==========================================================================
+   Brand
+========================================================================== */
+
+.english-brand {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        11px;
+
+    min-width:
+        0;
+
+    flex:
+        0
+        0
+        auto;
+
+    color:
+        var(--english-text);
+
+    text-decoration:
+        none;
+
+    transition:
+        color
+        var(--english-transition);
+}
+
+
+.english-brand__logo {
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    flex:
+        0
+        0
+        42px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    overflow:
+        hidden;
+
+    background:
+        var(--english-primary);
+
+    border-radius:
+        12px;
+
+    transition:
+        background-color
+        var(--english-transition);
+}
+
+
+.english-brand__logo img {
+
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        contain;
+}
+
+
+.english-brand__text {
+
+    min-width:
+        0;
+}
+
+
+.english-brand strong {
+
+    display:
+        block;
+
+    overflow:
+        hidden;
+
+    color:
+        var(--english-text);
+
+    font-family:
+        "Inter",
+        Arial,
+        sans-serif;
+
+    font-size:
+        14px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.2;
+
+    letter-spacing:
+        -0.02em;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+}
+
+
+.english-brand small {
+
+    display:
+        block;
+
+    margin-top:
+        3px;
+
+    color:
+        var(--english-muted);
+
+    font-family:
+        "Inter",
+        Arial,
+        sans-serif;
+
+    font-size:
+        9px;
+
+    font-weight:
+        500;
+
+    line-height:
+        1.2;
+}
+
+
+/* ==========================================================================
+   Navigation
+========================================================================== */
+
+.english-nav {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    gap:
+        3px;
+
+    flex:
+        1
+        1
+        auto;
+
+    min-width:
+        0;
+}
+
+
+.english-nav__link,
+.english-nav__language {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    min-height:
+        40px;
+
+    padding:
+        8px
+        10px;
+
+    color:
+        var(--english-muted);
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:
+        9px;
+
+    font-family:
+        "Inter",
+        Arial,
+        sans-serif;
+
+    font-size:
+        11px;
+
+    font-weight:
+        600;
+
+    line-height:
+        1;
+
+    text-decoration:
+        none;
+
+    white-space:
+        nowrap;
+
+    transition:
+        background-color
+        160ms
+        ease,
+
+        border-color
+        160ms
+        ease,
+
+        color
+        160ms
+        ease;
+}
+
+
+.english-nav__link:hover,
+.english-nav__link--active {
+
+    background:
+        var(--english-surface-soft);
+
+    color:
+        var(--english-text);
+}
+
+
+.english-nav__language {
+
+    margin-left:
+        7px;
+
+    padding-inline:
+        13px;
+
+    border-color:
+        var(--english-border);
+
+    background:
+        var(--english-surface);
+
+    color:
+        var(--english-text);
+}
+
+
+.english-nav__language:hover {
+
+    background:
+        var(--english-surface-soft);
+
+    border-color:
+        var(--english-border-strong);
+
+    color:
+        var(--english-text);
+}
+
+
+/* ==========================================================================
+   Header actions
+========================================================================== */
+
+.english-header__actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    flex:
+        0
+        0
+        auto;
+
+    margin-left:
+        auto;
+}
+
+
+/* ==========================================================================
+   Theme toggle
+========================================================================== */
+
+.english-theme-toggle {
+
+    position:
+        relative;
+
+    width:
+        40px;
+
+    height:
+        40px;
+
+    flex:
+        0
+        0
+        40px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin:
+        0;
+
+    padding:
+        0;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        10px;
+
+    color:
+        var(--english-text);
+
+    cursor:
+        pointer;
+
+    appearance:
+        none;
+
+    -webkit-tap-highlight-color:
+        transparent;
+
+    transition:
+        background-color
+        160ms
+        ease,
+
+        border-color
+        160ms
+        ease,
+
+        color
+        160ms
+        ease,
+
+        box-shadow
+        160ms
+        ease,
+
+        transform
+        160ms
+        ease;
+}
+
+
+.english-theme-toggle:hover {
+
+    background:
+        var(--english-surface-soft);
+
+    border-color:
+        var(--english-border-strong);
+
+    box-shadow:
+        var(--english-shadow-xs);
+
+    transform:
+        translateY(
+            -1px
+        );
+}
+
+
+.english-theme-toggle:active {
+
+    transform:
+        scale(
+            0.94
+        );
+}
+
+
+.english-theme-toggle__icon {
+
+    width:
+        20px;
+
+    height:
+        20px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--english-text);
+
+    font-size:
+        18px;
+
+    font-weight:
+        500;
+
+    line-height:
+        1;
+
+    user-select:
+        none;
+
+    transition:
+        color
+        160ms
+        ease,
+
+        transform
+        220ms
+        ease;
+}
+
+
+.english-theme-toggle:hover
+.english-theme-toggle__icon {
+
+    transform:
+        rotate(
+            10deg
+        );
+}
+
+
+/* ==========================================================================
+   Hamburger
+========================================================================== */
+
+.english-menu-toggle {
+
+    display:
+        none;
+
+    position:
+        relative;
+
+    width:
+        44px;
+
+    height:
+        44px;
+
+    flex:
+        0
+        0
+        44px;
+
+    padding:
+        9px;
+
+    background:
+        var(--english-surface);
+
+    border:
+        1px solid
+        var(--english-border);
+
+    border-radius:
+        11px;
+
+    color:
+        var(--english-text);
+
+    cursor:
+        pointer;
+
+    appearance:
+        none;
+
+    transition:
+        background-color
+        160ms
+        ease,
+
+        border-color
+        160ms
+        ease,
+
+        color
+        160ms
+        ease,
+
+        transform
+        160ms
+        ease;
+}
+
+
+.english-menu-toggle:hover {
+
+    background:
+        var(--english-surface-soft);
+
+    border-color:
+        var(--english-border-strong);
+}
+
+
+.english-menu-toggle:active {
+
+    transform:
+        scale(
+            0.96
+        );
+}
+
+
+.english-menu-toggle span {
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    width:
+        20px;
+
+    height:
+        2px;
+
+    display:
+        block;
+
+    background:
+        var(--english-text);
+
+    border-radius:
+        999px;
+
+    transform:
+        translateX(
+            -50%
+        );
+
+    transition:
+        transform
+        180ms
+        ease,
+
+        opacity
+        180ms
+        ease,
+
+        top
+        180ms
+        ease;
+}
+
+
+.english-menu-toggle span:nth-child(1) {
+
+    top:
+        13px;
+}
+
+
+.english-menu-toggle span:nth-child(2) {
+
+    top:
+        20px;
+}
+
+
+.english-menu-toggle span:nth-child(3) {
+
+    top:
+        27px;
+}
+
+
+/* ==========================================================================
+   Open hamburger
+========================================================================== */
+
+.english-menu-toggle[aria-expanded="true"]
+span:nth-child(1) {
+
+    top:
+        20px;
+
+    transform:
+        translateX(-50%)
+        rotate(45deg);
+}
+
+
+.english-menu-toggle[aria-expanded="true"]
+span:nth-child(2) {
+
+    opacity:
+        0;
+}
+
+
+.english-menu-toggle[aria-expanded="true"]
+span:nth-child(3) {
+
+    top:
+        20px;
+
+    transform:
+        translateX(-50%)
+        rotate(-45deg);
+}
+
+
+/* ==========================================================================
+   Tablet / Mobile
+========================================================================== */
+
+@media (max-width: 900px) {
+
+    .english-header__inner {
+
+        min-height:
+            68px;
+
+        gap:
+            12px;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | On mobile:
+    |
+    |     Brand              Theme   Hamburger
+    |
+    |--------------------------------------------------------------------------
+    */
+
+    .english-header__actions {
+
+        margin-left:
+            auto;
+
+        gap:
+            7px;
+    }
+
+
+    .english-theme-toggle {
+
+        width:
+            42px;
+
+        height:
+            42px;
+
+        flex-basis:
+            42px;
+
+        order:
+            1;
+    }
+
+
+    .english-menu-toggle {
+
+        display:
+            block;
+
+        order:
+            2;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Navigation becomes the drawer.
+    |
+    | The theme toggle is NOT part of it.
+    |--------------------------------------------------------------------------
+    */
+
+    .english-nav {
+
+        position:
+            fixed;
+
+        top:
+            68px;
+
+        left:
+            12px;
+
+        right:
+            12px;
+
+        display:
+            flex;
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+        justify-content:
+            flex-start;
+
+        gap:
+            4px;
+
+        max-height:
+            calc(
+                100dvh
+                - 80px
+            );
+
+        padding:
+            10px;
+
+        overflow-y:
+            auto;
+
+        background:
+            color-mix(
+                in srgb,
+                var(--english-surface) 98%,
+                transparent
+            );
+
+        border:
+            1px solid
+            var(--english-border);
+
+        border-radius:
+            14px;
+
+        box-shadow:
+            var(--english-shadow-md);
+
+        opacity:
+            0;
+
+        visibility:
+            hidden;
+
+        pointer-events:
+            none;
+
+        transform:
+            translateY(
+                -8px
+            );
+
+        transition:
+            opacity
+            180ms
+            ease,
+
+            visibility
+            180ms
+            ease,
+
+            transform
+            180ms
+            ease;
+    }
+
+
+    .english-nav.english-nav--open {
+
+        opacity:
+            1;
+
+        visibility:
+            visible;
+
+        pointer-events:
+            auto;
+
+        transform:
+            translateY(
+                0
+            );
+    }
+
+
+    .english-nav__link,
+    .english-nav__language {
+
+        width:
+            100%;
+
+        min-height:
+            46px;
+
+        justify-content:
+            flex-start;
+
+        padding:
+            12px
+            13px;
+
+        border-radius:
+            10px;
+
+        font-size:
+            13px;
+    }
+
+
+    .english-nav__link:hover,
+    .english-nav__link--active {
+
+        background:
+            var(--english-surface-soft);
+
+        color:
+            var(--english-text);
+    }
+
+
+    .english-nav__language {
+
+        margin:
+            5px
+            0
+            0;
+
+        justify-content:
+            center;
+
+        border:
+            1px solid
+            var(--english-border);
+
+        background:
+            var(--english-surface);
+    }
+
+
+    .english-nav__language:hover {
+
+        background:
+            var(--english-surface-soft);
+
+        border-color:
+            var(--english-border-strong);
+    }
+
+}
+
+
+/* ==========================================================================
+   Small phones
+========================================================================== */
+
+@media (max-width: 500px) {
+
+    .english-header__inner {
+
+        min-height:
+            64px;
+
+        gap:
+            8px;
+    }
+
+
+    .english-brand__logo {
+
+        width:
+            38px;
+
+        height:
+            38px;
+
+        flex-basis:
+            38px;
+    }
+
+
+    .english-brand strong {
+
+        font-size:
+            12px;
+    }
+
+
+    .english-brand small {
+
+        font-size:
+            8px;
+    }
+
+
+    .english-theme-toggle {
+
+        width:
+            40px;
+
+        height:
+            40px;
+
+        flex-basis:
+            40px;
+    }
+
+
+    .english-menu-toggle {
+
+        width:
+            40px;
+
+        height:
+            40px;
+
+        flex-basis:
+            40px;
+    }
+
+
+    .english-nav {
+
+        top:
+            64px;
+
+        left:
+            8px;
+
+        right:
+            8px;
+
+        max-height:
+            calc(
+                100dvh
+                - 72px
+            );
+    }
+
+}
+
+
+/* ==========================================================================
+   Reduced motion
+========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .english-header,
+    .english-brand,
+    .english-brand__logo,
+    .english-brand strong,
+    .english-brand small,
+    .english-nav,
+    .english-nav__link,
+    .english-nav__language,
+    .english-theme-toggle,
+    .english-theme-toggle__icon,
+    .english-menu-toggle,
+    .english-menu-toggle span {
+
+        transition:
+            none !important;
+    }
+
+}

@@ -52,7 +52,8 @@ return [
     | Character Set
     |--------------------------------------------------------------------------
     |
-    | utf8mb4 is required for Persian text and modern Unicode content.
+    | utf8mb4 provides full Unicode support, including Persian and
+    | Arabic characters.
     |
     */
 
@@ -81,25 +82,46 @@ return [
     'options' => [
 
         /*
-        | Return database errors as PDO exceptions.
+        |--------------------------------------------------------------------------
+        | Error handling
+        |--------------------------------------------------------------------------
         */
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+
+        PDO::ATTR_ERRMODE =>
+            PDO::ERRMODE_EXCEPTION,
 
         /*
-        | Return query results as associative arrays by default.
+        |--------------------------------------------------------------------------
+        | Fetch mode
+        |--------------------------------------------------------------------------
         */
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+
+        PDO::ATTR_DEFAULT_FETCH_MODE =>
+            PDO::FETCH_ASSOC,
 
         /*
-        | Disable emulated prepared statements.
+        |--------------------------------------------------------------------------
+        | Prepared statements
+        |--------------------------------------------------------------------------
         |
-        | This is important for proper parameterized queries.
+        | Use native prepared statements.
+        |
         */
-        PDO::ATTR_EMULATE_PREPARES => false,
+
+        PDO::ATTR_EMULATE_PREPARES =>
+            false,
 
         /*
-        | Keep connections available when possible.
+        |--------------------------------------------------------------------------
+        | Persistent connection
+        |--------------------------------------------------------------------------
+        |
+        | Disabled for predictable request lifecycle behavior.
+        |
         */
-        PDO::ATTR_PERSISTENT => false,
+
+        PDO::ATTR_PERSISTENT =>
+            false,
+
     ],
 ];

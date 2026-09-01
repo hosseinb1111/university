@@ -10,7 +10,6 @@ use App\Core\Session;
 use App\Core\Storage;
 use App\Core\View;
 use App\Models\HomepageSlide;
-use App\Models\Media;
 use RuntimeException;
 
 final class HomepageSlideController
@@ -20,13 +19,14 @@ final class HomepageSlideController
      */
     public function index(): string
     {
-        $page = max(
-            1,
-            (int) (
-                $_GET['page']
-                ?? 1
-            )
-        );
+        $page =
+            max(
+                1,
+                (int) (
+                    $_GET['page']
+                    ?? 1
+                )
+            );
 
         $slides =
             HomepageSlide::paginate(
@@ -132,8 +132,18 @@ final class HomepageSlideController
                         ? $formErrors
                         : [],
 
-                'mediaItems' =>
-                    self::mediaItems(),
+                /*
+                 * IMPORTANT:
+                 * The create form must POST to the store route,
+                 * not back to /admin/slides/create.
+                 */
+                'action' =>
+                    View::route(
+                        'admin.slides.store'
+                    ),
+
+                'submitLabel' =>
+                    'ایجاد اسلاید',
             ]
         );
     }
@@ -183,6 +193,16 @@ final class HomepageSlideController
         }
 
         try {
+            $data['image'] =
+                $this->uploadImage(
+                    'image'
+                );
+
+            $data['mobile_image'] =
+                $this->uploadImage(
+                    'mobile_image'
+                );
+
             HomepageSlide::create(
                 $data,
                 $userId
@@ -274,8 +294,21 @@ final class HomepageSlideController
                         ? $formErrors
                         : [],
 
-                'mediaItems' =>
-                    self::mediaItems(),
+                /*
+                 * IMPORTANT:
+                 * The edit form must POST to the update route.
+                 */
+                'action' =>
+                    View::route(
+                        'admin.slides.update',
+                        [
+                            'id' =>
+                                $slideId,
+                        ]
+                    ),
+
+                'submitLabel' =>
+                    'ذخیره تغییرات',
             ]
         );
     }
@@ -348,6 +381,24 @@ final class HomepageSlideController
         }
 
         try {
+            $data['image'] =
+                $this->uploadImage(
+                    'image',
+                    $this->nullableString(
+                        $existing['image']
+                        ?? null
+                    )
+                );
+
+            $data['mobile_image'] =
+                $this->uploadImage(
+                    'mobile_image',
+                    $this->nullableString(
+                        $existing['mobile_image']
+                        ?? null
+                    )
+                );
+
             $updated =
                 HomepageSlide::update(
                     $slideId,
@@ -465,17 +516,22 @@ final class HomepageSlideController
     /**
      * Read submitted form data.
      *
+     * Note: 'image' / 'mobile_image' are intentionally NOT read here.
+     * They come from $_FILES and are handled by uploadImage() after
+     * validation, inside store()/update().
+     *
      * @return array<string, mixed>
      */
     private function input(): array
     {
         return [
+            /*
+             * Title is optional.
+             */
             'title' =>
-                trim(
-                    (string) (
-                        $_POST['title']
-                        ?? ''
-                    )
+                $this->nullableString(
+                    $_POST['title']
+                    ?? null
                 ),
 
             'subtitle' =>
@@ -502,18 +558,6 @@ final class HomepageSlideController
                     ?? null
                 ),
 
-            'image' =>
-                $this->nullableString(
-                    $_POST['image']
-                    ?? null
-                ),
-
-            'mobile_image' =>
-                $this->nullableString(
-                    $_POST['mobile_image']
-                    ?? null
-                ),
-
             'sort_order' =>
                 max(
                     0,
@@ -529,18 +573,6 @@ final class HomepageSlideController
                 )
                     ? 1
                     : 0,
-
-            'starts_at' =>
-                $this->normalizeDateTime(
-                    $_POST['starts_at']
-                    ?? null
-                ),
-
-            'ends_at' =>
-                $this->normalizeDateTime(
-                    $_POST['ends_at']
-                    ?? null
-                ),
         ];
     }
 
@@ -556,21 +588,16 @@ final class HomepageSlideController
     ): array {
         $errors = [];
 
+        /*
+         * Title is optional.
+         */
         $title =
-            trim(
-                (string) (
-                    $data['title']
-                    ?? ''
-                )
-            );
+            $data['title']
+            ?? null;
 
         if (
-            $title === ''
-        ) {
-            $errors['title'] =
-                'عنوان اسلاید الزامی است.';
-        } elseif (
-            mb_strlen(
+            is_string($title)
+            && mb_strlen(
                 $title,
                 'UTF-8'
             ) > 255
@@ -609,6 +636,9 @@ final class HomepageSlideController
                 'متن دکمه نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.';
         }
 
+        /*
+         * Button URL is optional.
+         */
         $buttonUrl =
             $data['button_url']
             ?? null;
@@ -624,117 +654,62 @@ final class HomepageSlideController
                 'لینک دکمه معتبر نیست.';
         }
 
-        $image =
-            $data['image']
-            ?? null;
-
-        if (
-            is_string($image)
-            && $image !== ''
-            && !$this->validUrl(
-                $image
-            )
-        ) {
-            $errors['image'] =
-                'آدرس تصویر اصلی معتبر نیست.';
-        }
-
-        $mobileImage =
-            $data['mobile_image']
-            ?? null;
-
-        if (
-            is_string($mobileImage)
-            && $mobileImage !== ''
-            && !$this->validUrl(
-                $mobileImage
-            )
-        ) {
-            $errors['mobile_image'] =
-                'آدرس تصویر موبایل معتبر نیست.';
-        }
-
-        $startsAt =
-            $data['starts_at']
-            ?? null;
-
-        $endsAt =
-            $data['ends_at']
-            ?? null;
-
-        if (
-            is_string($startsAt)
-            && $startsAt !== ''
-            && !$this->validDateTime(
-                $startsAt
-            )
-        ) {
-            $errors['starts_at'] =
-                'تاریخ شروع نمایش معتبر نیست.';
-        }
-
-        if (
-            is_string($endsAt)
-            && $endsAt !== ''
-            && !$this->validDateTime(
-                $endsAt
-            )
-        ) {
-            $errors['ends_at'] =
-                'تاریخ پایان نمایش معتبر نیست.';
-        }
-
-        if (
-            is_string($startsAt)
-            && $startsAt !== ''
-            && is_string($endsAt)
-            && $endsAt !== ''
-            && $this->validDateTime($startsAt)
-            && $this->validDateTime($endsAt)
-            && strtotime($startsAt)
-                >= strtotime($endsAt)
-        ) {
-            $errors['ends_at'] =
-                'تاریخ پایان باید بعد از تاریخ شروع باشد.';
-        }
-
         return $errors;
     }
 
     /**
-     * Build media items for the slide form.
+     * Handle a single uploaded image field.
      *
-     * @return array<int, array<string, mixed>>
+     * If no file was submitted for this field, the existing stored
+     * path (if any) is kept as-is. This preserves the current image
+     * on edit when the admin leaves the file input empty.
      */
-    private static function mediaItems(): array
-    {
-        $items =
-            Media::images(
-                200
-            );
+    private function uploadImage(
+        string $field,
+        ?string $existingPath = null
+    ): ?string {
+        $file =
+            $_FILES[$field]
+            ?? null;
 
-        foreach (
-            $items
-            as &$media
+        if (
+            !is_array($file)
+            || (
+                (int) (
+                    $file['error']
+                    ?? UPLOAD_ERR_NO_FILE
+                )
+            ) === UPLOAD_ERR_NO_FILE
         ) {
-            $media['public_url'] =
-                Storage::publicUrl(
-                    (string) (
-                        $media['file_path']
-                        ?? ''
-                    )
-                );
+            return $existingPath;
         }
 
-        unset(
-            $media
-        );
+        $allowed =
+            config(
+                'app.uploads.allowed_images',
+                []
+            );
 
-        return $items;
+        $stored =
+            Storage::storeUploadedFile(
+                $file,
+                is_array($allowed)
+                    ? $allowed
+                    : []
+            );
+
+        return Storage::publicUrl(
+            (string) (
+                $stored['file_path']
+                ?? ''
+            )
+        );
     }
 
     /**
      * Validate a local or HTTP(S) URL.
+     *
+     * Still used for button_url.
      */
     private function validUrl(
         string $value
@@ -804,70 +779,6 @@ final class HomepageSlideController
         )
         && is_string($host)
         && $host !== '';
-    }
-
-    /**
-     * Validate datetime.
-     */
-    private function validDateTime(
-        string $value
-    ): bool {
-        $value =
-            trim(
-                $value
-            );
-
-        if (
-            $value === ''
-        ) {
-            return true;
-        }
-
-        return strtotime(
-            $value
-        ) !== false;
-    }
-
-    /**
-     * Normalize datetime-local input.
-     */
-    private function normalizeDateTime(
-        mixed $value
-    ): ?string {
-        if (
-            !is_string(
-                $value
-            )
-        ) {
-            return null;
-        }
-
-        $value =
-            trim(
-                $value
-            );
-
-        if (
-            $value === ''
-        ) {
-            return null;
-        }
-
-        $timestamp =
-            strtotime(
-                $value
-            );
-
-        if (
-            $timestamp === false
-        ) {
-            return $value;
-        }
-
-        return date(
-            'Y-m-d H:i:s',
-            $timestamp
-        );
     }
 
     /**
